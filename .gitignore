@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output / caches
+dist/
+**/dist/
+build/
+**/build/
+.cache/
+**/.cache/
+.mf/
+**/.mf/
+/public/build/
+**/public/build/
+
+# Shopify Hydrogen / framework
+.shopify/
+**/.shopify/
+.react-router/
+**/.react-router/
+.oxygen/
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+**/.env
+!**/.env.example
+
+# Tooling caches
+.firecrawl/
+.playwright-mcp/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log

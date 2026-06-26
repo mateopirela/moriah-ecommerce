@@ -1,0 +1,113 @@
+/* ============================================================
+   MORIAH Café — Design Tokens
+   Editorial / dark-luxury direction. Forest green canvas,
+   gold foil accents, warm cream. Drawn from brand emblem.
+   ============================================================ */
+
+:root {
+  /* --- Brand palette --- */
+  --pine-900: #0c241c; /* deepest forest — footer / overlays */
+  --pine-800: #13362b; /* primary dark surface (hero, header) */
+  --pine-700: #1b4438; /* raised dark surface / cards on dark */
+  --pine-600: #265446; /* hover on dark surfaces */
+
+  --gold-500: #c9a24b; /* PRIMARY — CTAs, emblem, links */
+  --gold-400: #d8b667; /* hover / highlight */
+  --gold-300: #e7cf94; /* soft gold text on dark */
+
+  --cream-50: #f7f3ea; /* light page background */
+  --cream-100: #efe8d8; /* light surface / cards */
+  --cream-200: #e4d9c2; /* borders on light */
+
+  --ink-900: #1a1a1a; /* body text on light (never pure black) */
+  --ink-600: #51514c; /* muted text on light */
+  --ink-400: #8a8a82; /* captions */
+
+  --white: #ffffff;
+
+  /* Semantic */
+  --sale: #b5402f; /* sale price — warm red, never = regular */
+  --success: #3f7d52;
+
+  /* --- Surface roles (light theme default) --- */
+  --bg: var(--cream-50);
+  --bg-alt: var(--cream-100);
+  --surface: var(--white);
+  --text: var(--ink-900);
+  --text-muted: var(--ink-600);
+  --border: var(--cream-200);
+  --primary: var(--gold-500);
+  --primary-hover: var(--gold-400);
+  --on-primary: var(--pine-900);
+
+  /* --- Typography --- */
+  --font-display: 'Fraunces', 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --text-eyebrow: 0.75rem; /* 12px uppercase label */
+  --text-base: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem); /* 16–17 */
+  --text-lg: clamp(1.125rem, 1.05rem + 0.4vw, 1.25rem);
+  --text-price: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --text-h3: clamp(1.35rem, 1.1rem + 1vw, 1.75rem);
+  --text-h2: clamp(1.9rem, 1.3rem + 2.6vw, 2.75rem);
+  --text-hero: clamp(2.75rem, 1.4rem + 6.4vw, 5.5rem);
+
+  --leading-tight: 1.05;
+  --leading-snug: 1.25;
+  --leading-body: 1.6;
+
+  --tracking-wide: 0.18em;
+  --tracking-wider: 0.28em;
+
+  /* --- Spacing (8px base grid) --- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+  --space-6: 3rem;
+  --space-7: 4rem;
+  --space-section: clamp(4rem, 3rem + 5vw, 7.5rem);
+  --space-hero: clamp(5rem, 3rem + 8vw, 9rem);
+
+  /* --- Layout --- */
+  --maxw: 1280px;
+  --maxw-prose: 64ch;
+  --gutter: clamp(1.25rem, 0.5rem + 3vw, 3rem);
+  --header-h: 76px;
+  --announce-h: 40px;
+
+  /* --- Radius --- */
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --r-pill: 999px;
+
+  /* --- Shadow (Premium depth) --- */
+  --shadow-sm: 0 1px 2px rgba(12, 36, 28, 0.06);
+  --shadow-md: 0 10px 30px -12px rgba(12, 36, 28, 0.25);
+  --shadow-lg: 0 30px 60px -20px rgba(12, 36, 28, 0.35);
+  --shadow-xl: 0 50px 100px -30px rgba(12, 36, 28, 0.4);
+  --shadow-floating: 0 20px 50px -15px rgba(12, 36, 28, 0.3);
+  --shadow-glow: 0 0 40px rgba(201, 162, 75, 0.15);
+
+  /* --- Motion (Editorial/luxury timing) --- */
+  --dur-micro: 150ms;
+  --dur-fast: 200ms;
+  --dur: 320ms;
+  --dur-slow: 600ms;
+  --dur-entrance: 800ms;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-in-quad: cubic-bezier(0.11, 0, 0.5, 0);
+
+  /* --- Texture & Grain --- */
+  --texture-grain: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="4" seed="2"/><feColorMatrix type="saturate" values=".3"/></filter><rect width="100%" height="100%" filter="url(%23n)"/></svg>');
+  --grain-opacity: 0.02;
+
+  /* z-index */
+  --z-header: 100;
+  --z-aside: 200;
+  --z-toast: 300;
+}
