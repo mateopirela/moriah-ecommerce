@@ -14,7 +14,8 @@
   font-display: swap;
 }
 
-.tx {
+/* Tokens en :root para que header/footer (fuera de .tx) también los usen. */
+:root {
   /* --- Paleta Tropicalia mapeada a MORIAH (brandboard) --- */
   --tx-bg: #fff7e7;          /* beige-fondo */
   --tx-surface: #fbefdb;     /* beige */
@@ -33,7 +34,9 @@
   --tx-maxw: 1280px;
   --tx-gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
   --tx-radius: 18px;
+}
 
+.tx {
   background: var(--tx-bg);
   color: var(--tx-text);
   font-family: var(--tx-body);
@@ -127,18 +130,37 @@
    HEADER (global) — réplica del navbar Tropicalia
    ============================================================ */
 .header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  height: 66px;
+  height: 72px;
   padding-inline: var(--tx-gutter);
-  background: var(--tx-ink);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
+/* Scrim para legibilidad del texto claro sobre el hero (debajo del contenido) */
+.header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(12, 24, 20, 0.55), rgba(12, 24, 20, 0));
+  transition: opacity 0.3s ease;
+}
+/* Estado sólido: al scrollear, o en páginas internas (sin hero) */
+.header.is-solid {
+  background: var(--tx-bg);
+  box-shadow: 0 6px 24px -16px rgba(25, 51, 47, 0.55);
+  border-bottom: 1px solid var(--tx-line);
+}
+.header.is-solid::before { opacity: 0; }
 .header__brand {
   display: flex;
   align-items: center;
@@ -151,8 +173,10 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   font-size: 1.5rem;
-  color: var(--tx-gold);
+  color: #fff7e7;
+  transition: color 0.3s ease;
 }
+.header.is-solid .header__wordmark { color: var(--tx-ink); }
 .header-menu-desktop {
   display: flex;
   align-items: center;
@@ -161,16 +185,19 @@
 .header-menu-item {
   font-family: var(--tx-body);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #f3ead6;
+  letter-spacing: 0.1em;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #fff7e7;
   text-decoration: none;
   white-space: nowrap;
   transition: color 0.18s ease;
 }
 .header-menu-item:hover,
 .header-menu-item[aria-current='page'] { color: var(--tx-gold); }
+.header.is-solid .header-menu-item { color: var(--tx-ink-soft); }
+.header.is-solid .header-menu-item:hover,
+.header.is-solid .header-menu-item[aria-current='page'] { color: var(--tx-gold-deep); }
 
 .header-ctas {
   display: flex;
@@ -185,14 +212,17 @@
   justify-content: center;
   width: 38px;
   height: 38px;
-  color: #f3ead6;
+  color: #fff7e7;
   background: none;
   border: none;
   cursor: pointer;
   text-decoration: none;
+  transition: color 0.18s ease;
 }
 .header-ctas .icon-btn:hover,
 .header-ctas .cart-count:hover { color: var(--tx-gold); }
+.header.is-solid .header-ctas .icon-btn,
+.header.is-solid .header-ctas .cart-count { color: var(--tx-ink); }
 .cart-count__badge {
   position: absolute;
   top: 2px;
@@ -208,7 +238,8 @@
   display: grid;
   place-items: center;
 }
-.header-menu-mobile-toggle { display: none; }
+.header-menu-mobile-toggle { display: none; color: #fff7e7; }
+.header.is-solid .header-menu-mobile-toggle { color: var(--tx-ink); }
 
 /* Dropdown (CAFÉ / MERCH) */
 .tx-nav-group { position: relative; }
@@ -249,6 +280,10 @@
 }
 .tx-nav-panel a:hover { background: var(--tx-surface); color: var(--tx-gold-deep); }
 
+/* El header es fixed: la home (con .tx-hero) va a sangre completa por debajo;
+   las páginas internas reciben offset para no quedar ocultas bajo el nav. */
+main:not(:has(.tx-hero)) { padding-top: 72px; }
+
 /* Mobile aside nav (light surface) */
 .header-menu-mobile { display: grid; gap: 0.2rem; padding: 0.5rem 0; }
 .header-menu-mobile .header-menu-item {
@@ -281,7 +316,9 @@
   padding-left: clamp(1.5rem, 5vw, 5rem);
   background: linear-gradient(90deg, rgba(25, 51, 47, 0.55) 0%, rgba(25, 51, 47, 0.1) 60%, transparent 100%);
 }
-.tx-hero__title { color: #fff7e7; max-width: 12ch; }
+.tx-hero__title { color: #fff7e7; max-width: 16ch; }
+/* el hero arranca bajo el header fixed: deja aire arriba en el overlay */
+.tx-hero__overlay { padding-top: 72px; }
 .tx-hero__title em { color: var(--tx-gold); font-style: normal; }
 
 /* ============================================================
@@ -491,7 +528,7 @@
     align-items: center;
     justify-content: center;
     width: 38px; height: 38px;
-    background: none; border: none; color: #f3ead6; cursor: pointer;
+    background: none; border: none; cursor: pointer;
   }
   .tx-collections, .tx-products { grid-template-columns: 1fr 1fr; }
   .footer__grid { grid-template-columns: 1fr; }

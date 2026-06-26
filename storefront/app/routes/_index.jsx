@@ -59,10 +59,10 @@ function Hero() {
         />
         <div className="tx-hero__overlay">
           <span className="tx-eyebrow" style={{color: 'var(--tx-gold)'}}>
-            Tostadores de café de especialidad
+            Un tributo a la memoria
           </span>
           <h1 className="tx-display tx-h1 tx-hero__title">
-            Un café <em>para el alma</em>
+            Yo no aprendí a querer el café. <em>Lo heredé.</em>
           </h1>
           <Link className="tx-btn" to="/collections/cafes">
             Conoce más

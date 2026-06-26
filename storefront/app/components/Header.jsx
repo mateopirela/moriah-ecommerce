@@ -1,5 +1,5 @@
-import {Suspense} from 'react';
-import {Await, NavLink, Link, useAsyncValue} from 'react-router';
+import {Suspense, useEffect, useState} from 'react';
+import {Await, NavLink, Link, useAsyncValue, useLocation} from 'react-router';
 import {useAnalytics, useOptimisticCart} from '@shopify/hydrogen';
 import {useAside} from '~/components/Aside';
 import {IconSearch, IconBag, IconUser, IconMenu} from '~/components/Icons';
@@ -41,8 +41,24 @@ const TX_NAV = [
  */
 export function Header({header, isLoggedIn, cart}) {
   const {shop} = header;
+  const {pathname} = useLocation();
+  const isHome = pathname === '/';
+  const [scrolled, setScrolled] = useState(false);
+
+  // Navbar scroll-aware (réplica Tropicalia): transparente sobre el hero,
+  // sólido al scrollear. Las páginas sin hero arrancan siempre sólidas.
+  useEffect(() => {
+    if (!isHome) return undefined;
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener('scroll', onScroll, {passive: true});
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isHome]);
+
+  const isSolid = !isHome || scrolled;
+
   return (
-    <header className="header">
+    <header className={`header${isSolid ? ' is-solid' : ''}`}>
       <NavLink prefetch="intent" to="/" className="header__brand" end>
         <img
           src="/images/logo-moriah.png"
