@@ -68,27 +68,18 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
               </div>
 
               <div className="footer__col">
-                <h4>Compañía</h4>
-                {footer?.menu &&
-                header.shop.primaryDomain?.url &&
-                footer.menu.items?.some((item) =>
-                  /nuestra-historia|\/policies\//.test(item.url || ''),
-                ) ? (
-                  <FooterMenu
-                    menu={footer.menu}
-                    primaryDomainUrl={header.shop.primaryDomain.url}
-                    publicStoreDomain={publicStoreDomain}
-                  />
-                ) : (
-                  <nav className="footer__links" aria-label="Compañía">
-                    <Link to="/pages/nuestra-historia">Nuestra historia</Link>
-                    <Link to="/policies/shipping-policy">
-                      Política de envíos
-                    </Link>
-                    <Link to="/policies/refund-policy">Devoluciones</Link>
-                    <Link to="/policies/privacy-policy">Privacidad</Link>
-                  </nav>
-                )}
+                <h4>Contacto</h4>
+                <div className="footer__contact">
+                  <span>Tostadores de café de especialidad</span>
+                  <a href="tel:+57">+57 300 000 0000</a>
+                  <span>Bogotá · Colombia</span>
+                  <a href="mailto:hola@cafemoriah.com">hola@cafemoriah.com</a>
+                </div>
+                <nav className="footer__links" aria-label="Compañía" style={{marginTop: '1rem'}}>
+                  <Link to="/pages/nuestra-historia">Nuestra historia</Link>
+                  <Link to="/policies/shipping-policy">Política de envíos</Link>
+                  <Link to="/policies/privacy-policy">Datos personales</Link>
+                </nav>
               </div>
 
               <div className="footer__col">

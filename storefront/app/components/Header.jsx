@@ -1,97 +1,92 @@
 import {Suspense} from 'react';
-import {Await, NavLink, useAsyncValue} from 'react-router';
+import {Await, NavLink, Link, useAsyncValue} from 'react-router';
 import {useAnalytics, useOptimisticCart} from '@shopify/hydrogen';
 import {useAside} from '~/components/Aside';
 import {IconSearch, IconBag, IconUser, IconMenu} from '~/components/Icons';
 
 /**
+ * Navbar — réplica de la estructura de tropicaliacoffee.com:
+ * logo · CAFÉ▾ · MERCH▾ · CATACIÓN · PREPARA TU CAFÉ · TIENDA · BLOG · CONTACTO · iconos
+ */
+const TX_NAV = [
+  {
+    title: 'Café',
+    url: '/collections/cafes',
+    items: [
+      {title: 'Todos', url: '/collections/cafes'},
+      {title: 'Línea de Origen', url: '/collections/cafes'},
+      {title: 'Micro-lotes', url: '/collections/cafes'},
+      {title: 'Club de la Memoria', url: '/#club'},
+    ],
+  },
+  {
+    title: 'Merch',
+    url: '/collections/all',
+    items: [
+      {title: 'Pocillos', url: '/collections/all'},
+      {title: 'Para vestir', url: '/collections/all'},
+      {title: 'Accesorios', url: '/collections/all'},
+      {title: 'Caja regalo', url: '/collections/all'},
+    ],
+  },
+  {title: 'Catación', url: '/quiz'},
+  {title: 'Prepara tu café', url: '/pages/nuestra-historia'},
+  {title: 'Tienda', url: '/collections/all'},
+  {title: 'Blog', url: '/blogs/news'},
+  {title: 'Contacto', url: '/memoria'},
+];
+
+/**
  * @param {HeaderProps}
  */
-export function Header({header, isLoggedIn, cart, publicStoreDomain}) {
-  const {shop, menu} = header;
+export function Header({header, isLoggedIn, cart}) {
+  const {shop} = header;
   return (
     <header className="header">
       <NavLink prefetch="intent" to="/" className="header__brand" end>
         <img
           src="/images/logo-moriah.png"
           alt={`${shop.name} — Un café para el alma`}
-          width={46}
-          height={46}
+          width={38}
+          height={38}
         />
         <span className="header__wordmark">MORIAH</span>
       </NavLink>
-      <HeaderMenu
-        menu={menu}
-        viewport="desktop"
-        primaryDomainUrl={header.shop.primaryDomain.url}
-        publicStoreDomain={publicStoreDomain}
-      />
+      <TropicaliaNav />
       <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
     </header>
   );
 }
 
-/**
- * @param {{
- *   menu: HeaderProps['header']['menu'];
- *   primaryDomainUrl: HeaderProps['header']['shop']['primaryDomain']['url'];
- *   viewport: Viewport;
- *   publicStoreDomain: HeaderProps['publicStoreDomain'];
- * }}
- */
-export function HeaderMenu({
-  menu,
-  primaryDomainUrl,
-  viewport,
-  publicStoreDomain,
-}) {
-  const className = `header-menu-${viewport}`;
-  const {close} = useAside();
-
-  // Use the Shopify menu only once it's been customized for MORIAH (it links
-  // to the cafés). Until then (Mock.shop demo menu, or a fresh store's default
-  // "Inicio/Catálogo/Contacto"), keep the MORIAH nav defined in code.
-  const isMoriahMenu = menu?.items?.some((item) =>
-    /\/collections\/cafes|\/quiz|nuestra-historia/.test(item.url || ''),
-  );
-  const navMenu = (isMoriahMenu && menu) || FALLBACK_HEADER_MENU;
-
+function TropicaliaNav() {
   return (
-    <nav className={className} role="navigation" aria-label="Principal">
-      {viewport === 'mobile' && (
-        <NavLink
-          end
-          onClick={close}
-          prefetch="intent"
-          className="header-menu-item"
-          to="/"
-        >
-          Inicio
-        </NavLink>
-      )}
-      {navMenu.items.map((item) => {
-        if (!item.url) return null;
-
-        // if the url is internal, we strip the domain
-        const url =
-          item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
-        return (
+    <nav className="header-menu-desktop" role="navigation" aria-label="Principal">
+      {TX_NAV.map((item) =>
+        item.items ? (
+          <div className="tx-nav-group" key={item.title}>
+            <NavLink className="header-menu-item" to={item.url} prefetch="intent">
+              {item.title} <span aria-hidden="true">▾</span>
+            </NavLink>
+            <div className="tx-nav-panel">
+              {item.items.map((sub) => (
+                <Link key={sub.title} to={sub.url} prefetch="intent">
+                  {sub.title}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ) : (
           <NavLink
             className="header-menu-item"
-            end
-            key={item.id}
-            onClick={close}
+            key={item.title}
+            to={item.url}
             prefetch="intent"
-            to={url}
+            end
           >
             {item.title}
           </NavLink>
-        );
-      })}
+        ),
+      )}
     </nav>
   );
 }
@@ -137,6 +132,36 @@ function SearchToggle() {
       <IconSearch />
       <span className="sr-only">Buscar</span>
     </button>
+  );
+}
+
+/**
+ * Mobile aside menu — reuses the Tropicalia nav items.
+ */
+export function HeaderMenu({viewport}) {
+  const {close} = useAside();
+  if (viewport !== 'mobile') return null;
+  const flat = TX_NAV.flatMap((item) =>
+    item.items ? [item, ...item.items] : [item],
+  );
+  return (
+    <nav className="header-menu-mobile" role="navigation" aria-label="Principal">
+      <NavLink end onClick={close} prefetch="intent" className="header-menu-item" to="/">
+        Inicio
+      </NavLink>
+      {flat.map((item, i) => (
+        <NavLink
+          className="header-menu-item"
+          end
+          key={`${item.title}-${i}`}
+          onClick={close}
+          prefetch="intent"
+          to={item.url}
+        >
+          {item.title}
+        </NavLink>
+      ))}
+    </nav>
   );
 }
 
@@ -187,66 +212,6 @@ function CartBanner() {
   const cart = useOptimisticCart(originalCart);
   return <CartBadge count={cart?.totalQuantity ?? 0} />;
 }
-
-const FALLBACK_HEADER_MENU = {
-  id: 'gid://shopify/Menu/moriah-main',
-  items: [
-    {
-      id: 'moriah-cafes',
-      resourceId: null,
-      tags: [],
-      title: 'Cafés',
-      type: 'HTTP',
-      url: '/collections/cafes',
-      items: [],
-    },
-    {
-      id: 'moriah-club',
-      resourceId: null,
-      tags: [],
-      title: 'Club de la Memoria',
-      type: 'HTTP',
-      url: '/#club',
-      items: [],
-    },
-    {
-      id: 'moriah-memoria',
-      resourceId: null,
-      tags: [],
-      title: 'Comparte tu historia',
-      type: 'HTTP',
-      url: '/memoria',
-      items: [],
-    },
-    {
-      id: 'moriah-quiz',
-      resourceId: null,
-      tags: [],
-      title: 'Encuentra tu café',
-      type: 'HTTP',
-      url: '/quiz',
-      items: [],
-    },
-    {
-      id: 'moriah-historia',
-      resourceId: null,
-      tags: [],
-      title: 'Nuestra Historia',
-      type: 'HTTP',
-      url: '/pages/nuestra-historia',
-      items: [],
-    },
-    {
-      id: 'moriah-envios',
-      resourceId: null,
-      tags: [],
-      title: 'Envíos',
-      type: 'HTTP',
-      url: '/#envios',
-      items: [],
-    },
-  ],
-};
 
 /** @typedef {'desktop' | 'mobile'} Viewport */
 /**

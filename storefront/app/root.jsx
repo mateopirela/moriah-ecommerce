@@ -18,6 +18,7 @@ import componentStyles from '~/styles/components.css?url';
 import layoutStyles from '~/styles/layout.css?url';
 import homeStyles from '~/styles/home.css?url';
 import productStyles from '~/styles/product.css?url';
+import tropicaliaStyles from '~/styles/tropicalia.css?url';
 import {PageLayout} from './components/PageLayout';
 import {Tracking, CustomAnalytics} from './components/Tracking';
 
@@ -67,8 +68,10 @@ export function links() {
       crossOrigin: 'anonymous',
     },
     {
+      // Tropicalia template fonts: Karla (cuerpo) + Caveat Brush (fallback
+      // display, mientras no se cargue VTC Carrie en /public/fonts/).
       rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap',
+      href: 'https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600;700;800&family=Caveat+Brush&display=swap',
     },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
   ];
@@ -168,7 +171,7 @@ export function Layout({children}) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <meta name="theme-color" content="#13362b" />
+        <meta name="theme-color" content="#19332f" />
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={tokenStyles}></link>
         <link rel="stylesheet" href={baseStyles}></link>
@@ -176,6 +179,8 @@ export function Layout({children}) {
         <link rel="stylesheet" href={layoutStyles}></link>
         <link rel="stylesheet" href={homeStyles}></link>
         <link rel="stylesheet" href={productStyles}></link>
+        {/* Tropicalia template — cargado AL FINAL para ganar especificidad */}
+        <link rel="stylesheet" href={tropicaliaStyles}></link>
         <Meta />
         <Links />
       </head>

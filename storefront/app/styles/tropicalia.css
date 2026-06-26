@@ -1,0 +1,502 @@
+/* ============================================================
+   MORIAH × Tropicalia template
+   Réplica fiel de la estructura/diseño de tropicaliacoffee.com,
+   vestida con la marca MORIAH (paleta del brandboard).
+   Cargada AL FINAL para ganar especificidad sobre el tema base.
+   ============================================================ */
+
+@font-face {
+  font-family: 'VTC Carrie';
+  /* Coloca el archivo en storefront/public/fonts/ para el look EXACTO.
+     Mientras no exista, cae al fallback Caveat Brush (Google Fonts). */
+  src: url('/fonts/vtccarrie-regular.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+.tx {
+  /* --- Paleta Tropicalia mapeada a MORIAH (brandboard) --- */
+  --tx-bg: #fff7e7;          /* beige-fondo */
+  --tx-surface: #fbefdb;     /* beige */
+  --tx-gold: #cf8e08;        /* dorado MORIAH (brandboard) ~ #b36d18 Tropicalia */
+  --tx-gold-deep: #b36d18;
+  --tx-ink: #19332f;         /* verde pino MORIAH ~ azul #0b3959 Tropicalia */
+  --tx-ink-soft: #2a4a43;
+  --tx-red: #b3181b;         /* acento puntual */
+  --tx-text: #2a2a2a;
+  --tx-muted: #6b675f;
+  --tx-line: rgba(25, 51, 47, 0.14);
+
+  --tx-display: 'VTC Carrie', 'Caveat Brush', cursive;
+  --tx-body: 'Karla', system-ui, -apple-system, sans-serif;
+
+  --tx-maxw: 1280px;
+  --tx-gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
+  --tx-radius: 18px;
+
+  background: var(--tx-bg);
+  color: var(--tx-text);
+  font-family: var(--tx-body);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.tx *,
+.tx *::before,
+.tx *::after {
+  box-sizing: border-box;
+}
+
+.tx-container {
+  width: 100%;
+  max-width: var(--tx-maxw);
+  margin-inline: auto;
+  padding-inline: var(--tx-gutter);
+}
+
+/* Display headings — Tropicalia: hand-drawn, UPPERCASE, weight 400 */
+.tx-display {
+  font-family: var(--tx-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 1.02;
+  letter-spacing: 0.01em;
+  color: var(--tx-ink);
+  margin: 0;
+}
+.tx-h1 { font-size: clamp(2.6rem, 1.4rem + 5.4vw, 4rem); }
+.tx-h2 { font-size: clamp(2rem, 1.3rem + 2.8vw, 2.6rem); }
+.tx-h3 { font-size: clamp(1.45rem, 1.1rem + 1.5vw, 2rem); }
+
+.tx-eyebrow {
+  font-family: var(--tx-body);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--tx-gold-deep);
+}
+
+.tx-lede {
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+  color: var(--tx-muted);
+  max-width: 56ch;
+}
+
+/* --- Botón pill (Tropicalia: dorado, mayúsculas, pequeño) --- */
+.tx-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--tx-gold);
+  color: #fff;
+  font-family: var(--tx-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.tx-btn:hover { background: var(--tx-gold-deep); transform: translateY(-1px); }
+.tx-btn--ink { background: var(--tx-ink); }
+.tx-btn--ink:hover { background: var(--tx-ink-soft); }
+.tx-btn--ghost {
+  background: transparent;
+  color: var(--tx-ink);
+  border: 1.5px solid var(--tx-ink);
+}
+.tx-btn--ghost:hover { background: var(--tx-ink); color: #fff; }
+
+.tx-link {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--tx-ink);
+  text-decoration: none;
+  border-bottom: 2px solid var(--tx-gold);
+  padding-bottom: 2px;
+}
+
+/* ============================================================
+   HEADER (global) — réplica del navbar Tropicalia
+   ============================================================ */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: 66px;
+  padding-inline: var(--tx-gutter);
+  background: var(--tx-ink);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.header__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+}
+.header__brand img { width: 38px; height: 38px; }
+.header__wordmark {
+  font-family: var(--tx-display);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 1.5rem;
+  color: var(--tx-gold);
+}
+.header-menu-desktop {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+}
+.header-menu-item {
+  font-family: var(--tx-body);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #f3ead6;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.18s ease;
+}
+.header-menu-item:hover,
+.header-menu-item[aria-current='page'] { color: var(--tx-gold); }
+
+.header-ctas {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.header-ctas .icon-btn,
+.header-ctas .cart-count {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: #f3ead6;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+.header-ctas .icon-btn:hover,
+.header-ctas .cart-count:hover { color: var(--tx-gold); }
+.cart-count__badge {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--tx-gold);
+  color: var(--tx-ink);
+  font-size: 0.62rem;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+.header-menu-mobile-toggle { display: none; }
+
+/* Dropdown (CAFÉ / MERCH) */
+.tx-nav-group { position: relative; }
+.tx-nav-group > .header-menu-item { display: inline-flex; align-items: center; gap: 0.3rem; }
+.tx-nav-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  min-width: 190px;
+  background: var(--tx-bg);
+  border: 1px solid var(--tx-line);
+  border-radius: 12px;
+  box-shadow: 0 24px 50px -20px rgba(25, 51, 47, 0.4);
+  padding: 0.6rem;
+  display: grid;
+  gap: 0.1rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+}
+.tx-nav-group:hover .tx-nav-panel,
+.tx-nav-group:focus-within .tx-nav-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+.tx-nav-panel a {
+  display: block;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  color: var(--tx-ink);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.tx-nav-panel a:hover { background: var(--tx-surface); color: var(--tx-gold-deep); }
+
+/* Mobile aside nav (light surface) */
+.header-menu-mobile { display: grid; gap: 0.2rem; padding: 0.5rem 0; }
+.header-menu-mobile .header-menu-item {
+  color: var(--tx-ink);
+  padding: 0.7rem 0.2rem;
+  border-bottom: 1px solid var(--tx-line);
+  font-size: 0.85rem;
+}
+.header-menu-mobile .header-menu-item:hover { color: var(--tx-gold-deep); }
+
+/* ============================================================
+   HERO — split full-bleed (Tropicalia banner-inicio)
+   ============================================================ */
+.tx-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: clamp(460px, 70vh, 680px);
+}
+.tx-hero__media { position: relative; overflow: hidden; }
+.tx-hero__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tx-hero__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.2rem;
+  padding: var(--tx-gutter);
+  padding-left: clamp(1.5rem, 5vw, 5rem);
+  background: linear-gradient(90deg, rgba(25, 51, 47, 0.55) 0%, rgba(25, 51, 47, 0.1) 60%, transparent 100%);
+}
+.tx-hero__title { color: #fff7e7; max-width: 12ch; }
+.tx-hero__title em { color: var(--tx-gold); font-style: normal; }
+
+/* ============================================================
+   SECTION scaffolding
+   ============================================================ */
+.tx-section { padding-block: clamp(3.5rem, 2rem + 6vw, 6.5rem); }
+.tx-section--surface { background: var(--tx-surface); }
+.tx-section--ink { background: var(--tx-ink); }
+.tx-section--ink .tx-display { color: #fff7e7; }
+.tx-section--ink .tx-lede { color: rgba(255, 247, 231, 0.78); }
+.tx-section-head { text-align: center; display: grid; gap: 0.8rem; justify-items: center; margin-bottom: clamp(2rem, 4vw, 3.2rem); }
+
+/* --- Colecciones: grid 4 columnas (Trópico/Esencia/Privilegio/Vino) --- */
+.tx-collections {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(1rem, 2vw, 1.8rem);
+}
+.tx-collection-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--tx-bg);
+  border: 1px solid var(--tx-line);
+  border-radius: var(--tx-radius);
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.tx-collection-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 30px 50px -24px rgba(25, 51, 47, 0.45);
+}
+.tx-collection-card__media { aspect-ratio: 4 / 5; overflow: hidden; }
+.tx-collection-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+.tx-collection-card:hover .tx-collection-card__media img { transform: scale(1.06); }
+.tx-collection-card__body { padding: 1.2rem 1.2rem 1.5rem; display: grid; gap: 0.6rem; }
+.tx-collection-card__desc { font-size: 0.85rem; color: var(--tx-muted); flex: 1; }
+.tx-collection-card .tx-btn { margin-top: 0.4rem; align-self: flex-start; }
+
+/* --- Suscripción split (Tropicalia "Suscríbete ahora") --- */
+.tx-sub {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
+}
+.tx-sub__media { border-radius: var(--tx-radius); overflow: hidden; aspect-ratio: 5 / 4; }
+.tx-sub__media img { width: 100%; height: 100%; object-fit: cover; }
+.tx-sub__body { display: grid; gap: 1.1rem; justify-items: start; }
+.tx-sub__perks { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.tx-sub__perks li { display: flex; gap: 0.6rem; font-size: 0.9rem; }
+.tx-sub__perks li::before { content: '✦'; color: var(--tx-gold); }
+
+/* --- Merch: grid 4 (Tropicalia "NUESTROS INFALTABLES") --- */
+.tx-products {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(1rem, 2vw, 1.6rem);
+}
+.tx-product-card { display: grid; gap: 0.6rem; text-decoration: none; }
+.tx-product-card__media {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--tx-radius);
+  overflow: hidden;
+  background: var(--tx-surface);
+  position: relative;
+}
+.tx-product-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+.tx-product-card:hover .tx-product-card__media img { transform: scale(1.05); }
+.tx-product-card__badge {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.7rem;
+  background: var(--tx-ink);
+  color: #fff7e7;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+}
+.tx-product-card__name {
+  font-family: var(--tx-display);
+  text-transform: uppercase;
+  font-size: 1.05rem;
+  color: var(--tx-ink);
+}
+.tx-product-card__price { font-weight: 700; color: var(--tx-text); }
+
+/* --- Gallery strip (Tropicalia "Store Gallery") --- */
+.tx-gallery {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(220px, 28vw, 320px);
+  gap: 1rem;
+  overflow-x: auto;
+  padding-inline: var(--tx-gutter);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.tx-gallery::-webkit-scrollbar { display: none; }
+.tx-gallery img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--tx-radius);
+  scroll-snap-align: start;
+}
+
+/* --- Rituales: grid 3 (Tropicalia menú "INSPIRADOS EN...") --- */
+.tx-rituals {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1.2rem, 2.5vw, 2rem);
+}
+.tx-ritual { display: grid; gap: 0.7rem; }
+.tx-ritual__media { aspect-ratio: 4 / 3; border-radius: var(--tx-radius); overflow: hidden; }
+.tx-ritual__media img { width: 100%; height: 100%; object-fit: cover; }
+.tx-ritual__desc { font-size: 0.85rem; color: var(--tx-muted); }
+
+/* ============================================================
+   FOOTER (global) — réplica multi-columna Tropicalia
+   ============================================================ */
+.footer { background: var(--tx-ink); color: #f3ead6; padding-top: clamp(3rem, 5vw, 4.5rem); }
+.footer__grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  padding-bottom: 2.5rem;
+}
+.footer__brand img { width: 56px; height: 56px; }
+.footer__tagline { color: rgba(243, 234, 214, 0.7); font-size: 0.85rem; margin: 0.8rem 0 1rem; max-width: 34ch; }
+.footer__social { display: flex; gap: 0.8rem; }
+.footer__social a { color: #f3ead6; opacity: 0.8; }
+.footer__social a:hover { color: var(--tx-gold); opacity: 1; }
+.footer__col h4 {
+  font-family: var(--tx-display);
+  text-transform: uppercase;
+  color: var(--tx-gold);
+  font-size: 1.15rem;
+  margin: 0 0 1rem;
+  font-weight: 400;
+}
+.footer__links { display: grid; gap: 0.55rem; }
+.footer__links a, .footer-menu a {
+  color: rgba(243, 234, 214, 0.78);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+.footer__links a:hover, .footer-menu a:hover { color: var(--tx-gold); }
+.footer-menu { display: grid; gap: 0.55rem; }
+.footer__contact { display: grid; gap: 0.4rem; font-size: 0.82rem; color: rgba(243, 234, 214, 0.78); }
+.footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-block: 1.4rem;
+  border-top: 1px solid rgba(243, 234, 214, 0.14);
+  font-size: 0.75rem;
+  color: rgba(243, 234, 214, 0.6);
+}
+.footer__pay { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.newsletter-form { display: flex; gap: 0.5rem; }
+.newsletter-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(243, 234, 214, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff7e7;
+  font-family: var(--tx-body);
+}
+.newsletter-form input::placeholder { color: rgba(243, 234, 214, 0.5); }
+.newsletter-form .btn {
+  border: none;
+  background: var(--tx-gold);
+  color: var(--tx-ink);
+  border-radius: 999px;
+  width: 44px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 980px) {
+  .tx-collections { grid-template-columns: repeat(2, 1fr); }
+  .tx-products { grid-template-columns: repeat(2, 1fr); }
+  .tx-rituals { grid-template-columns: 1fr; max-width: 30rem; margin-inline: auto; }
+  .tx-hero { grid-template-columns: 1fr; min-height: 78vh; }
+  .tx-hero__media:nth-child(2) { display: none; }
+  .tx-hero__overlay { background: linear-gradient(180deg, rgba(25,51,47,0.2), rgba(25,51,47,0.65)); }
+  .tx-sub { grid-template-columns: 1fr; }
+  .tx-sub__media { order: -1; }
+  .footer__grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 760px) {
+  .header-menu-desktop { display: none; }
+  .header-menu-mobile-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px; height: 38px;
+    background: none; border: none; color: #f3ead6; cursor: pointer;
+  }
+  .tx-collections, .tx-products { grid-template-columns: 1fr 1fr; }
+  .footer__grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 460px) {
+  .tx-collections, .tx-products { grid-template-columns: 1fr; max-width: 22rem; margin-inline: auto; }
+}
