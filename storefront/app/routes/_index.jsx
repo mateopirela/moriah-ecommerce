@@ -1,5 +1,5 @@
 import {useLoaderData, Link} from 'react-router';
-import {CAFES, SUBSCRIPTION, formatCop} from '~/data/cafes';
+import {SUBSCRIPTION, formatCop} from '~/data/cafes';
 import {MERCH} from '~/data/merch';
 
 /**
@@ -24,19 +24,25 @@ export const meta = () => {
 
 /** @param {Route.LoaderArgs} args */
 export async function loader(args) {
-  const {collection} = await args.context.storefront
-    .query(HOME_CAFES_QUERY, {variables: {handle: 'cafes'}})
-    .catch(() => ({collection: null}));
-  return {cafes: collection?.products?.nodes ?? null};
+  const data = await args.context.storefront
+    .query(HOME_QUERY)
+    .catch(() => ({cafes: null, merch: null}));
+  return {
+    cafes: data?.cafes?.products?.nodes ?? null,
+    merch: data?.merch?.products?.nodes ?? null,
+  };
 }
 
 export default function Homepage() {
+  /** @type {{cafes: any[] | null, merch: any[] | null}} */
+  const {cafes, merch} = useLoaderData();
   return (
     <div className="tx">
       <Hero />
       <CollectionsSection />
+      <CafesSection products={cafes} />
       <SubscriptionSection />
-      <MerchSection />
+      <MerchSection products={merch} />
       <GallerySection />
       <RitualsSection />
     </div>
@@ -54,7 +60,7 @@ function Hero() {
           alt="Café MORIAH en la mano — Un café para el alma"
           width={1100}
           height={1375}
-          fetchpriority="high"
+          fetchPriority="high"
           decoding="async"
         />
         <div className="tx-hero__overlay">
@@ -140,6 +146,56 @@ function CollectionsSection() {
   );
 }
 
+/* ------------------------------ CAFÉS ------------------------------- */
+/**
+ * Grid de los cafés reales de la colección `cafes` de Shopify. Solo se
+ * renderiza cuando hay productos (si Shopify aún no tiene la colección, se
+ * omite y la home sigue con sus secciones editoriales).
+ * @param {{products: any[] | null}}
+ */
+function CafesSection({products}) {
+  if (!products || !products.length) return null;
+
+  return (
+    <section className="tx-section">
+      <div className="tx-container">
+        <div className="tx-section-head">
+          <span className="tx-eyebrow">Nuestra selección de especialidad</span>
+          <h2 className="tx-display tx-h2">Conoce nuestros cafés</h2>
+        </div>
+        <div className="tx-products">
+          {products.slice(0, 4).map((p) => (
+            <Link
+              className="tx-product-card"
+              to={`/products/${p.handle}`}
+              key={p.handle}
+            >
+              <div className="tx-product-card__media">
+                <img
+                  src={p.featuredImage?.url || '/images/producto-bolsa.webp'}
+                  alt={p.featuredImage?.altText || p.title}
+                  width={500}
+                  height={500}
+                  loading="lazy"
+                />
+              </div>
+              <span className="tx-product-card__name">{p.title}</span>
+              <span className="tx-product-card__price">
+                {formatCop(Number(p.priceRange?.minVariantPrice?.amount ?? 0))}
+              </span>
+            </Link>
+          ))}
+        </div>
+        <div style={{textAlign: 'center', marginTop: '2.5rem'}}>
+          <Link className="tx-link" to="/collections/cafes">
+            Ver todos los cafés
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* --------------------------- SUSCRIPCIÓN ---------------------------- */
 /** Split (Tropicalia "Suscríbete ahora") — Club de la Memoria. */
 function SubscriptionSection() {
@@ -180,9 +236,23 @@ function SubscriptionSection() {
 }
 
 /* ------------------------------ MERCH ------------------------------- */
-/** Grid 4 (Tropicalia "NUESTROS INFALTABLES"). */
-function MerchSection() {
-  const featured = MERCH.slice(0, 4);
+/**
+ * Grid 4 (Tropicalia "NUESTROS INFALTABLES"). Lee la colección `merch` real de
+ * Shopify cuando existe; si no, cae al catálogo local como semilla.
+ * @param {{products: any[] | null}}
+ */
+function MerchSection({products}) {
+  const featured =
+    products && products.length
+      ? products.slice(0, 4).map((p) => ({
+          handle: p.handle,
+          title: p.title,
+          image: p.featuredImage?.url || '/images/producto-bolsa.webp',
+          price: Number(p.priceRange?.minVariantPrice?.amount ?? 0),
+          badge: null,
+        }))
+      : MERCH.slice(0, 4);
+
   return (
     <section className="tx-section tx-section--surface">
       <div className="tx-container">
@@ -192,7 +262,7 @@ function MerchSection() {
         </div>
         <div className="tx-products">
           {featured.map((m) => (
-            <Link className="tx-product-card" to="/collections/cafes" key={m.handle}>
+            <Link className="tx-product-card" to={`/products/${m.handle}`} key={m.handle}>
               <div className="tx-product-card__media">
                 {m.badge && <span className="tx-product-card__badge">{m.badge}</span>}
                 <img src={m.image} alt={m.title} width={500} height={500} loading="lazy" />
@@ -203,7 +273,7 @@ function MerchSection() {
           ))}
         </div>
         <div style={{textAlign: 'center', marginTop: '2.5rem'}}>
-          <Link className="tx-link" to="/collections/all">
+          <Link className="tx-link" to="/collections/merch">
             Ver todos
           </Link>
         </div>
@@ -282,16 +352,45 @@ function RitualsSection() {
 }
 
 /* ------------------------------ QUERIES ----------------------------- */
-const HOME_CAFES_QUERY = `#graphql
-  query HomeCafes($handle: String!, $country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    collection(handle: $handle) {
-      id
-      products(first: 6, sortKey: PRICE) {
-        nodes { id title handle }
+const HOME_PRODUCT_FIELDS = `#graphql
+  fragment HomeProduct on Product {
+    id
+    title
+    handle
+    featuredImage {
+      url
+      altText
+    }
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
       }
     }
   }
+`;
+
+const HOME_QUERY = `#graphql
+  query Home($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    cafes: collection(handle: "cafes") {
+      id
+      products(first: 4) {
+        nodes {
+          ...HomeProduct
+        }
+      }
+    }
+    merch: collection(handle: "merch") {
+      id
+      products(first: 4) {
+        nodes {
+          ...HomeProduct
+        }
+      }
+    }
+  }
+  ${HOME_PRODUCT_FIELDS}
 `;
 
 /** @typedef {import('./+types/_index').Route} Route */

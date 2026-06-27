@@ -16,6 +16,17 @@ export function ProductForm({productOptions, selectedVariant, product}) {
   const {open} = useAside();
   const [quantity, setQuantity] = useState(1);
 
+  // Selling plans (subscription "Club de la Memoria"). Degrades gracefully:
+  // when the product has no selling plans, only one-time purchase is shown.
+  const sellingPlans =
+    product?.sellingPlanGroups?.nodes?.[0]?.sellingPlans?.nodes ?? [];
+  const hasSubscription = sellingPlans.length > 0;
+  const [purchaseType, setPurchaseType] = useState('once'); // 'once' | 'sub'
+  const [sellingPlanId, setSellingPlanId] = useState(sellingPlans[0]?.id ?? '');
+
+  const activePlanId =
+    hasSubscription && purchaseType === 'sub' ? sellingPlanId : undefined;
+
   const available = selectedVariant?.availableForSale;
 
   return (
@@ -81,6 +92,58 @@ export function ProductForm({productOptions, selectedVariant, product}) {
         );
       })}
 
+      {hasSubscription && (
+        <div className="buy-type" role="radiogroup" aria-label="Tipo de compra">
+          <button
+            type="button"
+            className="buy-type__opt"
+            role="radio"
+            aria-checked={purchaseType === 'once'}
+            data-active={purchaseType === 'once'}
+            onClick={() => setPurchaseType('once')}
+          >
+            <span className="buy-type__head">
+              <span className="buy-type__dot" />
+              Compra única
+            </span>
+          </button>
+          <button
+            type="button"
+            className="buy-type__opt buy-type__opt--sub"
+            role="radio"
+            aria-checked={purchaseType === 'sub'}
+            data-active={purchaseType === 'sub'}
+            onClick={() => setPurchaseType('sub')}
+          >
+            <span className="buy-type__head">
+              <span className="buy-type__dot" />
+              Suscríbete y ahorra
+              <span className="buy-type__save">−15%</span>
+            </span>
+          </button>
+        </div>
+      )}
+
+      {hasSubscription && purchaseType === 'sub' && (
+        <div className="variant-group">
+          <label className="variant-group__label" htmlFor="selling-plan">
+            Frecuencia de entrega
+          </label>
+          <select
+            id="selling-plan"
+            className="select"
+            value={sellingPlanId}
+            onChange={(e) => setSellingPlanId(e.target.value)}
+          >
+            {sellingPlans.map((plan) => (
+              <option key={plan.id} value={plan.id}>
+                {plan.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <div className="pdp-buy">
         <div className="pdp-buy__row">
           <div className="qty-stepper" aria-label="Cantidad">
@@ -123,12 +186,23 @@ export function ProductForm({productOptions, selectedVariant, product}) {
             }
             lines={
               selectedVariant
-                ? [{merchandiseId: selectedVariant.id, quantity, selectedVariant}]
+                ? [
+                    {
+                      merchandiseId: selectedVariant.id,
+                      quantity,
+                      selectedVariant,
+                      ...(activePlanId ? {sellingPlanId: activePlanId} : {}),
+                    },
+                  ]
                 : []
             }
           >
             <IconBag width={18} height={18} />
-            {available ? 'Agregar al carrito' : 'Agotado'}
+            {available
+              ? activePlanId
+                ? 'Suscribirme'
+                : 'Agregar al carrito'
+              : 'Agotado'}
           </AddToCartButton>
         </div>
       </div>
