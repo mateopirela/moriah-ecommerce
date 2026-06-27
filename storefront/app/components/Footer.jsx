@@ -1,5 +1,5 @@
 import {Suspense} from 'react';
-import {Await, NavLink, Link} from 'react-router';
+import {Await, Link} from 'react-router';
 import {
   IconInstagram,
   IconWhatsapp,
@@ -10,12 +10,12 @@ import {
 /**
  * @param {FooterProps}
  */
-export function Footer({footer: footerPromise, header, publicStoreDomain}) {
+export function Footer({footer: footerPromise}) {
   const year = 2025;
   return (
     <Suspense>
       <Await resolve={footerPromise}>
-        {(footer) => (
+        {() => (
           <footer className="footer">
             <div className="container footer__grid">
               <div className="footer__brand">
@@ -144,39 +144,6 @@ function PaymentBadges() {
         </span>
       ))}
     </>
-  );
-}
-
-/**
- * @param {{
- *   menu: FooterQuery['menu'];
- *   primaryDomainUrl: FooterProps['header']['shop']['primaryDomain']['url'];
- *   publicStoreDomain: string;
- * }}
- */
-function FooterMenu({menu, primaryDomainUrl, publicStoreDomain}) {
-  return (
-    <nav className="footer-menu" role="navigation" aria-label="Compañía">
-      {menu.items.map((item) => {
-        if (!item.url) return null;
-        const url =
-          item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
-        const isExternal = !url.startsWith('/');
-        return isExternal ? (
-          <a href={url} key={item.id} rel="noopener noreferrer" target="_blank">
-            {item.title}
-          </a>
-        ) : (
-          <NavLink end key={item.id} prefetch="intent" to={url}>
-            {item.title}
-          </NavLink>
-        );
-      })}
-    </nav>
   );
 }
 

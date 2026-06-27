@@ -1,5 +1,5 @@
-import {useLoaderData, Link} from 'react-router';
-import {CAFES, SUBSCRIPTION, formatCop} from '~/data/cafes';
+import {Link} from 'react-router';
+import {SUBSCRIPTION, formatCop} from '~/data/cafes';
 import {MERCH} from '~/data/merch';
 
 /**
@@ -21,14 +21,6 @@ export const meta = () => {
     {property: 'og:image', content: '/images/hero-lifestyle.webp'},
   ];
 };
-
-/** @param {Route.LoaderArgs} args */
-export async function loader(args) {
-  const {collection} = await args.context.storefront
-    .query(HOME_CAFES_QUERY, {variables: {handle: 'cafes'}})
-    .catch(() => ({collection: null}));
-  return {cafes: collection?.products?.nodes ?? null};
-}
 
 export default function Homepage() {
   return (
@@ -54,7 +46,7 @@ function Hero() {
           alt="Café MORIAH en la mano — Un café para el alma"
           width={1100}
           height={1375}
-          fetchpriority="high"
+          fetchPriority="high"
           decoding="async"
         />
         <div className="tx-hero__overlay">
@@ -280,18 +272,5 @@ function RitualsSection() {
     </section>
   );
 }
-
-/* ------------------------------ QUERIES ----------------------------- */
-const HOME_CAFES_QUERY = `#graphql
-  query HomeCafes($handle: String!, $country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    collection(handle: $handle) {
-      id
-      products(first: 6, sortKey: PRICE) {
-        nodes { id title handle }
-      }
-    }
-  }
-`;
 
 /** @typedef {import('./+types/_index').Route} Route */

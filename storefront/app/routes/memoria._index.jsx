@@ -1,8 +1,7 @@
 import {redirect, data} from 'react-router';
-import {useLoaderData, useActionData} from 'react-router';
 import {z} from 'zod';
 import {MemoryForm} from '~/components/MemoryForm';
-import {IconArrowRight, IconMountain} from '~/components/Icons';
+import {IconArrowRight} from '~/components/Icons';
 
 export const meta = () => [
   {title: 'Comparte tu primer tinto · #MiPrimerTinto'},
@@ -104,8 +103,6 @@ export async function action({request, context}) {
  * Memory Bank landing page.
  */
 export default function MemoryBankPage() {
-  const data = useLoaderData();
-
   return (
     <div className="memory-page">
       {/* Hero */}
