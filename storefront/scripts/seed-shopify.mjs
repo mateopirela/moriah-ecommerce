@@ -101,6 +101,69 @@ const CAFES = [
 const KIT_PRICE = round100((45000 + 52000 + 75000) * 0.85); // 146.200
 const KIT_COMPARE_AT = 45000 + 52000 + 75000; // 172.000
 
+// --- Merch (espejo de app/data/merch.js) --------------------------------
+// Productos simples (variante única) "Para vestir y para el ritual".
+const MERCH = [
+  {
+    handle: 'caja-el-legado',
+    title: 'Caja El Legado',
+    price: 220000,
+    image: 'kit-bolsas.webp',
+    tags: ['Regalo insignia', 'Caja regalo'],
+    description:
+      'El nombre definitivo para tu producto estrella de regalo. Al entregar el molino, el pocillo y el café, estás entregando la herramienta para heredar una tradición.',
+  },
+  {
+    handle: 'pocillo-de-verdad',
+    title: 'Pocillo De Verdad',
+    price: 58000,
+    image: 'producto-bolsa.webp',
+    tags: ['El ritual', 'Pocillos'],
+    description:
+      'Inspirado en la promesa del manifiesto de "compartir un tinto de verdad". No es un mug genérico de oficina, es el contenedor de un ritual real.',
+  },
+  {
+    handle: 'tote-bag-abundancia',
+    title: 'Tote Bag Abundancia',
+    price: 75000,
+    image: 'cafe-cafes.webp',
+    tags: ['Para cargar lo que importa', 'Accesorios'],
+    description:
+      'Un guiño sutil a "la abundancia de esas mañanas", ideal para cargar todo lo que importa en el día a día.',
+  },
+  {
+    handle: 'gorra-la-pausa',
+    title: 'Gorra La Pausa',
+    price: 120000,
+    image: 'tostado-moriah.webp',
+    tags: ['Baja la velocidad', 'Para vestir'],
+    description:
+      'El accesorio perfecto para cubrirse del sol y recordarse a uno mismo (y al mundo) que está bien bajar la velocidad.',
+  },
+  {
+    handle: 'sueter-el-afan',
+    title: 'Suéter El Afán',
+    price: 185000,
+    image: 'equipo-moriah.webp',
+    tags: ['Desconéctate', 'Para vestir'],
+    description:
+      'La ironía perfecta; la prenda que te pones precisamente para protegerte y desconectarte del afán de las pantallas y las reuniones de la ciudad.',
+  },
+];
+
+// --- Suscripción: Club de la Memoria (selling plans) --------------------
+const SUBSCRIPTION = {
+  groupName: 'Club de la Memoria',
+  merchantCode: 'club-de-la-memoria',
+  discountPercent: 15,
+  // (intervalo, cantidad) por cada frecuencia ofrecida.
+  options: [
+    {label: 'Cada 2 semanas', interval: 'WEEK', count: 2},
+    {label: 'Cada 4 semanas', interval: 'WEEK', count: 4},
+    {label: 'Cada 6 semanas', interval: 'WEEK', count: 6},
+  ],
+};
+
 // --- Helpers -------------------------------------------------------------
 let TOKEN = null;
 
@@ -217,6 +280,25 @@ async function createKit() {
   });
 }
 
+async function createMerch(item) {
+  return upsertProduct({
+    handle: item.handle,
+    title: item.title,
+    descriptionHtml: `<p>${item.description}</p>`,
+    vendor: 'MORIAH Café',
+    status: 'ACTIVE',
+    productType: 'Merch',
+    tags: item.tags,
+    productOptions: [{name: 'Title', position: 1, values: [{name: 'Default Title'}]}],
+    variants: [
+      {
+        optionValues: [{optionName: 'Title', name: 'Default Title'}],
+        price: String(item.price),
+      },
+    ],
+  });
+}
+
 // --- Imágenes (staged upload → productCreateMedia) ------------------------
 async function uploadImage(productId, filename, alt) {
   const filePath = path.join(IMAGES_DIR, filename);
@@ -311,10 +393,12 @@ async function ensureMetafieldDefinitions() {
   }
 }
 
-// --- Colección -----------------------------------------------------------
-async function upsertCollection(productIds) {
+// --- Colecciones ---------------------------------------------------------
+/** Crea (o reutiliza) una colección manual y le agrega los productos dados. */
+async function upsertCollection({handle, title, descriptionHtml, productIds}) {
   const existing = await gql(
-    `query { collectionByHandle(handle: "cafes") { id } }`,
+    `query($handle: String!) { collectionByHandle(handle: $handle) { id } }`,
+    {handle},
   );
   let collectionId = existing.collectionByHandle?.id;
 
@@ -326,33 +410,87 @@ async function upsertCollection(productIds) {
           userErrors { field message }
         }
       }`,
-      {
-        input: {
-          handle: 'cafes',
-          title: 'Cafés',
-          descriptionHtml:
-            '<p>Ediciones de especialidad y blends únicos, cultivados con intención y respeto por la tierra. Café 100% colombiano.</p>',
-        },
-      },
+      {input: {handle, title, descriptionHtml}},
     );
     userErrors(created.collectionCreate, 'collectionCreate');
     collectionId = created.collectionCreate.collection.id;
   }
 
-  const added = await gql(
-    `mutation collectionAddProducts($id: ID!, $productIds: [ID!]!) {
-      collectionAddProducts(id: $id, productIds: $productIds) {
-        collection { id }
+  if (productIds.length) {
+    const added = await gql(
+      `mutation collectionAddProducts($id: ID!, $productIds: [ID!]!) {
+        collectionAddProducts(id: $id, productIds: $productIds) {
+          collection { id }
+          userErrors { field message }
+        }
+      }`,
+      {id: collectionId, productIds},
+    );
+    const errs = added.collectionAddProducts.userErrors.filter(
+      (e) => !/already exists/i.test(e.message),
+    );
+    if (errs.length) throw new Error(`collectionAddProducts ${handle}: ${JSON.stringify(errs)}`);
+  }
+  return collectionId;
+}
+
+// --- Suscripción: selling plan group (Club de la Memoria) ----------------
+/**
+ * Crea el selling plan group "Club de la Memoria" con un plan por frecuencia
+ * (−15% recurrente) y lo asocia a los cafés. Idempotente por merchantCode.
+ *
+ * NOTA: crear los planes habilita la opción "Suscríbete y ahorra" en el
+ * catálogo, pero el COBRO recurrente real lo gestiona una app de suscripciones
+ * (contratos). Recomendado: instalar la app gratuita "Shopify Subscriptions".
+ */
+async function upsertSellingPlanGroup(cafeProductIds) {
+  const existing = await gql(
+    `query($q: String!) { sellingPlanGroups(first: 1, query: $q) { nodes { id } } }`,
+    {q: `merchant_code:${SUBSCRIPTION.merchantCode}`},
+  ).catch(() => ({sellingPlanGroups: {nodes: []}}));
+  if (existing.sellingPlanGroups?.nodes?.[0]?.id) {
+    return existing.sellingPlanGroups.nodes[0].id;
+  }
+
+  const plans = SUBSCRIPTION.options.map((o) => ({
+    name: `${SUBSCRIPTION.groupName} · ${o.label}`,
+    options: [o.label],
+    category: 'SUBSCRIPTION',
+    billingPolicy: {
+      recurring: {interval: o.interval, intervalCount: o.count},
+    },
+    deliveryPolicy: {
+      recurring: {interval: o.interval, intervalCount: o.count},
+    },
+    pricingPolicies: [
+      {
+        fixed: {
+          adjustmentType: 'PERCENTAGE',
+          adjustmentValue: {percentage: SUBSCRIPTION.discountPercent},
+        },
+      },
+    ],
+  }));
+
+  const created = await gql(
+    `mutation sellingPlanGroupCreate($input: SellingPlanGroupInput!, $resources: SellingPlanGroupResourceInput) {
+      sellingPlanGroupCreate(input: $input, resources: $resources) {
+        sellingPlanGroup { id }
         userErrors { field message }
       }
     }`,
-    {id: collectionId, productIds},
+    {
+      input: {
+        name: SUBSCRIPTION.groupName,
+        merchantCode: SUBSCRIPTION.merchantCode,
+        options: ['Frecuencia de entrega'],
+        sellingPlansToCreate: plans,
+      },
+      resources: {productIds: cafeProductIds},
+    },
   );
-  const errs = added.collectionAddProducts.userErrors.filter(
-    (e) => !/already exists/i.test(e.message),
-  );
-  if (errs.length) throw new Error(`collectionAddProducts: ${JSON.stringify(errs)}`);
-  return collectionId;
+  userErrors(created.sellingPlanGroupCreate, 'sellingPlanGroupCreate');
+  return created.sellingPlanGroupCreate.sellingPlanGroup.id;
 }
 
 // --- Publicación en canales ----------------------------------------------
@@ -378,17 +516,17 @@ async function publishAll(ids) {
 
 // --- Main ------------------------------------------------------------------
 async function main() {
-  console.log('1/5 Autenticando…');
+  console.log('1/7 Autenticando…');
   TOKEN = await getToken();
 
-  console.log('2/5 Definiendo metafields (visibles en storefront)…');
+  console.log('2/7 Definiendo metafields (visibles en storefront)…');
   await ensureMetafieldDefinitions();
 
-  console.log('2/5 Creando cafés…');
-  const productIds = [];
+  console.log('3/7 Creando cafés…');
+  const cafeIds = [];
   for (const cafe of CAFES) {
     const product = await createCafe(cafe);
-    productIds.push(product.id);
+    cafeIds.push(product.id);
     console.log(`  ✓ ${product.title} (${product.handle})`);
     if (!(await hasMedia(product.id))) {
       await uploadImage(product.id, 'producto-bolsa.webp', `${product.title} · MORIAH Café`);
@@ -396,24 +534,73 @@ async function main() {
     }
   }
 
-  console.log('3/5 Creando Kit Tres Orígenes…');
+  console.log('4/7 Creando Kit Tres Orígenes…');
   const kit = await createKit();
-  productIds.push(kit.id);
   console.log(`  ✓ ${kit.title} ($${KIT_PRICE} / antes $${KIT_COMPARE_AT})`);
   if (!(await hasMedia(kit.id))) {
     await uploadImage(kit.id, 'kit-bolsas.webp', 'Kit Tres Orígenes · MORIAH Café');
     console.log('    ✓ imagen');
   }
 
-  console.log('4/5 Creando colección `cafes`…');
-  const collectionId = await upsertCollection(productIds);
-  console.log(`  ✓ colección ${collectionId}`);
+  console.log('5/7 Creando merch…');
+  const merchIds = [];
+  for (const item of MERCH) {
+    const product = await createMerch(item);
+    merchIds.push(product.id);
+    console.log(`  ✓ ${product.title} (${product.handle})`);
+    if (!(await hasMedia(product.id))) {
+      await uploadImage(product.id, item.image, `${product.title} · MORIAH Café`);
+      console.log('    ✓ imagen');
+    }
+  }
 
-  console.log('5/5 Publicando en canales de venta…');
-  await publishAll([...productIds, collectionId]);
+  console.log('6/7 Creando colecciones y suscripción…');
+  const cafesCol = await upsertCollection({
+    handle: 'cafes',
+    title: 'Cafés',
+    descriptionHtml:
+      '<p>Ediciones de especialidad y blends únicos, cultivados con intención y respeto por la tierra. Café 100% colombiano.</p>',
+    productIds: [...cafeIds, kit.id],
+  });
+  const merchCol = await upsertCollection({
+    handle: 'merch',
+    title: 'Merch',
+    descriptionHtml:
+      '<p>Para vestir y para el ritual. El manifiesto MORIAH hecho objeto.</p>',
+    productIds: merchIds,
+  });
+  const allCol = await upsertCollection({
+    handle: 'all',
+    title: 'Todo',
+    descriptionHtml: '<p>Todo el catálogo MORIAH: cafés, kits y merch.</p>',
+    productIds: [...cafeIds, kit.id, ...merchIds],
+  });
+  console.log('  ✓ colecciones: cafes · merch · all');
+
+  let planGroupId = null;
+  try {
+    planGroupId = await upsertSellingPlanGroup(cafeIds);
+    console.log(`  ✓ suscripción "Club de la Memoria" (${planGroupId})`);
+  } catch (err) {
+    console.warn(
+      `  ⚠️  No se pudo crear el selling plan group (${err.message}).\n` +
+        '     Suele requerir scope de suscripciones / app "Shopify Subscriptions". ' +
+        'El resto del catálogo quedó creado correctamente.',
+    );
+  }
+
+  console.log('7/7 Publicando en canales de venta…');
+  await publishAll([
+    ...cafeIds,
+    kit.id,
+    ...merchIds,
+    cafesCol,
+    merchCol,
+    allCol,
+  ]);
   console.log('  ✓ publicado');
 
-  console.log('\nListo. Catálogo creado en Shopify.');
+  console.log('\nListo. Catálogo MORIAH creado en Shopify.');
 }
 
 main().catch((err) => {

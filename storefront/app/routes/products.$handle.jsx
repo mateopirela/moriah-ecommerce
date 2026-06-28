@@ -730,6 +730,21 @@ const PRODUCT_FRAGMENT = `#graphql
         }
       }
     }
+    sellingPlanGroups(first: 5) {
+      nodes {
+        name
+        options {
+          name
+          values
+        }
+        sellingPlans(first: 10) {
+          nodes {
+            id
+            name
+          }
+        }
+      }
+    }
     selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {
       ...ProductVariant
     }

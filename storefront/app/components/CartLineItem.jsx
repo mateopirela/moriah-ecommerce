@@ -61,6 +61,11 @@ export function CartLineItem({layout, line, childrenMap}) {
               </li>
             ))}
           </ul>
+          {line?.sellingPlanAllocation?.sellingPlan?.name && (
+            <p className="cart-line__subscription">
+              <small>🔁 {line.sellingPlanAllocation.sellingPlan.name}</small>
+            </p>
+          )}
           <CartLineQuantity line={line} />
         </div>
       </div>
