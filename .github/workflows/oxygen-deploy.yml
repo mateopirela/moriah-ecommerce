@@ -58,6 +58,6 @@ jobs:
       - name: Build & publish to Oxygen
         run: npx shopify hydrogen deploy
         env:
-          # Token del canal Hydrogen/Oxygen (Shopify admin → Hydrogen → Deployments).
-          # Debe añadirse en: repo → Settings → Secrets and variables → Actions.
-          SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN }}
+          # Token inyectado por la integración nativa Shopify ↔ GitHub
+          # (Hydrogen → Repositorio Git). El sufijo es el ID del storefront.
+          SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000147614 }}
