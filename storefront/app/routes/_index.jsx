@@ -1,5 +1,5 @@
-import {useLoaderData, Link} from 'react-router';
-import {CAFES, SUBSCRIPTION, formatCop} from '~/data/cafes';
+import {Link} from 'react-router';
+import {formatCop} from '~/data/cafes';
 import {MERCH} from '~/data/merch';
 
 /** @type {Route.MetaFunction} */
@@ -54,7 +54,7 @@ function BannerHome() {
         alt="MORIAH Café — Un café para el alma"
         width={1920}
         height={1080}
-        fetchpriority="high"
+        fetchPriority="high"
         decoding="async"
         className="tx-banner__img"
       />

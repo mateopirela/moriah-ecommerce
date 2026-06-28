@@ -1,5 +1,5 @@
 import {Suspense} from 'react';
-import {Await, NavLink, Link} from 'react-router';
+import {Await, Link} from 'react-router';
 import {
   IconInstagram,
   IconWhatsapp,
@@ -9,7 +9,7 @@ import {
 /**
  * @param {FooterProps}
  */
-export function Footer({footer: footerPromise, header, publicStoreDomain}) {
+export function Footer({footer: footerPromise}) {
   return (
     <Suspense>
       <Await resolve={footerPromise}>

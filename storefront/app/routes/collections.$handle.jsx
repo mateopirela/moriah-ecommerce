@@ -1,4 +1,4 @@
-import {redirect, useLoaderData, useSearchParams} from 'react-router';
+import {redirect, useLoaderData, Link} from 'react-router';
 import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
@@ -96,7 +96,7 @@ function CollectionBanner({title, description, image}) {
         width={1920}
         height={600}
         className="tx-cat-banner__img"
-        fetchpriority="high"
+        fetchPriority="high"
         decoding="async"
       />
       <div className="tx-cat-banner__overlay">
