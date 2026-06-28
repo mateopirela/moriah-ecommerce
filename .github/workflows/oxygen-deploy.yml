@@ -1,0 +1,57 @@
+name: Deploy to Oxygen
+
+# Cada push a main construye y despliega el storefront Hydrogen a Oxygen.
+# En CI, `shopify hydrogen deploy` elige el entorno por la rama de Git
+# (main -> Production) y usa el token del secret OXYGEN_DEPLOYMENT_TOKEN.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  deploy:
+    name: Build and deploy to Oxygen
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # Disponible en los `if` de abajo para saltar el deploy si falta el token.
+      OXYGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN }}
+    defaults:
+      run:
+        working-directory: storefront
+    steps:
+      - name: Aviso si falta el token
+        if: env.OXYGEN_DEPLOYMENT_TOKEN == ''
+        run: |
+          echo "::warning::Falta el secret OXYGEN_DEPLOYMENT_TOKEN. Agrégalo en \
+          Settings → Secrets and variables → Actions y vuelve a hacer push (o \
+          re-ejecuta este workflow). El deploy se omitió."
+
+      - name: Checkout
+        if: env.OXYGEN_DEPLOYMENT_TOKEN != ''
+        uses: actions/checkout@v4
+        with:
+          # El deploy lee metadatos del commit actual para la versión desplegada.
+          fetch-depth: 0
+
+      - name: Setup Node
+        if: env.OXYGEN_DEPLOYMENT_TOKEN != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: storefront/package-lock.json
+
+      - name: Install dependencies
+        if: env.OXYGEN_DEPLOYMENT_TOKEN != ''
+        run: npm ci
+
+      - name: Deploy to Oxygen
+        if: env.OXYGEN_DEPLOYMENT_TOKEN != ''
+        run: npx shopify hydrogen deploy --no-lockfile-check
+        env:
+          SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN }}
