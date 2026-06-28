@@ -1,13 +1,24 @@
 import {useLoaderData} from 'react-router';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {StoryPage} from '~/components/StoryPage';
+import {BrewGuidePage} from '~/components/BrewGuidePage';
+import {ContactPage} from '~/components/ContactPage';
 
 // Pages rendered locally until they exist in Shopify (seed→Shopify pattern).
 const SEED_PAGES = {
   'nuestra-historia': {
-    title: 'Nuestra Historia · Moriah, el monte de la provisión',
+    title: 'Nuestra Historia · MORIAH Café',
     description:
       'Conoce por qué nos llamamos MORIAH: el monte de la provisión. Un grupo de amigos, fincas aliadas en Colombia y un propósito en cada taza.',
+  },
+  'prepara-tu-cafe': {
+    title: 'Prepara tu café · MORIAH Café',
+    description:
+      'Guías paso a paso para Aeropress, Chemex, filtrado manual y prensa francesa. El café MORIAH en tu método favorito.',
+  },
+  contacto: {
+    title: 'Contacto · MORIAH Café',
+    description: 'Escríbenos y nos contactaremos contigo.',
   },
 };
 
@@ -15,16 +26,12 @@ const SEED_PAGES = {
  * @type {Route.MetaFunction}
  */
 export const meta = ({data}) => {
+  const seed = SEED_PAGES[data?.page?.handle];
+  const title = seed ? seed.title : (data?.page?.title ? `${data.page.title} · MORIAH Café` : 'MORIAH Café');
+  const description = seed?.description || data?.page?.seo?.description || data?.page?.description;
   return [
-    {title: data?.page?.title ? `${data.page.title} · MORIAH Café` : 'MORIAH Café'},
-    ...(data?.page?.seo?.description || data?.page?.description
-      ? [
-          {
-            name: 'description',
-            content: data.page.seo?.description ?? data.page.description,
-          },
-        ]
-      : []),
+    {title},
+    ...(description ? [{name: 'description', content: description}] : []),
   ];
 };
 
@@ -90,16 +97,22 @@ export default function Page() {
   /** @type {LoaderReturnData} */
   const {page, isSeed} = useLoaderData();
 
-  if (isSeed && page.handle === 'nuestra-historia') {
-    return <StoryPage />;
+  if (isSeed) {
+    if (page.handle === 'nuestra-historia') return <StoryPage />;
+    if (page.handle === 'prepara-tu-cafe') return <BrewGuidePage />;
+    if (page.handle === 'contacto') return <ContactPage />;
   }
 
   return (
-    <div className="page">
-      <header>
-        <h1>{page.title}</h1>
-      </header>
-      <main dangerouslySetInnerHTML={{__html: page.body}} />
+    <div className="tx-page">
+      <section className="tx-page-section">
+        <h1 className="tx-display tx-h1" style={{color:'var(--tx-gold)', marginBottom:'2rem'}}>{page.title}</h1>
+        <div
+          className="tx-lede"
+          style={{maxWidth:'70ch', lineHeight:1.8}}
+          dangerouslySetInnerHTML={{__html: page.body}}
+        />
+      </section>
     </div>
   );
 }

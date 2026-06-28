@@ -35,9 +35,9 @@ export function ProductForm({productOptions, selectedVariant, product}) {
         if (option.optionValues.length === 1) return null;
 
         return (
-          <div className="variant-group" key={option.name}>
-            <span className="variant-group__label">{option.name}</span>
-            <div className="variant-options">
+          <div className="tx-variant-group" key={option.name}>
+            <span className="tx-titulo" style={{marginBottom:'0.4rem'}}>{option.name}</span>
+            <div className="tx-variant-pills">
               {option.optionValues.map((value) => {
                 const {
                   name,
@@ -53,14 +53,14 @@ export function ProductForm({productOptions, selectedVariant, product}) {
                 if (isDifferentProduct) {
                   return (
                     <Link
-                      className="variant-option"
+                      className="tx-variant-pill"
                       key={option.name + name}
                       prefetch="intent"
                       preventScrollReset
                       replace
                       to={`/products/${handle}?${variantUriQuery}`}
-                      data-selected={selected}
-                      data-available={optAvailable}
+                      data-selected={selected ? 'true' : 'false'}
+                      data-unavailable={!optAvailable ? 'true' : 'false'}
                     >
                       <ProductOptionSwatch swatch={swatch} name={name} />
                     </Link>
@@ -69,10 +69,10 @@ export function ProductForm({productOptions, selectedVariant, product}) {
                 return (
                   <button
                     type="button"
-                    className="variant-option"
+                    className="tx-variant-pill"
                     key={option.name + name}
-                    data-selected={selected}
-                    data-available={optAvailable}
+                    data-selected={selected ? 'true' : 'false'}
+                    data-unavailable={!exists ? 'true' : 'false'}
                     disabled={!exists}
                     onClick={() => {
                       if (!selected) {

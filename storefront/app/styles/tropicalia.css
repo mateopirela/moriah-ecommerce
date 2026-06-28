@@ -1,37 +1,38 @@
 /* ============================================================
    MORIAH × Tropicalia template
-   Réplica fiel de la estructura/diseño de tropicaliacoffee.com,
-   vestida con la marca MORIAH (paleta del brandboard).
-   Cargada AL FINAL para ganar especificidad sobre el tema base.
+   Estructura fiel a tropicaliacoffee.com, marca MORIAH.
    ============================================================ */
 
 @font-face {
   font-family: 'VTC Carrie';
-  /* Coloca el archivo en storefront/public/fonts/ para el look EXACTO.
-     Mientras no exista, cae al fallback Caveat Brush (Google Fonts). */
   src: url('/fonts/vtccarrie-regular.otf') format('opentype');
   font-weight: 400;
   font-display: swap;
 }
 
-/* Tokens en :root para que header/footer (fuera de .tx) también los usen. */
+@font-face {
+  font-family: 'Terital United W 00';
+  src: url('/fonts/terital-united-w00-regular.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
-  /* --- Paleta Tropicalia mapeada a MORIAH (brandboard) --- */
-  --tx-bg: #fff7e7;          /* beige-fondo */
-  --tx-surface: #fbefdb;     /* beige */
-  --tx-gold: #cf8e08;        /* dorado MORIAH (brandboard) ~ #b36d18 Tropicalia */
-  --tx-gold-deep: #b36d18;
-  --tx-ink: #19332f;         /* verde pino MORIAH ~ azul #0b3959 Tropicalia */
-  --tx-ink-soft: #2a4a43;
-  --tx-red: #b3181b;         /* acento puntual */
-  --tx-text: #2a2a2a;
-  --tx-muted: #6b675f;
-  --tx-line: rgba(25, 51, 47, 0.14);
+  --tx-bg:         #fbefdb;
+  --tx-surface:    #f5e6cc;
+  --tx-gold:       #b36d18;
+  --tx-gold-light: #cf8e08;
+  --tx-ink:        #0b3959;
+  --tx-ink-soft:   #19332f;
+  --tx-text:       #2a2a2a;
+  --tx-muted:      #6b675f;
+  --tx-line:       rgba(11, 57, 89, 0.14);
+  --tx-cream:      #fff7e7;
 
   --tx-display: 'VTC Carrie', 'Caveat Brush', cursive;
-  --tx-body: 'Karla', system-ui, -apple-system, sans-serif;
+  --tx-body:    'Karla', 'Montserrat', system-ui, sans-serif;
 
-  --tx-maxw: 1280px;
+  --tx-maxw:   1280px;
   --tx-gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
   --tx-radius: 18px;
 }
@@ -44,11 +45,7 @@
   line-height: 1.6;
 }
 
-.tx *,
-.tx *::before,
-.tx *::after {
-  box-sizing: border-box;
-}
+.tx *, .tx *::before, .tx *::after { box-sizing: border-box; }
 
 .tx-container {
   width: 100%;
@@ -57,7 +54,7 @@
   padding-inline: var(--tx-gutter);
 }
 
-/* Display headings — Tropicalia: hand-drawn, UPPERCASE, weight 400 */
+/* --- Tipografía display --- */
 .tx-display {
   font-family: var(--tx-display);
   font-weight: 400;
@@ -67,53 +64,59 @@
   color: var(--tx-ink);
   margin: 0;
 }
-.tx-h1 { font-size: clamp(2.6rem, 1.4rem + 5.4vw, 4rem); }
-.tx-h2 { font-size: clamp(2rem, 1.3rem + 2.8vw, 2.6rem); }
-.tx-h3 { font-size: clamp(1.45rem, 1.1rem + 1.5vw, 2rem); }
+.tx-h1 { font-size: clamp(2.6rem, 1.4rem + 5.4vw, 4.4rem); }
+.tx-h2 { font-size: clamp(2rem, 1.3rem + 2.8vw, 3rem); }
+.tx-h3 { font-size: clamp(1.4rem, 1.1rem + 1.3vw, 2rem); }
 
 .tx-eyebrow {
+  display: block;
   font-family: var(--tx-body);
   text-transform: uppercase;
   letter-spacing: 0.22em;
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--tx-gold-deep);
+  color: var(--tx-gold);
+}
+
+.tx-titulo-eyebrow {
+  font-family: var(--tx-body);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--tx-text);
 }
 
 .tx-lede {
-  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+  font-size: clamp(0.9rem, 0.85rem + 0.3vw, 1.05rem);
   color: var(--tx-muted);
-  max-width: 56ch;
+  max-width: 48ch;
+  margin: 0;
 }
 
-/* --- Botón pill (Tropicalia: dorado, mayúsculas, pequeño) --- */
+/* --- Botón pill --- */
 .tx-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   background: var(--tx-gold);
-  color: #fff;
+  color: var(--tx-cream);
   font-family: var(--tx-body);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-size: 0.72rem;
-  padding: 0.7rem 1.4rem;
+  padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 999px;
   cursor: pointer;
   text-decoration: none;
   transition: background 0.2s ease, transform 0.2s ease;
 }
-.tx-btn:hover { background: var(--tx-gold-deep); transform: translateY(-1px); }
+.tx-btn:hover { background: var(--tx-ink); transform: translateY(-1px); }
+.tx-btn--peq { padding: 0.55rem 1.1rem; font-size: 0.68rem; }
 .tx-btn--ink { background: var(--tx-ink); }
 .tx-btn--ink:hover { background: var(--tx-ink-soft); }
-.tx-btn--ghost {
-  background: transparent;
-  color: var(--tx-ink);
-  border: 1.5px solid var(--tx-ink);
-}
-.tx-btn--ghost:hover { background: var(--tx-ink); color: #fff; }
 
 .tx-link {
   text-transform: uppercase;
@@ -127,13 +130,11 @@
 }
 
 /* ============================================================
-   HEADER (global) — réplica del navbar Tropicalia
+   HEADER
    ============================================================ */
 .header {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   z-index: 100;
   display: flex;
   align-items: center;
@@ -142,25 +143,24 @@
   height: 72px;
   padding-inline: var(--tx-gutter);
   background: transparent;
-  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
-/* Scrim para legibilidad del texto claro sobre el hero (debajo del contenido) */
 .header::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(12, 24, 20, 0.55), rgba(12, 24, 20, 0));
+  background: linear-gradient(180deg, rgba(11,57,89,0.5), transparent);
   transition: opacity 0.3s ease;
 }
-/* Estado sólido: al scrollear, o en páginas internas (sin hero) */
 .header.is-solid {
   background: var(--tx-bg);
-  box-shadow: 0 6px 24px -16px rgba(25, 51, 47, 0.55);
+  box-shadow: 0 4px 20px -12px rgba(11, 57, 89, 0.4);
   border-bottom: 1px solid var(--tx-line);
 }
 .header.is-solid::before { opacity: 0; }
+
 .header__brand {
   display: flex;
   align-items: center;
@@ -173,10 +173,11 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   font-size: 1.5rem;
-  color: #fff7e7;
+  color: var(--tx-cream);
   transition: color 0.3s ease;
 }
 .header.is-solid .header__wordmark { color: var(--tx-ink); }
+
 .header-menu-desktop {
   display: flex;
   align-items: center;
@@ -188,16 +189,15 @@
   letter-spacing: 0.1em;
   font-size: 0.74rem;
   font-weight: 700;
-  color: #fff7e7;
+  color: var(--tx-cream);
   text-decoration: none;
   white-space: nowrap;
   transition: color 0.18s ease;
 }
 .header-menu-item:hover,
 .header-menu-item[aria-current='page'] { color: var(--tx-gold); }
-.header.is-solid .header-menu-item { color: var(--tx-ink-soft); }
-.header.is-solid .header-menu-item:hover,
-.header.is-solid .header-menu-item[aria-current='page'] { color: var(--tx-gold-deep); }
+.header.is-solid .header-menu-item { color: var(--tx-ink); }
+.header.is-solid .header-menu-item:hover { color: var(--tx-gold); }
 
 .header-ctas {
   display: flex;
@@ -210,9 +210,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
-  color: #fff7e7;
+  width: 38px; height: 38px;
+  color: var(--tx-cream);
   background: none;
   border: none;
   cursor: pointer;
@@ -223,25 +222,32 @@
 .header-ctas .cart-count:hover { color: var(--tx-gold); }
 .header.is-solid .header-ctas .icon-btn,
 .header.is-solid .header-ctas .cart-count { color: var(--tx-ink); }
+
 .cart-count__badge {
   position: absolute;
-  top: 2px;
-  right: 0;
-  min-width: 16px;
-  height: 16px;
+  top: 2px; right: 0;
+  min-width: 16px; height: 16px;
   padding: 0 4px;
   border-radius: 999px;
   background: var(--tx-gold);
-  color: var(--tx-ink);
+  color: var(--tx-cream);
   font-size: 0.62rem;
   font-weight: 800;
   display: grid;
   place-items: center;
 }
-.header-menu-mobile-toggle { display: none; color: #fff7e7; }
+
+.header-menu-mobile-toggle {
+  display: none;
+  color: var(--tx-cream);
+  background: none;
+  border: none;
+  padding: 0.3rem;
+  cursor: pointer;
+}
 .header.is-solid .header-menu-mobile-toggle { color: var(--tx-ink); }
 
-/* Dropdown (CAFÉ / MERCH) */
+/* Dropdown CAFÉ / MERCH con imágenes */
 .tx-nav-group { position: relative; }
 .tx-nav-group > .header-menu-item { display: inline-flex; align-items: center; gap: 0.3rem; }
 .tx-nav-panel {
@@ -249,14 +255,16 @@
   top: calc(100% + 10px);
   left: 50%;
   transform: translateX(-50%) translateY(6px);
-  min-width: 190px;
+  min-width: 500px;
   background: var(--tx-bg);
   border: 1px solid var(--tx-line);
-  border-radius: 12px;
-  box-shadow: 0 24px 50px -20px rgba(25, 51, 47, 0.4);
-  padding: 0.6rem;
+  border-radius: 16px;
+  box-shadow: 0 24px 50px -20px rgba(11, 57, 89, 0.35);
+  padding: 1rem;
   display: grid;
-  gap: 0.1rem;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0.5rem;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
@@ -268,23 +276,34 @@
   transform: translateX(-50%) translateY(0);
 }
 .tx-nav-panel a {
-  display: block;
-  padding: 0.5rem 0.7rem;
-  border-radius: 8px;
-  color: var(--tx-ink);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
   text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.2s ease;
 }
-.tx-nav-panel a:hover { background: var(--tx-surface); color: var(--tx-gold-deep); }
+.tx-nav-panel a:hover { transform: translateY(-2px); }
+.tx-nav-panel-img {
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  width: 100%;
+  border-radius: 8px;
+}
+.tx-nav-panel-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--tx-ink);
+  padding: 0 0.2rem 0.4rem;
+}
 
-/* El header es fixed: la home (con .tx-hero) va a sangre completa por debajo;
-   las páginas internas reciben offset para no quedar ocultas bajo el nav. */
-main:not(:has(.tx-hero)) { padding-top: 72px; }
+/* Páginas sin hero: offset bajo el header */
+main:not(:has(.tx-banner)) { padding-top: 72px; }
 
-/* Mobile aside nav (light surface) */
+/* Mobile aside nav */
 .header-menu-mobile { display: grid; gap: 0.2rem; padding: 0.5rem 0; }
 .header-menu-mobile .header-menu-item {
   color: var(--tx-ink);
@@ -292,86 +311,201 @@ main:not(:has(.tx-hero)) { padding-top: 72px; }
   border-bottom: 1px solid var(--tx-line);
   font-size: 0.85rem;
 }
-.header-menu-mobile .header-menu-item:hover { color: var(--tx-gold-deep); }
+.header-menu-mobile .header-menu-item:hover { color: var(--tx-gold); }
 
 /* ============================================================
-   HERO — split full-bleed (Tropicalia banner-inicio)
+   BANNER HOME — imagen full-width (Tropicalia: banner-inicio)
    ============================================================ */
-.tx-hero {
+.tx-banner {
   position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: clamp(460px, 70vh, 680px);
+  width: 100%;
+  height: 100svh;
+  min-height: 500px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
 }
-.tx-hero__media { position: relative; overflow: hidden; }
-.tx-hero__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.tx-hero__overlay {
+.tx-banner__img {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+.tx-banner__texto {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 1.2rem;
-  padding: var(--tx-gutter);
-  padding-left: clamp(1.5rem, 5vw, 5rem);
-  background: linear-gradient(90deg, rgba(25, 51, 47, 0.55) 0%, rgba(25, 51, 47, 0.1) 60%, transparent 100%);
+  align-items: flex-start;
+  gap: 1.4rem;
+  padding: clamp(2rem, 6vw, 5rem) clamp(1.5rem, 5vw, 5rem);
+  padding-bottom: clamp(3rem, 8vh, 6rem);
+  background: linear-gradient(
+    0deg,
+    rgba(11, 57, 89, 0.7) 0%,
+    rgba(11, 57, 89, 0.3) 40%,
+    transparent 70%
+  );
+  width: 100%;
 }
-.tx-hero__title { color: #fff7e7; max-width: 16ch; }
-/* el hero arranca bajo el header fixed: deja aire arriba en el overlay */
-.tx-hero__overlay { padding-top: 72px; }
-.tx-hero__title em { color: var(--tx-gold); font-style: normal; }
+.tx-banner__h1 {
+  color: var(--tx-cream);
+  max-width: 20ch;
+  font-size: clamp(2.8rem, 1.5rem + 5vw, 5rem);
+  line-height: 1;
+}
+.tx-banner__h1 em {
+  color: var(--tx-gold);
+  font-style: normal;
+}
 
 /* ============================================================
    SECTION scaffolding
    ============================================================ */
-.tx-section { padding-block: clamp(3.5rem, 2rem + 6vw, 6.5rem); }
+.tx-section { padding-block: clamp(4rem, 3rem + 5vw, 7rem); }
 .tx-section--surface { background: var(--tx-surface); }
 .tx-section--ink { background: var(--tx-ink); }
-.tx-section--ink .tx-display { color: #fff7e7; }
-.tx-section--ink .tx-lede { color: rgba(255, 247, 231, 0.78); }
-.tx-section-head { text-align: center; display: grid; gap: 0.8rem; justify-items: center; margin-bottom: clamp(2rem, 4vw, 3.2rem); }
+.tx-section--ink .tx-display { color: var(--tx-cream); }
+.tx-section--ink .tx-lede { color: rgba(255,247,231,0.78); }
 
-/* --- Colecciones: grid 4 columnas (Trópico/Esencia/Privilegio/Vino) --- */
-.tx-collections {
+/* ============================================================
+   LÍNEAS — 4 cafés (Tropicalia: section#lineas)
+   ============================================================ */
+.tx-lineas-section { background: var(--tx-bg); }
+
+.tx-lineas-head {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: clamp(1rem, 2vw, 1.8rem);
+  gap: 0.6rem;
+  margin-bottom: clamp(2.5rem, 4vw, 4rem);
+  max-width: 52ch;
 }
-.tx-collection-card {
-  display: flex;
-  flex-direction: column;
-  background: var(--tx-bg);
-  border: 1px solid var(--tx-line);
+
+.tx-lineas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(1.2rem, 2.5vw, 2rem);
+}
+
+.tx-linea {
+  background: var(--tx-surface);
   border-radius: var(--tx-radius);
   overflow: hidden;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid var(--tx-line);
 }
-.tx-collection-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 30px 50px -24px rgba(25, 51, 47, 0.45);
-}
-.tx-collection-card__media { aspect-ratio: 4 / 5; overflow: hidden; }
-.tx-collection-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-.tx-collection-card:hover .tx-collection-card__media img { transform: scale(1.06); }
-.tx-collection-card__body { padding: 1.2rem 1.2rem 1.5rem; display: grid; gap: 0.6rem; }
-.tx-collection-card__desc { font-size: 0.85rem; color: var(--tx-muted); flex: 1; }
-.tx-collection-card .tx-btn { margin-top: 0.4rem; align-self: flex-start; }
 
-/* --- Suscripción split (Tropicalia "Suscríbete ahora") --- */
-.tx-sub {
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
+/* Header de color por línea */
+.tx-linea__header {
+  padding: 1.2rem 1.4rem;
+  display: flex;
   align-items: center;
-  gap: clamp(1.5rem, 4vw, 4rem);
+  justify-content: space-between;
+  min-height: 80px;
 }
-.tx-sub__media { border-radius: var(--tx-radius); overflow: hidden; aspect-ratio: 5 / 4; }
-.tx-sub__media img { width: 100%; height: 100%; object-fit: cover; }
-.tx-sub__body { display: grid; gap: 1.1rem; justify-items: start; }
-.tx-sub__perks { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
-.tx-sub__perks li { display: flex; gap: 0.6rem; font-size: 0.9rem; }
-.tx-sub__perks li::before { content: '✦'; color: var(--tx-gold); }
+.tx-linea__header--origen  { background: #e8d5b0; }
+.tx-linea__header--micro   { background: var(--tx-ink); }
+.tx-linea__header--club    { background: #c4a96e; }
+.tx-linea__header--legado  { background: var(--tx-ink-soft); }
 
-/* --- Merch: grid 4 (Tropicalia "NUESTROS INFALTABLES") --- */
+.tx-linea__nombres { display: flex; flex-direction: column; gap: 0.2rem; }
+.tx-linea__name {
+  font-family: var(--tx-display);
+  text-transform: uppercase;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--tx-cream);
+  letter-spacing: 0.02em;
+}
+.tx-linea__header--origen .tx-linea__name,
+.tx-linea__header--club .tx-linea__name { color: var(--tx-ink); }
+.tx-linea__sub {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,247,231,0.75);
+}
+.tx-linea__header--origen .tx-linea__sub,
+.tx-linea__header--club .tx-linea__sub { color: rgba(11,57,89,0.65); }
+
+.tx-linea__body {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.4rem;
+}
+.tx-linea__contenido {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.tx-linea__desc { font-size: 0.85rem; }
+.tx-linea__img {
+  width: clamp(100px, 14vw, 160px);
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   DARK / VIDEO SECTION (Tropicalia: video-tropicalia)
+   ============================================================ */
+.tx-dark-section {
+  position: relative;
+  min-height: clamp(280px, 40vh, 500px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.tx-dark-section__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.tx-dark-section__overlay {
+  position: relative;
+  z-index: 2;
+  background: rgba(11, 57, 89, 0.72);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(3rem, 6vw, 6rem) var(--tx-gutter);
+  min-height: inherit;
+}
+.tx-dark-section__texto {
+  color: var(--tx-cream);
+  text-align: center;
+  max-width: 44ch;
+  font-size: clamp(1.6rem, 1rem + 3vw, 2.8rem);
+}
+
+/* ============================================================
+   INFALTABLES (Tropicalia: nuestros-infaltables)
+   ============================================================ */
+.tx-infaltables-section { background: var(--tx-bg); }
+
+.tx-infaltables-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: clamp(2rem, 3vw, 3rem);
+}
+.tx-infaltables-movil {
+  text-align: center;
+  margin-top: 2rem;
+  display: none;
+}
+.tx-desktop-only { display: inline-flex; }
+
 .tx-products {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -385,14 +519,17 @@ main:not(:has(.tx-hero)) { padding-top: 72px; }
   background: var(--tx-surface);
   position: relative;
 }
-.tx-product-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+.tx-product-card__media img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
 .tx-product-card:hover .tx-product-card__media img { transform: scale(1.05); }
 .tx-product-card__badge {
   position: absolute;
-  top: 0.7rem;
-  left: 0.7rem;
+  top: 0.7rem; left: 0.7rem;
   background: var(--tx-ink);
-  color: #fff7e7;
+  color: var(--tx-cream);
   font-size: 0.6rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -403,46 +540,181 @@ main:not(:has(.tx-hero)) { padding-top: 72px; }
 .tx-product-card__name {
   font-family: var(--tx-display);
   text-transform: uppercase;
-  font-size: 1.05rem;
+  font-size: 1rem;
   color: var(--tx-ink);
 }
-.tx-product-card__price { font-weight: 700; color: var(--tx-text); }
+.tx-product-card__price { font-weight: 700; color: var(--tx-text); font-size: 0.9rem; }
 
-/* --- Gallery strip (Tropicalia "Store Gallery") --- */
+/* ============================================================
+   GALERÍA / INSPIRADOS (Tropicalia: tienda)
+   ============================================================ */
+.tx-galeria-section { padding-block: 0; }
+
+.tx-galeria-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: clamp(400px, 60vh, 700px);
+}
+.tx-galeria-split__fotos {
+  overflow: hidden;
+  position: relative;
+}
+.tx-galeria-split__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.2rem;
+  padding-block: clamp(3rem, 5vw, 5rem);
+}
+
 .tx-gallery {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: clamp(220px, 28vw, 320px);
-  gap: 1rem;
+  grid-auto-columns: clamp(180px, 22vw, 260px);
+  gap: 0.8rem;
+  height: 100%;
   overflow-x: auto;
-  padding-inline: var(--tx-gutter);
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
+  padding: 0.8rem;
 }
 .tx-gallery::-webkit-scrollbar { display: none; }
 .tx-gallery img {
   width: 100%;
   aspect-ratio: 3 / 4;
   object-fit: cover;
-  border-radius: var(--tx-radius);
+  border-radius: 12px;
   scroll-snap-align: start;
 }
 
-/* --- Rituales: grid 3 (Tropicalia menú "INSPIRADOS EN...") --- */
-.tx-rituals {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(1.2rem, 2.5vw, 2rem);
+/* ============================================================
+   FOOTER — Tropicalia-style: minimal top + logo + full-width photo
+   ============================================================ */
+
+/* New tx-footer (replaces old .footer grid) */
+.tx-footer {
+  background: var(--tx-ink);
+  color: var(--tx-cream);
 }
-.tx-ritual { display: grid; gap: 0.7rem; }
-.tx-ritual__media { aspect-ratio: 4 / 3; border-radius: var(--tx-radius); overflow: hidden; }
-.tx-ritual__media img { width: 100%; height: 100%; object-fit: cover; }
-.tx-ritual__desc { font-size: 0.85rem; color: var(--tx-muted); }
+
+.tx-footer__top {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-top: clamp(3rem, 5vw, 5rem);
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid rgba(255,247,231,0.12);
+}
+
+.tx-footer__tagline {
+  font-family: var(--tx-body);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255,247,231,0.65);
+}
+
+.tx-footer__cols {
+  display: flex;
+  gap: clamp(2rem, 6vw, 6rem);
+  flex-wrap: wrap;
+}
+
+.tx-footer__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.tx-footer__nav a {
+  color: rgba(255,247,231,0.82);
+  text-decoration: none;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+  transition: color 0.18s;
+}
+.tx-footer__nav a:hover { color: var(--tx-gold); }
+
+.tx-footer__contact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.tx-footer__social {
+  display: flex;
+  gap: 0.7rem;
+  margin-bottom: 0.6rem;
+}
+.tx-footer__social a {
+  color: rgba(255,247,231,0.75);
+  display: flex;
+  align-items: center;
+}
+.tx-footer__social a:hover { color: var(--tx-gold); }
+.tx-footer__social svg { width: 22px; height: 22px; }
+
+.tx-footer__link {
+  color: rgba(255,247,231,0.72);
+  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+}
+.tx-footer__link:hover { color: var(--tx-gold); }
+
+/* Big circular logo centrado */
+.tx-footer__logo-wrap {
+  display: flex;
+  justify-content: center;
+  padding-block: clamp(2.5rem, 5vw, 4rem);
+}
+.tx-footer__logo {
+  width: clamp(80px, 12vw, 140px);
+  height: auto;
+  border-radius: 50%;
+  object-fit: cover;
+  filter: brightness(0) invert(1) opacity(0.85);
+}
+
+/* Franja de políticas */
+.tx-footer__bottom {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  padding-block: 1.2rem;
+  border-top: 1px solid rgba(255,247,231,0.1);
+  font-size: 0.72rem;
+  color: rgba(255,247,231,0.55);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.tx-footer__policy {
+  color: rgba(255,247,231,0.55);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+.tx-footer__policy:hover { color: var(--tx-gold); }
+
+/* Foto full-width al fondo — la firma visual de Tropicalia */
+.tx-footer__photo {
+  position: relative;
+  overflow: hidden;
+  height: clamp(220px, 30vw, 420px);
+}
+.tx-footer__photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+  display: block;
+  filter: brightness(0.7);
+}
 
 /* ============================================================
-   FOOTER (global) — réplica multi-columna Tropicalia
+   FOOTER legacy (mantener compatibilidad si alguna ruta lo usa)
    ============================================================ */
-.footer { background: var(--tx-ink); color: #f3ead6; padding-top: clamp(3rem, 5vw, 4.5rem); }
+.footer { background: var(--tx-ink); color: var(--tx-cream); padding-top: clamp(3rem, 5vw, 4.5rem); }
 .footer__grid {
   display: grid;
   grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
@@ -450,9 +722,9 @@ main:not(:has(.tx-hero)) { padding-top: 72px; }
   padding-bottom: 2.5rem;
 }
 .footer__brand img { width: 56px; height: 56px; }
-.footer__tagline { color: rgba(243, 234, 214, 0.7); font-size: 0.85rem; margin: 0.8rem 0 1rem; max-width: 34ch; }
+.footer__tagline { color: rgba(255,247,231,0.7); font-size: 0.85rem; margin: 0.8rem 0 1rem; max-width: 34ch; }
 .footer__social { display: flex; gap: 0.8rem; }
-.footer__social a { color: #f3ead6; opacity: 0.8; }
+.footer__social a { color: var(--tx-cream); opacity: 0.8; }
 .footer__social a:hover { color: var(--tx-gold); opacity: 1; }
 .footer__col h4 {
   font-family: var(--tx-display);
@@ -464,13 +736,15 @@ main:not(:has(.tx-hero)) { padding-top: 72px; }
 }
 .footer__links { display: grid; gap: 0.55rem; }
 .footer__links a, .footer-menu a {
-  color: rgba(243, 234, 214, 0.78);
+  color: rgba(255,247,231,0.78);
   text-decoration: none;
   font-size: 0.85rem;
 }
 .footer__links a:hover, .footer-menu a:hover { color: var(--tx-gold); }
 .footer-menu { display: grid; gap: 0.55rem; }
-.footer__contact { display: grid; gap: 0.4rem; font-size: 0.82rem; color: rgba(243, 234, 214, 0.78); }
+.footer__contact { display: grid; gap: 0.4rem; font-size: 0.82rem; color: rgba(255,247,231,0.78); }
+.footer__contact a { color: rgba(255,247,231,0.78); text-decoration: none; }
+.footer__contact a:hover { color: var(--tx-gold); }
 .footer__bottom {
   display: flex;
   align-items: center;
@@ -478,9 +752,9 @@ main:not(:has(.tx-hero)) { padding-top: 72px; }
   gap: 1rem;
   flex-wrap: wrap;
   padding-block: 1.4rem;
-  border-top: 1px solid rgba(243, 234, 214, 0.14);
+  border-top: 1px solid rgba(255,247,231,0.14);
   font-size: 0.75rem;
-  color: rgba(243, 234, 214, 0.6);
+  color: rgba(255,247,231,0.6);
 }
 .footer__pay { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 .newsletter-form { display: flex; gap: 0.5rem; }
@@ -489,12 +763,12 @@ main:not(:has(.tx-hero)) { padding-top: 72px; }
   min-width: 0;
   padding: 0.7rem 0.9rem;
   border-radius: 999px;
-  border: 1px solid rgba(243, 234, 214, 0.25);
-  background: rgba(255, 255, 255, 0.04);
-  color: #fff7e7;
+  border: 1px solid rgba(255,247,231,0.25);
+  background: rgba(255,255,255,0.04);
+  color: var(--tx-cream);
   font-family: var(--tx-body);
 }
-.newsletter-form input::placeholder { color: rgba(243, 234, 214, 0.5); }
+.newsletter-form input::placeholder { color: rgba(255,247,231,0.5); }
 .newsletter-form .btn {
   border: none;
   background: var(--tx-gold);
@@ -507,18 +781,600 @@ main:not(:has(.tx-hero)) { padding-top: 72px; }
 }
 
 /* ============================================================
+   COLLECTION PAGE — Tropicalia style
+   ============================================================ */
+
+/* Banner categoría */
+.tx-cat-banner {
+  position: relative;
+  height: clamp(280px, 40vw, 500px);
+  overflow: hidden;
+}
+.tx-cat-banner__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+}
+.tx-cat-banner__overlay {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1.5rem, 5vw, 5rem);
+  background: linear-gradient(0deg, rgba(11,57,89,0.65) 0%, transparent 60%);
+}
+.tx-cat-banner__title {
+  color: var(--tx-cream);
+  font-size: clamp(2.2rem, 1.2rem + 4vw, 4rem);
+}
+.tx-cat-banner__desc {
+  color: rgba(255,247,231,0.82);
+  font-size: 0.9rem;
+  max-width: 60ch;
+  margin-top: 0.6rem;
+  line-height: 1.6;
+}
+
+/* Pills de categoría */
+.tx-cat-pills {
+  background: var(--tx-bg);
+  border-bottom: 1px solid var(--tx-line);
+  position: sticky;
+  top: 72px;
+  z-index: 10;
+}
+.tx-cat-pills__row {
+  display: flex;
+  gap: 0.2rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-block: 0.8rem;
+}
+.tx-cat-pills__row::-webkit-scrollbar { display: none; }
+
+.tx-cat-pill {
+  white-space: nowrap;
+  font-family: var(--tx-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  color: var(--tx-ink);
+  text-decoration: none;
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  border: 1.5px solid transparent;
+  transition: border-color 0.18s, background 0.18s, color 0.18s;
+}
+.tx-cat-pill:hover { border-color: var(--tx-gold); color: var(--tx-gold); }
+.tx-cat-pill--active {
+  background: var(--tx-ink);
+  color: var(--tx-cream);
+  border-color: var(--tx-ink);
+}
+
+/* Grid de productos — 4 columnas con hover swap */
+.tx-col-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(0.8rem, 2vw, 1.6rem);
+}
+
+.tx-col-card {
+  display: grid;
+  gap: 0.7rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.tx-col-card__media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--tx-surface);
+}
+
+.tx-col-card__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.35s ease, transform 0.4s ease;
+}
+.tx-col-card__img--primary { opacity: 1; }
+.tx-col-card__img--hover { opacity: 0; }
+
+.tx-col-card:hover .tx-col-card__img--primary { opacity: 0; }
+.tx-col-card:hover .tx-col-card__img--hover { opacity: 1; }
+.tx-col-card:hover .tx-col-card__img--primary { transform: scale(1.04); }
+
+.tx-col-card__info {
+  display: grid;
+  gap: 0.2rem;
+  padding-inline: 0.1rem;
+}
+.tx-col-card__name {
+  font-family: var(--tx-display);
+  text-transform: uppercase;
+  font-size: 0.95rem;
+  color: var(--tx-ink);
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  margin: 0;
+}
+.tx-col-card__price {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--tx-text);
+}
+
+/* "También te puede interesar" */
+.tx-tambien { background: var(--tx-surface); }
+.tx-tambien__title {
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  text-align: center;
+}
+.tx-tambien__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(0.8rem, 2vw, 1.4rem);
+}
+.tx-tambien__card {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  overflow: hidden;
+  text-decoration: none;
+  display: block;
+}
+.tx-tambien__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+  display: block;
+}
+.tx-tambien__card:hover .tx-tambien__img { transform: scale(1.06); }
+.tx-tambien__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(11,57,89,0.65) 0%, transparent 55%);
+  display: flex;
+  align-items: flex-end;
+  padding: 1.2rem 1.4rem;
+}
+.tx-tambien__label {
+  color: var(--tx-cream);
+  font-size: clamp(1.1rem, 1.5vw, 1.6rem);
+}
+
+/* ============================================================
+   PÁGINAS INTERNAS — offset header para rutas sin hero full-bleed
+   ============================================================ */
+.tx-page {
+  background: var(--tx-bg);
+  color: var(--tx-text);
+  font-family: var(--tx-body);
+  padding-top: 72px;
+}
+.tx-page-section {
+  padding: clamp(4rem, 3rem + 5vw, 8rem) var(--tx-gutter);
+  max-width: var(--tx-maxw);
+  margin-inline: auto;
+}
+
+/* ============================================================
+   NUESTRA HISTORIA — Tropicalia: section-auto.interna + #equipo
+   ============================================================ */
+.tx-nosotros__h1 {
+  font-family: var(--tx-display);
+  font-size: clamp(2.6rem, 1rem + 6vw, 5rem);
+  color: var(--tx-gold);
+  text-transform: uppercase;
+  line-height: 1;
+  margin: 0;
+}
+.tx-nosotros__intro {
+  display: grid;
+  grid-template-columns: 0.8fr 1.8fr 1fr;
+  gap: clamp(1.2rem, 4vw, 2.5rem);
+  margin-top: clamp(3rem, 6vh, 5rem);
+  align-items: stretch;
+}
+.tx-nosotros__col-dark {
+  background: var(--tx-ink);
+  border-radius: 6px;
+  padding: clamp(2rem, 6vh, 4rem) 1.2rem;
+  color: var(--tx-cream);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.tx-nosotros__col-dark h4 {
+  font-family: var(--tx-display);
+  text-transform: uppercase;
+  font-size: clamp(1rem, 1.8vw, 1.5rem);
+  color: var(--tx-cream);
+  margin: 0;
+}
+.tx-nosotros__col-dark p { font-size: 0.88rem; color: rgba(255,247,231,0.82); margin: 0; line-height: 1.6; }
+.tx-nosotros__col-img {
+  height: clamp(380px, 65vh, 640px);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.tx-nosotros__col-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tx-nosotros__col-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding-bottom: 10vh;
+}
+
+/* Equipo — text sticky + masonry grid */
+.tx-nosotros__equipo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+  padding-block: clamp(4rem, 8vh, 8rem);
+  max-width: var(--tx-maxw);
+  margin-inline: auto;
+  padding-inline: var(--tx-gutter);
+}
+.tx-nosotros__equipo-text {
+  position: sticky;
+  top: 18vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.tx-nosotros__masonry {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(0.8rem, 2vw, 1.4rem);
+}
+.tx-nosotros__photo {
+  border-radius: 6px;
+  overflow: hidden;
+  height: clamp(180px, 26vh, 320px);
+}
+.tx-nosotros__photo.tall { height: clamp(400px, 60vh, 700px); }
+.tx-nosotros__photo.narrow { width: 60%; }
+.tx-nosotros__photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ============================================================
+   PREPARA TU CAFÉ — tabs Aeropress / Chemex / Filtrado / Prensa
+   ============================================================ */
+.tx-brew-banner {
+  position: relative;
+  height: clamp(250px, 35vh, 420px);
+  overflow: hidden;
+}
+.tx-brew-banner__img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center 40%; display: block;
+}
+.tx-brew-banner__title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  background: linear-gradient(0deg, rgba(11,57,89,0.62) 0%, transparent 55%);
+  font-family: var(--tx-display);
+  font-size: clamp(2rem, 1rem + 4vw, 4rem);
+  color: var(--tx-cream);
+  text-transform: uppercase;
+}
+.tx-brew-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding-block: clamp(2rem, 4vh, 3rem);
+}
+.tx-brew-tab {
+  font-family: var(--tx-display);
+  font-size: clamp(1rem, 1.2vw, 1.3rem);
+  text-transform: uppercase;
+  color: var(--tx-gold);
+  background: transparent;
+  border: 1px solid var(--tx-gold);
+  border-radius: 999px;
+  padding: 0.35rem 1.4rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.18s, color 0.18s;
+  line-height: 1.1;
+}
+.tx-brew-tab:hover,
+.tx-brew-tab[data-active='true'] {
+  background: var(--tx-gold);
+  color: var(--tx-cream);
+}
+.tx-brew-pane { display: none; }
+.tx-brew-pane--active { display: grid; }
+.tx-brew-pane {
+  grid-template-columns: 1.75fr 1fr;
+  gap: clamp(2rem, 4vw, 5rem);
+  align-items: start;
+  padding-inline: var(--tx-gutter);
+  max-width: var(--tx-maxw);
+  margin-inline: auto;
+  padding-bottom: clamp(3rem, 6vh, 6rem);
+}
+.tx-brew-left {
+  display: grid;
+  grid-template-columns: 0.8fr 1fr;
+  gap: 2vw;
+  align-items: start;
+  position: sticky;
+  top: 13vh;
+}
+.tx-brew-specs { display: flex; flex-direction: column; gap: 0.6rem; padding-top: 2vh; }
+.tx-brew-spec { font-size: 0.88rem; color: var(--tx-ink); line-height: 1.5; }
+.tx-brew-spec strong { color: var(--tx-gold); font-weight: 700; }
+.tx-brew-img {
+  width: 100%;
+  height: clamp(300px, 72vh, 700px);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.tx-brew-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tx-brew-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  border-left: 2px solid var(--tx-ink);
+  padding-left: clamp(1rem, 2vw, 2rem);
+}
+.tx-brew-step h4 {
+  font-family: var(--tx-display);
+  text-transform: uppercase;
+  color: var(--tx-ink);
+  font-size: 0.95rem;
+  font-weight: 400;
+  margin: 0 0 0.4rem;
+}
+.tx-brew-step h4 span { color: var(--tx-gold); }
+.tx-brew-step p { font-size: 0.88rem; color: var(--tx-muted); margin: 0; line-height: 1.6; }
+
+/* ============================================================
+   CONTACTO — split form + photo (Tropicalia: .cont-contacto)
+   ============================================================ */
+.tx-contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: clamp(2rem, 4vw, 5rem);
+  align-items: start;
+}
+.tx-contact-head { margin-bottom: 1.8rem; }
+.tx-contact-head h1 {
+  font-family: var(--tx-display);
+  font-size: clamp(2rem, 1rem + 4vw, 3.8rem);
+  text-transform: uppercase;
+  color: var(--tx-gold);
+  line-height: 1;
+  margin: 0 0 0.5rem;
+}
+.tx-contact-form { display: flex; flex-direction: column; gap: 0.9rem; }
+.tx-form-field {
+  width: 100%;
+  padding: 0.85rem 0.9rem;
+  border: 1.5px solid rgba(11, 57, 89, 0.22);
+  border-radius: 4px;
+  background: transparent;
+  font-family: var(--tx-display);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--tx-ink);
+  outline: none;
+  transition: border-color 0.18s;
+  line-height: 1.2;
+}
+.tx-form-field::placeholder { color: rgba(11, 57, 89, 0.45); font-size: 0.95rem; }
+.tx-form-field:focus { border-color: var(--tx-gold); }
+.tx-form-field--textarea {
+  min-height: 120px;
+  resize: vertical;
+  font-family: var(--tx-body);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.88rem;
+}
+.tx-form-check { display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.8rem; color: var(--tx-muted); }
+.tx-form-check input { margin-top: 2px; accent-color: var(--tx-gold); }
+.tx-contact-photo {
+  border-radius: 12px;
+  overflow: hidden;
+  height: clamp(400px, 70vh, 680px);
+  position: sticky;
+  top: 10vh;
+}
+.tx-contact-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ============================================================
+   TIPOGRAFÍA SECUNDARIA — Terital United W 00 (= .titulo Tropicalia)
+   ============================================================ */
+.tx-titulo {
+  font-family: 'Terital United W 00', Georgia, serif;
+  font-size: 0.78rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--tx-gold);
+  display: block;
+}
+.tx-parrafo {
+  font-family: var(--tx-body);
+  font-size: 0.9rem;
+  color: var(--tx-ink);
+  line-height: 1.2;
+  display: block;
+}
+
+/* ============================================================
+   PDP — Fila de iconos metafield (Tropicalia: div-block-385.cafe)
+   ============================================================ */
+.tx-meta-icons {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  width: 100%;
+  padding-block: 1.1rem;
+  border-top: 1px solid var(--tx-line);
+  border-bottom: 1px solid var(--tx-line);
+  margin-block: 1.2rem;
+}
+.tx-meta-icon-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex: 1 0 auto;
+  min-width: 0;
+}
+.tx-meta-icon {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.tx-meta-icon-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+/* ============================================================
+   PDP — Pills de variante / molienda (Tropicalia: button-16)
+   ============================================================ */
+.tx-variant-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-block: 0.5rem;
+}
+.tx-variant-pill {
+  font-family: var(--tx-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--tx-ink);
+  background: transparent;
+  border: 1.5px solid rgba(11, 57, 89, 0.5);
+  border-radius: 6px;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  white-space: nowrap;
+  line-height: 1;
+}
+.tx-variant-pill:hover,
+.tx-variant-pill[data-selected='true'] {
+  background: var(--tx-ink);
+  color: var(--tx-cream);
+  border-color: var(--tx-ink);
+}
+.tx-variant-pill[data-unavailable='true'] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+/* ============================================================
+   COLLECTION — Overlay agotado (Tropicalia: cont-agotado)
+   ============================================================ */
+.tx-col-card__sold-out {
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 57, 89, 0.38);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  border-radius: 12px;
+}
+.tx-col-card__sold-out span {
+  font-family: var(--tx-display);
+  text-transform: uppercase;
+  font-size: 1rem;
+  color: var(--tx-cream);
+  letter-spacing: 0.06em;
+  background: rgba(11, 57, 89, 0.5);
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+}
+
+/* ============================================================
+   PDP — Shipping badges (Tropicalia: .div-block-523)
+   ============================================================ */
+.tx-shipping-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 1.2rem 0;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--tx-line);
+  border-radius: 8px;
+  background: rgba(179, 109, 24, 0.04);
+}
+.tx-shipping-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.tx-shipping-item img {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+.tx-shipping-item p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--tx-gold);
+  font-family: var(--tx-body);
+  line-height: 1.4;
+}
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 980px) {
-  .tx-collections { grid-template-columns: repeat(2, 1fr); }
+  .tx-lineas-grid { grid-template-columns: 1fr; }
   .tx-products { grid-template-columns: repeat(2, 1fr); }
-  .tx-rituals { grid-template-columns: 1fr; max-width: 30rem; margin-inline: auto; }
-  .tx-hero { grid-template-columns: 1fr; min-height: 78vh; }
-  .tx-hero__media:nth-child(2) { display: none; }
-  .tx-hero__overlay { background: linear-gradient(180deg, rgba(25,51,47,0.2), rgba(25,51,47,0.65)); }
-  .tx-sub { grid-template-columns: 1fr; }
-  .tx-sub__media { order: -1; }
+  .tx-galeria-split { grid-template-columns: 1fr; }
+  .tx-galeria-split__fotos { min-height: 300px; }
   .footer__grid { grid-template-columns: 1fr 1fr; }
+  .tx-banner { height: 80svh; }
+  .tx-col-grid { grid-template-columns: repeat(2, 1fr); }
+  .tx-tambien__grid { grid-template-columns: 1fr 1fr; }
+  .tx-footer__cols { gap: 2rem; }
+  /* Nosotros */
+  .tx-nosotros__intro { grid-template-columns: 1fr; }
+  .tx-nosotros__col-img { height: clamp(280px, 50vh, 460px); }
+  .tx-nosotros__equipo { grid-template-columns: 1fr; }
+  .tx-nosotros__equipo-text { position: static; }
+  /* Brew guide */
+  .tx-brew-pane--active { grid-template-columns: 1fr; }
+  .tx-brew-left { grid-template-columns: 1fr; position: static; }
+  .tx-brew-img { height: clamp(250px, 45vh, 500px); }
+  /* Contact */
+  .tx-contact-grid { grid-template-columns: 1fr; }
+  .tx-contact-photo { position: static; height: clamp(300px, 50vw, 480px); }
+  /* Meta icons */
+  .tx-meta-icons { flex-wrap: wrap; gap: 0.8rem; }
+  .tx-meta-icon-item { flex: 1 0 calc(33% - 0.5rem); }
 }
 
 @media (max-width: 760px) {
@@ -528,12 +1384,23 @@ main:not(:has(.tx-hero)) { padding-top: 72px; }
     align-items: center;
     justify-content: center;
     width: 38px; height: 38px;
-    background: none; border: none; cursor: pointer;
   }
-  .tx-collections, .tx-products { grid-template-columns: 1fr 1fr; }
+  .tx-products { grid-template-columns: repeat(2, 1fr); }
+  .tx-linea__body { flex-direction: column; }
+  .tx-linea__img { width: 100%; max-width: 180px; margin: 0 auto; }
+  .tx-infaltables-head .tx-desktop-only { display: none; }
+  .tx-infaltables-movil { display: block; }
+  .tx-desktop-only { display: none !important; }
   .footer__grid { grid-template-columns: 1fr; }
+  .tx-banner__h1 { font-size: clamp(2.2rem, 8vw, 3rem); }
+  .tx-col-grid { grid-template-columns: repeat(2, 1fr); }
+  .tx-tambien__grid { grid-template-columns: 1fr; }
+  .tx-cat-banner { height: clamp(220px, 50vw, 340px); }
+  .tx-footer__top { flex-direction: column; }
 }
 
 @media (max-width: 460px) {
-  .tx-collections, .tx-products { grid-template-columns: 1fr; max-width: 22rem; margin-inline: auto; }
+  .tx-products { grid-template-columns: 1fr; max-width: 22rem; margin-inline: auto; }
+  .tx-lineas-grid { gap: 1rem; }
+  .tx-col-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
 }

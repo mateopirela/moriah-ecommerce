@@ -16,10 +16,7 @@ import {getCafe, formatCop, BUNDLE, bundlePrice} from '~/data/cafes';
 import {PurchaseOptions} from '~/components/PurchaseOptions';
 import {RoastMeter} from '~/components/RoastMeter';
 import {
-  IconTruck,
-  IconShield,
   IconLeaf,
-  IconBox,
   IconCheck,
   IconPlus,
   IconUser,
@@ -159,6 +156,43 @@ function metaValue(product, key) {
   return mf?.value || null;
 }
 
+/**
+ * Fila de 5 iconos de metafield — Tropicalia: .div-block-385.cafe
+ * Muestra solo los campos con valor.
+ */
+function MetaIconsRow({variety, heroe, territory, farm, proceso}) {
+  const items = [
+    {icon: '/icons/icono-cafe-dorado.svg',     label: 'Variedad',   value: variety},
+    {icon: '/icons/icono-heroe-dorado.svg',    label: 'Héroe',      value: heroe},
+    {icon: '/icons/icono-colombia-dorado.svg', label: 'Territorio', value: territory},
+    {icon: '/icons/icono-finca-dorado.svg',    label: 'Finca',      value: farm},
+    {icon: '/icons/icono-empaque-dorado.svg',  label: 'Proceso',    value: proceso},
+  ].filter((it) => it.value);
+
+  if (!items.length) return null;
+
+  return (
+    <div className="tx-meta-icons">
+      {items.map((it) => (
+        <div key={it.label} className="tx-meta-icon-item">
+          <img
+            src={it.icon}
+            alt=""
+            aria-hidden="true"
+            width={38}
+            height={38}
+            className="tx-meta-icon"
+          />
+          <div className="tx-meta-icon-text">
+            <span className="tx-titulo">{it.label}</span>
+            <span className="tx-parrafo">{it.value}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Product() {
   /** @type {LoaderReturnData} */
   const {product, seedCafe, seedBundle} = useLoaderData();
@@ -221,11 +255,7 @@ function SeedBundlePage() {
               Entrega 2–4 días
             </p>
           </div>
-          <div className="trust-row">
-            <span className="trust-item"><IconTruck /> Envío gratis desde $100.000</span>
-            <span className="trust-item"><IconBox /> Sellado al vacío</span>
-            <span className="trust-item"><IconShield /> Nequi · PSE · Tarjeta</span>
-          </div>
+          <ShippingBadges />
           <div className="accordion">
             <details className="accordion__item" open>
               <summary className="accordion__trigger">
@@ -270,6 +300,14 @@ function SeedProductPage({cafe}) {
           <h1 className="pdp-title">{cafe.title}</h1>
           <p className="pdp-origin">{cafe.origin}</p>
 
+          <MetaIconsRow
+            variety={cafe.variety}
+            heroe={cafe.producer}
+            territory={cafe.region}
+            farm={cafe.farm}
+            proceso={cafe.process}
+          />
+
           <a href="#reseñas" style={{width: 'max-content'}}>
             <StarRating rating={5} count={128} />
           </a>
@@ -300,17 +338,7 @@ function SeedProductPage({cafe}) {
 
           <PurchaseOptions cafe={cafe} />
 
-          <div className="trust-row">
-            <span className="trust-item">
-              <IconTruck /> Envío gratis desde $100.000
-            </span>
-            <span className="trust-item">
-              <IconBox /> Sellado al vacío
-            </span>
-            <span className="trust-item">
-              <IconShield /> Nequi · PSE · Tarjeta
-            </span>
-          </div>
+          <ShippingBadges />
 
           {cafe.producer && (
             <div className="producer">
@@ -395,6 +423,8 @@ function ShopifyProductPage({product}) {
   const roast = metaValue(product, 'roast');
   const altitude = metaValue(product, 'altitude');
   const processMethod = metaValue(product, 'process');
+  const variety = metaValue(product, 'variety');
+  const farm = metaValue(product, 'farm');
 
   const compareAt = selectedVariant?.compareAtPrice;
   const onSale =
@@ -425,6 +455,14 @@ function ShopifyProductPage({product}) {
 
           <h1 className="pdp-title">{title}</h1>
           {origin && <p className="pdp-origin">{origin}</p>}
+
+          <MetaIconsRow
+            variety={variety}
+            heroe={vendor}
+            territory={origin}
+            farm={farm}
+            proceso={processMethod}
+          />
 
           <a href="#reseñas" style={{width: 'max-content'}}>
             <StarRating rating={5} count={128} />
@@ -494,17 +532,7 @@ function ShopifyProductPage({product}) {
             )}
           </div>
 
-          <div className="trust-row">
-            <span className="trust-item">
-              <IconTruck /> Envío gratis desde $100.000
-            </span>
-            <span className="trust-item">
-              <IconBox /> Sellado al vacío
-            </span>
-            <span className="trust-item">
-              <IconShield /> Pago 100% seguro
-            </span>
-          </div>
+          <ShippingBadges />
 
           <ProductAccordions descriptionHtml={descriptionHtml} />
         </div>
@@ -534,6 +562,24 @@ function ShopifyProductPage({product}) {
           ],
         }}
       />
+    </div>
+  );
+}
+
+/**
+ * Shipping info badges — Tropicalia: .div-block-523
+ */
+function ShippingBadges() {
+  return (
+    <div className="tx-shipping-row">
+      <div className="tx-shipping-item">
+        <img src="/icons/icono-local-dorado.svg" alt="" aria-hidden="true" width={28} height={28} />
+        <p>Bogotá: entrega en 2–3 días hábiles.</p>
+      </div>
+      <div className="tx-shipping-item">
+        <img src="/icons/icono-nacional-dorado.svg" alt="" aria-hidden="true" width={28} height={28} />
+        <p>Nacional: 3–5 días hábiles · gratis desde $100.000.</p>
+      </div>
     </div>
   );
 }
@@ -708,7 +754,9 @@ const PRODUCT_FRAGMENT = `#graphql
       {namespace: "custom", key: "origin"},
       {namespace: "custom", key: "roast"},
       {namespace: "custom", key: "altitude"},
-      {namespace: "custom", key: "process"}
+      {namespace: "custom", key: "process"},
+      {namespace: "custom", key: "variety"},
+      {namespace: "custom", key: "farm"}
     ]) {
       key
       value

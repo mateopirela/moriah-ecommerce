@@ -2,21 +2,18 @@ import {redirect, useLoaderData, useSearchParams} from 'react-router';
 import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
-import {ProductItem} from '~/components/ProductItem';
-import {CafeCard} from '~/components/CafeCard';
-import {BundleCard} from '~/components/BundleCard';
-import {CAFES} from '~/data/cafes';
+import {CAFES, formatCop} from '~/data/cafes';
 
-// Handles that should fall back to the local café catalog when Shopify
-// doesn't have the collection yet.
+// Handles that fall back to local catalog before Shopify collection is ready
 const SEED_HANDLES = ['cafes', 'all'];
 
-const SORT_OPTIONS = [
-  {key: 'featured', label: 'Destacados', sortKey: 'COLLECTION_DEFAULT', reverse: false},
-  {key: 'best', label: 'Más vendidos', sortKey: 'BEST_SELLING', reverse: false},
-  {key: 'price-asc', label: 'Precio: menor', sortKey: 'PRICE', reverse: false},
-  {key: 'price-desc', label: 'Precio: mayor', sortKey: 'PRICE', reverse: true},
-  {key: 'new', label: 'Novedades', sortKey: 'CREATED', reverse: true},
+// Category filters — mirrors Tropicalia's horizontal pill nav
+const CAFE_FILTERS = [
+  {handle: 'cafes', label: 'Todos'},
+  {handle: 'linea-origen', label: 'Línea de Origen'},
+  {handle: 'micro-lotes', label: 'Micro-lotes'},
+  {handle: 'club-de-la-memoria', label: 'Club de la Memoria'},
+  {handle: 'kit-el-legado', label: 'Kit El Legado'},
 ];
 
 /**
@@ -44,18 +41,11 @@ export async function loader(args) {
   return {...deferredData, ...criticalData};
 }
 
-/**
- * @param {Route.LoaderArgs}
- */
 async function loadCriticalData({context, params, request}) {
   const {handle} = params;
   const {storefront} = context;
-  const url = new URL(request.url);
-  const sortParam = url.searchParams.get('sort') || 'featured';
-  const sort =
-    SORT_OPTIONS.find((s) => s.key === sortParam) || SORT_OPTIONS[0];
 
-  const paginationVariables = getPaginationVariables(request, {pageBy: 9});
+  const paginationVariables = getPaginationVariables(request, {pageBy: 12});
 
   if (!handle) {
     throw redirect('/collections');
@@ -63,21 +53,14 @@ async function loadCriticalData({context, params, request}) {
 
   const {collection} = await storefront
     .query(COLLECTION_QUERY, {
-      variables: {
-        handle,
-        sortKey: sort.sortKey,
-        reverse: sort.reverse,
-        ...paginationVariables,
-      },
+      variables: {handle, ...paginationVariables},
     })
     .catch(() => ({collection: null}));
 
   const shopifyHasProducts = collection?.products?.nodes?.length > 0;
 
-  // Fall back to the local café catalog so we never 404 (or show demo
-  // products) before the Shopify `cafes` collection is set up.
   if (!shopifyHasProducts && SEED_HANDLES.includes(handle)) {
-    return {seed: true, activeSort: sort.key};
+    return {seed: true, handle};
   }
 
   if (!collection) {
@@ -86,126 +69,225 @@ async function loadCriticalData({context, params, request}) {
 
   redirectIfHandleIsLocalized(request, {handle, data: collection});
 
-  return {collection, activeSort: sort.key};
+  return {collection, handle};
 }
 
-/**
- * @param {Route.LoaderArgs}
- */
 function loadDeferredData() {
   return {};
 }
 
 export default function Collection() {
-  /** @type {LoaderReturnData} */
   const data = useLoaderData();
 
   if (data.seed) {
-    return <SeedCollection />;
+    return <SeedCollection handle={data.handle} />;
   }
 
-  return <ShopifyCollection collection={data.collection} activeSort={data.activeSort} />;
+  return <ShopifyCollection collection={data.collection} handle={data.handle} />;
 }
 
-/** Local café catalog view (pre-Shopify). */
-function SeedCollection() {
+/** ─── Tropicalia-style collection banner ─────────────────────────────── */
+function CollectionBanner({title, description, image}) {
   return (
-    <div className="collection">
-      <section className="collection-hero">
-        <div className="container collection-hero__inner">
-          <span className="eyebrow" style={{color: 'var(--gold-300)'}}>
-            Selección de especialidad
-          </span>
-          <h1 className="display-h2">Nuestros Cafés</h1>
-          <p className="lede" style={{color: 'rgba(247,243,234,0.8)'}}>
-            Ediciones de especialidad y blends únicos, cultivados con intención
-            y respeto por la tierra. Café 100% colombiano.
-          </p>
-        </div>
-      </section>
+    <section className="tx-cat-banner">
+      <img
+        src={image || '/images/hero-lifestyle.webp'}
+        alt={title}
+        width={1920}
+        height={600}
+        className="tx-cat-banner__img"
+        fetchpriority="high"
+        decoding="async"
+      />
+      <div className="tx-cat-banner__overlay">
+        <h1 className="tx-display tx-cat-banner__title">{title}</h1>
+        {description && (
+          <p className="tx-cat-banner__desc">{description}</p>
+        )}
+      </div>
+    </section>
+  );
+}
 
-      <div className="container">
-        <div className="collection-toolbar">
-          <span className="collection-count">{CAFES.length + 1} productos</span>
-        </div>
-        <div className="products-grid">
-          {CAFES.map((cafe, i) => (
-            <CafeCard key={cafe.handle} cafe={cafe} loading={i < 3 ? 'eager' : 'lazy'} />
+/** ─── Category pill navigation (Tropicalia: .div-block-385) ─────────── */
+function CategoryPills({activeHandle}) {
+  return (
+    <nav className="tx-cat-pills" aria-label="Categorías">
+      <div className="tx-container">
+        <div className="tx-cat-pills__row">
+          {CAFE_FILTERS.map((f) => (
+            <Link
+              key={f.handle}
+              to={`/collections/${f.handle}`}
+              className={`tx-cat-pill${activeHandle === f.handle ? ' tx-cat-pill--active' : ''}`}
+            >
+              {f.label}
+            </Link>
           ))}
-          <BundleCard />
         </div>
       </div>
+    </nav>
+  );
+}
+
+/** ─── Product card with hover-swap image (Tropicalia: .cont-img-producto) */
+function TxProductCard({product, index}) {
+  const price = product.priceRange?.minVariantPrice;
+  const images = product.images?.nodes ?? [];
+  const img1 = images[0]?.url ?? product.featuredImage?.url ?? '/images/cafe-bolsa.webp';
+  const img2 = images[1]?.url ?? null;
+  const unavailable = product.availableForSale === false;
+
+  return (
+    <Link
+      to={`/products/${product.handle}`}
+      className="tx-col-card"
+      prefetch="intent"
+    >
+      <div className="tx-col-card__media">
+        <img
+          src={img1}
+          alt={product.title}
+          width={600}
+          height={600}
+          loading={index < 4 ? 'eager' : 'lazy'}
+          className="tx-col-card__img tx-col-card__img--primary"
+        />
+        {img2 && (
+          <img
+            src={img2}
+            alt=""
+            aria-hidden="true"
+            width={600}
+            height={600}
+            loading="lazy"
+            className="tx-col-card__img tx-col-card__img--hover"
+          />
+        )}
+        {unavailable && (
+          <div className="tx-col-card__sold-out">
+            <span>Agotado</span>
+          </div>
+        )}
+      </div>
+      <div className="tx-col-card__info">
+        <h2 className="tx-col-card__name">{product.title}</h2>
+        {price && (
+          <div className="tx-col-card__price">
+            {formatCop(Number(price.amount))}
+          </div>
+        )}
+      </div>
+    </Link>
+  );
+}
+
+/** ─── Seed card using local CAFES data ──────────────────────────────── */
+function SeedCard({cafe, index}) {
+  return (
+    <Link to={`/products/${cafe.handle}`} className="tx-col-card" prefetch="intent">
+      <div className="tx-col-card__media">
+        <img
+          src={cafe.image}
+          alt={cafe.title}
+          width={600}
+          height={600}
+          loading={index < 4 ? 'eager' : 'lazy'}
+          className="tx-col-card__img tx-col-card__img--primary"
+        />
+      </div>
+      <div className="tx-col-card__info">
+        <h2 className="tx-col-card__name">{cafe.title}</h2>
+        <div className="tx-col-card__price">{formatCop(cafe.price)}</div>
+      </div>
+    </Link>
+  );
+}
+
+/** ─── "También te puede interesar" — 3 large category blocks ─────────── */
+function TambienTeInteresa() {
+  const items = [
+    {label: 'Nuestros cafés', to: '/collections/cafes', img: '/images/cafe-cafes.webp'},
+    {label: 'Kit El Legado', to: '/collections/cafes', img: '/images/kit-bolsas.webp'},
+    {label: 'Club de la Memoria', to: '/collections/cafes', img: '/images/lineup-bolsas.webp'},
+  ];
+  return (
+    <section className="tx-section tx-tambien">
+      <div className="tx-container">
+        <h2 className="tx-display tx-h2 tx-tambien__title">
+          También te puede interesar
+        </h2>
+        <div className="tx-tambien__grid">
+          {items.map((it) => (
+            <Link key={it.label} to={it.to} className="tx-tambien__card">
+              <img
+                src={it.img}
+                alt={it.label}
+                width={800}
+                height={600}
+                loading="lazy"
+                className="tx-tambien__img"
+              />
+              <div className="tx-tambien__overlay">
+                <span className="tx-display tx-h3 tx-tambien__label">{it.label}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** ─── Local seed collection ─────────────────────────────────────────── */
+function SeedCollection({handle}) {
+  return (
+    <div className="tx">
+      <CollectionBanner
+        title="Nuestros Cafés"
+        description="Café 100% colombiano de especialidad, cultivado con intención y respeto por la tierra. Cada grano tostado artesanalmente y sellado al vacío."
+      />
+      <CategoryPills activeHandle={handle} />
+      <section className="tx-section">
+        <div className="tx-container">
+          <div className="tx-col-grid">
+            {CAFES.map((cafe, i) => (
+              <SeedCard key={cafe.handle} cafe={cafe} index={i} />
+            ))}
+          </div>
+        </div>
+      </section>
+      <TambienTeInteresa />
     </div>
   );
 }
 
-/**
- * @param {{collection: any, activeSort: string}}
- */
-function ShopifyCollection({collection, activeSort}) {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const onSort = (key) => {
-    const next = new URLSearchParams(searchParams);
-    next.set('sort', key);
-    next.delete('cursor');
-    next.delete('direction');
-    setSearchParams(next, {preventScrollReset: true});
-  };
-
+/** ─── Live Shopify collection ───────────────────────────────────────── */
+function ShopifyCollection({collection, handle}) {
   return (
-    <div className="collection">
-      <section className="collection-hero">
-        <div className="container collection-hero__inner">
-          <span className="eyebrow" style={{color: 'var(--gold-300)'}}>
-            Selección de especialidad
-          </span>
-          <h1 className="display-h2">{collection.title}</h1>
-          {collection.description && (
-            <p className="lede" style={{color: 'rgba(247,243,234,0.8)'}}>
-              {collection.description}
-            </p>
-          )}
+    <div className="tx">
+      <CollectionBanner
+        title={collection.title}
+        description={collection.description}
+        image={collection.image?.url}
+      />
+      <CategoryPills activeHandle={handle} />
+      <section className="tx-section">
+        <div className="tx-container">
+          <PaginatedResourceSection
+            connection={collection.products}
+            resourcesClassName="tx-col-grid"
+          >
+            {({node: product, index}) => (
+              <TxProductCard key={product.id} product={product} index={index} />
+            )}
+          </PaginatedResourceSection>
         </div>
       </section>
-
-      <div className="container">
-        <div className="collection-toolbar">
-          <div className="filter-pills" role="group" aria-label="Ordenar">
-            {SORT_OPTIONS.map((s) => (
-              <button
-                key={s.key}
-                className="filter-pill"
-                aria-pressed={activeSort === s.key}
-                onClick={() => onSort(s.key)}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
-          <span className="collection-count">
-            {collection.products.nodes.length} productos
-          </span>
-        </div>
-
-        <PaginatedResourceSection
-          connection={collection.products}
-          resourcesClassName="products-grid"
-        >
-          {({node: product, index}) => (
-            <ProductItem
-              key={product.id}
-              product={product}
-              loading={index < 6 ? 'eager' : undefined}
-            />
-          )}
-        </PaginatedResourceSection>
-      </div>
+      <TambienTeInteresa />
 
       <Analytics.CollectionView
-        data={{
-          collection: {id: collection.id, handle: collection.handle},
-        }}
+        data={{collection: {id: collection.id, handle: collection.handle}}}
       />
     </div>
   );
@@ -222,12 +304,22 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
     title
     vendor
     tags
+    availableForSale
     featuredImage {
       id
       altText
       url
       width
       height
+    }
+    images(first: 2) {
+      nodes {
+        id
+        url
+        altText
+        width
+        height
+      }
     }
     priceRange {
       minVariantPrice {
@@ -250,21 +342,18 @@ const COLLECTION_QUERY = `#graphql
     $last: Int
     $startCursor: String
     $endCursor: String
-    $sortKey: ProductCollectionSortKeys
-    $reverse: Boolean
   ) @inContext(country: $country, language: $language) {
     collection(handle: $handle) {
       id
       handle
       title
       description
+      image { url }
       products(
         first: $first,
         last: $last,
         before: $startCursor,
         after: $endCursor,
-        sortKey: $sortKey,
-        reverse: $reverse
       ) {
         nodes {
           ...ProductItem
@@ -281,5 +370,4 @@ const COLLECTION_QUERY = `#graphql
 `;
 
 /** @typedef {import('./+types/collections.$handle').Route} Route */
-/** @typedef {import('storefrontapi.generated').ProductItemFragment} ProductItemFragment */
 /** @typedef {ReturnType<typeof useLoaderData<typeof loader>>} LoaderReturnData */

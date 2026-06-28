@@ -13,27 +13,26 @@ const TX_NAV = [
     title: 'Café',
     url: '/collections/cafes',
     items: [
-      {title: 'Todos', url: '/collections/cafes'},
-      {title: 'Línea de Origen', url: '/collections/cafes'},
-      {title: 'Micro-lotes', url: '/collections/cafes'},
-      {title: 'Club de la Memoria', url: '/#club'},
+      {title: 'Todos', url: '/collections/cafes', img: '/images/lineup-bolsas.webp'},
+      {title: 'Línea de Origen', url: '/collections/cafes', img: '/images/cafe-bolsa.webp'},
+      {title: 'Micro-lotes', url: '/collections/cafes', img: '/images/producto-bolsa.webp'},
+      {title: 'Club de la Memoria', url: '/#club', img: '/images/kit-bolsas.webp'},
     ],
   },
   {
     title: 'Merch',
     url: '/collections/all',
     items: [
-      {title: 'Pocillos', url: '/collections/all'},
-      {title: 'Para vestir', url: '/collections/all'},
-      {title: 'Accesorios', url: '/collections/all'},
-      {title: 'Caja regalo', url: '/collections/all'},
+      {title: 'Pocillos', url: '/collections/all', img: '/images/equipo-moriah.webp'},
+      {title: 'Para vestir', url: '/collections/all', img: '/images/tostado-moriah.webp'},
+      {title: 'Accesorios', url: '/collections/all', img: '/images/hero-bolsa.webp'},
+      {title: 'Caja regalo', url: '/collections/all', img: '/images/kit-bolsas.webp'},
     ],
   },
   {title: 'Catación', url: '/quiz'},
-  {title: 'Prepara tu café', url: '/pages/nuestra-historia'},
-  {title: 'Tienda', url: '/collections/all'},
-  {title: 'Blog', url: '/blogs/news'},
-  {title: 'Contacto', url: '/memoria'},
+  {title: 'Prepara tu café', url: '/pages/prepara-tu-cafe'},
+  {title: 'Tienda', url: '/collections/cafes'},
+  {title: 'Contacto', url: '/pages/contacto'},
 ];
 
 /**
@@ -86,7 +85,18 @@ function TropicaliaNav() {
             <div className="tx-nav-panel">
               {item.items.map((sub) => (
                 <Link key={sub.title} to={sub.url} prefetch="intent">
-                  {sub.title}
+                  {sub.img && (
+                    <img
+                      src={sub.img}
+                      alt=""
+                      aria-hidden="true"
+                      width={180}
+                      height={180}
+                      loading="lazy"
+                      className="tx-nav-panel-img"
+                    />
+                  )}
+                  <span className="tx-nav-panel-label">{sub.title}</span>
                 </Link>
               ))}
             </div>
