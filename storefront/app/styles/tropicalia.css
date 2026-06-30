@@ -472,7 +472,8 @@ main:not(:has(.tx-banner)) { padding-top: 72px; }
 .tx-dark-section__overlay {
   position: relative;
   z-index: 2;
-  background: rgba(11, 57, 89, 0.72);
+  /* Overlay verde pino de marca (antes azul Tropicalia #0b3959). */
+  background: rgba(25, 51, 47, 0.72);
   width: 100%;
   display: flex;
   align-items: center;
