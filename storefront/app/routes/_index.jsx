@@ -71,7 +71,7 @@ const LINEAS = [
     name: 'Línea de Origen',
     subtitle: 'Cafés con propósito',
     desc: 'Dedicados a los auténticos exploradores, aquellos que encuentran valor en las pequeñas cosas que otorgan sentido a la vida. Cafés 100% colombianos de alta montaña, cultivados con intención y respeto por la tierra.',
-    img: '/images/cafe-bolsa.webp',
+    img: '/images/producto-bolsa-cut.png',
     to: '/collections/cafes',
     mod: 'origen',
   },
@@ -80,7 +80,7 @@ const LINEAS = [
     name: 'Micro-lotes',
     subtitle: 'Cafés sublimes',
     desc: 'Un privilegio reservado para los verdaderos amantes del café. Nano-lotes y varietales extraordinarios, de sabores inolvidables. Aquí encontrarás una selección de genética pura y cafés de competición.',
-    img: '/images/producto-bolsa.webp',
+    img: '/images/cafe-bolsa-cut.png',
     to: '/collections/cafes',
     mod: 'micro',
   },
@@ -89,7 +89,7 @@ const LINEAS = [
     name: 'Club de la Memoria',
     subtitle: 'Tu café, siempre fresco',
     desc: 'Devuélvete el tiempo que importa. Recibe tu café en la frecuencia que elijas, con 15% de descuento permanente. Tostado fresco, sellado al vacío, directo a tu puerta. Sin complicaciones.',
-    img: '/images/lineup-bolsas.webp',
+    img: '/images/producto-bolsa-cut.png',
     to: '/#club',
     mod: 'club',
   },
@@ -98,7 +98,7 @@ const LINEAS = [
     name: 'Kit El Legado',
     subtitle: 'El ritual completo',
     desc: 'Molino, pocillo y café: la herramienta para heredar una tradición. Todo lo que necesitas para preparar el mejor café en casa y compartir el ritual con quienes más quieres.',
-    img: '/images/kit-bolsas.webp',
+    img: '/images/kit-bolsas-cut.png',
     to: '/collections/cafes',
     mod: 'legado',
   },
@@ -116,20 +116,8 @@ function LineasSection() {
         </div>
         <div className="tx-lineas-grid">
           {LINEAS.map((l) => (
-            <div className="tx-linea" key={l.key}>
-              <div className={`tx-linea__header tx-linea__header--${l.mod}`}>
-                <div className="tx-linea__nombres">
-                  <span className="tx-linea__name">{l.name}</span>
-                  <span className="tx-linea__sub">{l.subtitle}</span>
-                </div>
-              </div>
-              <div className="tx-linea__body">
-                <div className="tx-linea__contenido">
-                  <p className="tx-lede tx-linea__desc">{l.desc}</p>
-                  <Link className="tx-btn tx-btn--peq" to={l.to}>
-                    Comprar ahora
-                  </Link>
-                </div>
+            <article className="tx-linea" key={l.key}>
+              <div className="tx-linea__media">
                 <img
                   src={l.img}
                   alt={l.name}
@@ -139,7 +127,17 @@ function LineasSection() {
                   className="tx-linea__img"
                 />
               </div>
-            </div>
+              <div className="tx-linea__contenido">
+                <div className="tx-linea__nombres">
+                  <h3 className="tx-linea__name">{l.name}</h3>
+                  <span className="tx-linea__sub">{l.subtitle}</span>
+                </div>
+                <p className="tx-lede tx-linea__desc">{l.desc}</p>
+                <Link className="tx-btn tx-btn--peq" to={l.to}>
+                  Comprar ahora
+                </Link>
+              </div>
+            </article>
           ))}
         </div>
       </div>
