@@ -153,20 +153,16 @@ function LineasSection() {
 function VideoSection() {
   return (
     <section className="tx-dark-section">
-      <img
-        src="/images/monte-moriah.webp"
-        alt="Monte Moriah — Café de especialidad"
-        className="tx-dark-section__bg"
-        width={1920}
-        height={1080}
-        loading="lazy"
+      <video
+        className="tx-dark-section__video"
+        src="/videos/cafe.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-label="Café Moriah — cafés especiales de Colombia"
       />
-      <div className="tx-dark-section__overlay">
-        <h2 className="tx-display tx-h2 tx-dark-section__texto">
-          Cada grano lo seleccionamos cuidadosamente para llevarte los mejores
-          cafés especiales de Colombia
-        </h2>
-      </div>
     </section>
   );
 }
