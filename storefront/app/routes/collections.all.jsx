@@ -58,12 +58,25 @@ export default function Collection() {
   const {products} = useLoaderData();
 
   return (
-    <div className="tx">
+    <div className="tx tx-shop-page">
       <section className="tx-section">
         <div className="tx-container">
-          <header className="tx-lineas-head">
-            <div className="tx-titulo-eyebrow">Nuestra tienda</div>
-            <h1 className="tx-display tx-h2">Todos los productos</h1>
+          <header className="tx-shop-banner">
+            <img
+              src="/images/cafe-cafes.webp"
+              alt="La tienda de MORIAH Café"
+              width={1400}
+              height={1350}
+              className="tx-shop-banner__img"
+              fetchPriority="high"
+              decoding="async"
+            />
+            <div className="tx-shop-banner__overlay">
+              <span className="tx-shop-banner__eyebrow">Nuestra tienda</span>
+              <h1 className="tx-display tx-shop-banner__title">
+                Todos los productos
+              </h1>
+            </div>
           </header>
           <PaginatedResourceSection
             connection={products}
