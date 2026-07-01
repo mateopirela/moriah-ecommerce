@@ -1,13 +1,13 @@
-import {useLoaderData} from 'react-router';
+import {Link, useLoaderData} from 'react-router';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
-import {ProductItem} from '~/components/ProductItem';
+import {formatCop} from '~/data/cafes';
 
 /**
  * @type {Route.MetaFunction}
  */
 export const meta = () => {
-  return [{title: `Hydrogen | Products`}];
+  return [{title: 'Tienda · MORIAH Café'}];
 };
 
 /**
@@ -58,21 +58,66 @@ export default function Collection() {
   const {products} = useLoaderData();
 
   return (
-    <div className="collection">
-      <h1>Products</h1>
-      <PaginatedResourceSection
-        connection={products}
-        resourcesClassName="products-grid"
-      >
-        {({node: product, index}) => (
-          <ProductItem
-            key={product.id}
-            product={product}
-            loading={index < 8 ? 'eager' : undefined}
-          />
-        )}
-      </PaginatedResourceSection>
+    <div className="tx">
+      <section className="tx-section">
+        <div className="tx-container">
+          <header className="tx-lineas-head">
+            <div className="tx-titulo-eyebrow">Nuestra tienda</div>
+            <h1 className="tx-display tx-h2">Todos los productos</h1>
+          </header>
+          <PaginatedResourceSection
+            connection={products}
+            resourcesClassName="tx-col-grid"
+          >
+            {({node: product, index}) => (
+              <AllProductCard
+                key={product.id}
+                product={product}
+                index={index}
+              />
+            )}
+          </PaginatedResourceSection>
+        </div>
+      </section>
     </div>
+  );
+}
+
+/**
+ * Tarjeta de producto estilo Tropicalia: imagen cuadrada + nombre y precio
+ * debajo, sin caja/tarjeta. Reutiliza los estilos `tx-col-card`.
+ * @param {{product: CollectionItemFragment, index: number}}
+ */
+function AllProductCard({product, index}) {
+  const price = product.priceRange?.minVariantPrice;
+  const image = product.featuredImage;
+  return (
+    <Link
+      to={`/products/${product.handle}`}
+      className="tx-col-card"
+      prefetch="intent"
+    >
+      <div className="tx-col-card__media">
+        {image ? (
+          <img
+            src={image.url}
+            alt={image.altText || product.title}
+            width={600}
+            height={600}
+            loading={index < 8 ? 'eager' : 'lazy'}
+            className="tx-col-card__img tx-col-card__img--primary"
+          />
+        ) : null}
+      </div>
+      <div className="tx-col-card__info">
+        <h2 className="tx-col-card__name">{product.title}</h2>
+        {price && (
+          <div className="tx-col-card__price">
+            {formatCop(Number(price.amount))}
+          </div>
+        )}
+      </div>
+    </Link>
   );
 }
 
