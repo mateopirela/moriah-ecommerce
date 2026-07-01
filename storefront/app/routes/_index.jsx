@@ -28,7 +28,6 @@ export default function Homepage() {
     <div className="tx">
       <BannerHome />
       <LineasSection />
-      <VideoSection />
       <InfaltablesSection />
       <GaleriaSection />
     </div>
@@ -49,14 +48,15 @@ function BannerHome() {
           Conoce más
         </a>
       </div>
-      <img
-        src="/images/hero-lifestyle.webp"
-        alt="MORIAH Café — Un café para el alma"
-        width={1920}
-        height={1080}
-        fetchPriority="high"
-        decoding="async"
-        className="tx-banner__img"
+      <video
+        className="tx-banner__video"
+        src="/videos/cafe.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        aria-label="MORIAH Café — Un café para el alma"
       />
     </section>
   );
@@ -111,7 +111,7 @@ function LineasSection() {
         <div className="tx-lineas-head">
           <div className="tx-titulo-eyebrow">Ahora puedes tener</div>
           <h2 className="tx-display tx-h2">
-            La riqueza de nuestra tierra en tus manos
+            La riqueza de nuestra tierra<br /> en tus manos
           </h2>
         </div>
         <div className="tx-lineas-grid">
@@ -141,26 +141,6 @@ function LineasSection() {
           ))}
         </div>
       </div>
-    </section>
-  );
-}
-
-/* ============================================================
-   VIDEO / DARK SECTION — fondo oscuro con texto (Tropicalia)
-   ============================================================ */
-function VideoSection() {
-  return (
-    <section className="tx-dark-section">
-      <video
-        className="tx-dark-section__video"
-        src="/videos/cafe.mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        aria-label="Café Moriah — cafés especiales de Colombia"
-      />
     </section>
   );
 }

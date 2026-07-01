@@ -5,19 +5,23 @@
    ============================================================ */
 
 :root {
-  /* --- Brand palette --- */
-  --pine-900: #0c241c; /* deepest forest — footer / overlays */
-  --pine-800: #13362b; /* primary dark surface (hero, header) */
-  --pine-700: #1b4438; /* raised dark surface / cards on dark */
-  --pine-600: #265446; /* hover on dark surfaces */
+  /* --- Brand palette (BRANDBOARD MORIAH — hex oficiales) ---
+     COLOR 01 Yellow Ochre   #cf8e08
+     COLOR 02 Alabaster Gleam #f0debd
+     COLOR 03 Dark Pine Green #19332f
+     Foil claro (impresión)   #f9df7b                        */
+  --pine-900: #10221f; /* deepest forest — footer / overlays (shade de #19332f) */
+  --pine-800: #19332f; /* Dark Pine Green — superficie oscura primaria (hero, header) */
+  --pine-700: #234840; /* raised dark surface / cards on dark */
+  --pine-600: #2f5b50; /* hover on dark surfaces */
 
-  --gold-500: #c9a24b; /* PRIMARY — CTAs, emblem, links */
-  --gold-400: #d8b667; /* hover / highlight */
-  --gold-300: #e7cf94; /* soft gold text on dark */
+  --gold-500: #cf8e08; /* Yellow Ochre — PRIMARY: CTAs, emblema, links */
+  --gold-400: #e0a51f; /* hover / highlight (tint de #cf8e08) */
+  --gold-300: #f9df7b; /* foil claro — texto/acento dorado sobre oscuro */
 
-  --cream-50: #f7f3ea; /* light page background */
-  --cream-100: #efe8d8; /* light surface / cards */
-  --cream-200: #e4d9c2; /* borders on light */
+  --cream-50: #faf4e6; /* fondo de página (tint claro de Alabaster) */
+  --cream-100: #f0debd; /* Alabaster Gleam — superficie / cards */
+  --cream-200: #e2caa0; /* borders on light (shade de Alabaster) */
 
   --ink-900: #1a1a1a; /* body text on light (never pure black) */
   --ink-600: #51514c; /* muted text on light */
@@ -40,9 +44,11 @@
   --primary-hover: var(--gold-400);
   --on-primary: var(--pine-900);
 
-  /* --- Typography --- */
+  /* --- Typography (BRANDBOARD MORIAH) ---
+     Primaria: Satoshi (cuerpo + UI).
+     Secundaria/display: Fraunces como stand-in de "TBJ Siromi Regular". */
   --font-display: 'Fraunces', 'Playfair Display', Georgia, serif;
-  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: 'Satoshi', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   --text-eyebrow: 0.75rem; /* 12px uppercase label */
   --text-base: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem); /* 16–17 */

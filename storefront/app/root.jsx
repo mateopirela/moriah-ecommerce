@@ -67,11 +67,18 @@ export function links() {
       href: 'https://fonts.gstatic.com',
       crossOrigin: 'anonymous',
     },
+    {rel: 'preconnect', href: 'https://api.fontshare.com'},
     {
-      // Tropicalia template fonts: Karla (cuerpo) + Caveat Brush (fallback
-      // display, mientras no se cargue VTC Carrie en /public/fonts/).
+      // Tipografías de marca (BRANDBOARD MORIAH):
+      //  - Primaria: Satoshi (Fontshare) — cuerpo y UI en todo el sitio.
+      //  - Secundaria: Fraunces (Google) — serif contemporáneo, stand-in de
+      //    "TBJ Siromi Regular" para titulares y wordmark hasta conseguirla.
       rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600;700;800&family=Caveat+Brush&display=swap',
+      href: 'https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap',
+    },
+    {
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&display=swap',
     },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
   ];

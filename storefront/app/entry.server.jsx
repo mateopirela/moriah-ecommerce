@@ -22,9 +22,19 @@ export default async function handleRequest(
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
-    // Allow Google Fonts (Fraunces + Inter) used by the MORIAH design system.
-    styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-    fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+    // Tipografías de marca: Satoshi (Fontshare) + Fraunces (Google Fonts).
+    styleSrc: [
+      "'self'",
+      "'unsafe-inline'",
+      'https://fonts.googleapis.com',
+      'https://api.fontshare.com',
+    ],
+    fontSrc: [
+      "'self'",
+      'https://fonts.gstatic.com',
+      'https://cdn.fontshare.com',
+      'data:',
+    ],
     // Analytics: GA4 + Meta Pixel (dormant unless env IDs are set).
     scriptSrc: [
       "'self'",

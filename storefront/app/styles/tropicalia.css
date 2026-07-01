@@ -3,34 +3,23 @@
    Estructura fiel a tropicaliacoffee.com, marca MORIAH.
    ============================================================ */
 
-@font-face {
-  font-family: 'VTC Carrie';
-  src: url('/fonts/vtccarrie-regular.otf') format('opentype');
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Terital United W 00';
-  src: url('/fonts/terital-united-w00-regular.otf') format('opentype');
-  font-weight: 400;
-  font-display: swap;
-}
-
 :root {
-  --tx-bg:         #fbefdb;
-  --tx-surface:    #f5e6cc;
-  --tx-gold:       #b36d18;
-  --tx-gold-light: #cf8e08;
-  --tx-ink:        #19332f;
+  /* Paleta alineada al BRANDBOARD MORIAH:
+     Yellow Ochre #cf8e08 · Alabaster Gleam #f0debd · Dark Pine #19332f */
+  --tx-bg:         #faf4e6; /* tint claro de Alabaster para lienzo */
+  --tx-surface:    #f0debd; /* Alabaster Gleam — superficies/cards */
+  --tx-gold:       #cf8e08; /* Yellow Ochre (primario) */
+  --tx-gold-light: #f9df7b; /* foil claro */
+  --tx-ink:        #19332f; /* Dark Pine Green */
   --tx-ink-soft:   #2a4a43;
   --tx-text:       #2a2a2a;
   --tx-muted:      #6b675f;
   --tx-line:       rgba(25, 51, 47, 0.14);
-  --tx-cream:      #fff7e7;
+  --tx-cream:      #f0debd;
 
-  --tx-display: 'VTC Carrie', 'Caveat Brush', cursive;
-  --tx-body:    'Karla', 'Montserrat', system-ui, sans-serif;
+  /* Tipografías de marca: Satoshi (cuerpo) + Fraunces (display, stand-in Siromi) */
+  --tx-display: 'Fraunces', 'Playfair Display', Georgia, serif;
+  --tx-body:    'Satoshi', system-ui, -apple-system, sans-serif;
 
   --tx-maxw:   1280px;
   --tx-gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
@@ -323,31 +312,54 @@ main:not(:has(.tx-banner)) { padding-top: 72px; }
   min-height: 500px;
   overflow: hidden;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: center;
 }
-.tx-banner__img {
+.tx-banner__video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
+  object-position: center center;
   display: block;
+}
+/* Oscurecido para legibilidad del texto sobre el video (capa intermedia). */
+.tx-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(12, 36, 28, 0.45) 0%,
+      rgba(12, 36, 28, 0.25) 45%,
+      rgba(12, 36, 28, 0.55) 100%
+    ),
+    radial-gradient(
+      ellipse at center,
+      rgba(0, 0, 0, 0.35) 0%,
+      rgba(0, 0, 0, 0.15) 55%,
+      rgba(0, 0, 0, 0.45) 100%
+    );
 }
 .tx-banner__texto {
   position: relative;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 1.4rem;
+  align-items: center;
+  text-align: center;
+  gap: 1.6rem;
   padding: clamp(2rem, 6vw, 5rem) clamp(1.5rem, 5vw, 5rem);
-  padding-bottom: clamp(3rem, 8vh, 6rem);
   width: 100%;
 }
 .tx-banner__h1 {
   color: var(--tx-cream);
-  max-width: 20ch;
+  max-width: 22ch;
+  margin-inline: auto;
   font-size: clamp(2.8rem, 1.5rem + 5vw, 5rem);
   line-height: 1;
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
@@ -355,6 +367,30 @@ main:not(:has(.tx-banner)) { padding-top: 72px; }
 .tx-banner__h1 em {
   color: var(--tx-gold);
   font-style: normal;
+}
+
+/* Entrada "apareciendo hacia arriba" (fade-in-up) escalonada.
+   En prefers-reduced-motion el reset global deja el texto visible. */
+@keyframes txFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.tx-banner__h1,
+.tx-banner__texto .tx-btn {
+  opacity: 0;
+  animation: txFadeUp 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.tx-banner__h1 {
+  animation-delay: 150ms;
+}
+.tx-banner__texto .tx-btn {
+  animation-delay: 450ms;
 }
 
 /* ============================================================
@@ -376,9 +412,20 @@ main:not(:has(.tx-banner)) { padding-top: 72px; }
   display: grid;
   gap: 0.6rem;
   margin: 0 auto clamp(2.5rem, 4vw, 4rem);
-  max-width: 40ch;
+  max-width: min(92%, 880px);
   text-align: center;
   justify-items: center;
+}
+
+/* Salto de línea controlado del titular: horizontal en desktop
+   ("...tierra" / "en tus manos"); en móvil fluye natural. */
+.tx-lineas-head .tx-h2 br {
+  display: none;
+}
+@media (min-width: 40em) {
+  .tx-lineas-head .tx-h2 br {
+    display: inline;
+  }
 }
 
 /* 4 columnas horizontales */
@@ -445,18 +492,6 @@ main:not(:has(.tx-banner)) { padding-top: 72px; }
 /* ============================================================
    DARK / VIDEO SECTION (Tropicalia: video-tropicalia)
    ============================================================ */
-.tx-dark-section {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-  background: var(--tx-ink);
-}
-.tx-dark-section__video {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
 /* ============================================================
    INFALTABLES (Tropicalia: nuestros-infaltables)
    ============================================================ */
@@ -1172,10 +1207,10 @@ main:not(:has(.tx-banner)) { padding-top: 72px; }
 .tx-contact-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* ============================================================
-   TIPOGRAFÍA SECUNDARIA — Terital United W 00 (= .titulo Tropicalia)
+   TIPOGRAFÍA SECUNDARIA — serif de marca (stand-in Siromi)
    ============================================================ */
 .tx-titulo {
-  font-family: 'Terital United W 00', Georgia, serif;
+  font-family: var(--tx-display);
   font-size: 0.78rem;
   font-weight: 400;
   text-transform: uppercase;
