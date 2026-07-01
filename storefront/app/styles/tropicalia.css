@@ -622,6 +622,7 @@ main:not(:has(.tx-banner)) { padding-top: 72px; }
 
 .tx-footer__cols {
   display: flex;
+  align-items: center;
   gap: clamp(2rem, 6vw, 6rem);
   flex-wrap: wrap;
 }
@@ -667,11 +668,11 @@ main:not(:has(.tx-banner)) { padding-top: 72px; }
 }
 .tx-footer__link:hover { color: var(--tx-gold); }
 
-/* Big circular logo centrado */
+/* Logo circular a la derecha del contacto */
 .tx-footer__logo-wrap {
   display: flex;
   justify-content: center;
-  padding-block: clamp(2.5rem, 5vw, 4rem);
+  margin-left: auto;
 }
 .tx-footer__logo {
   width: clamp(80px, 12vw, 140px);
@@ -1401,6 +1402,8 @@ main:not(:has(.tx-banner)) { padding-top: 72px; }
   .tx-tambien__grid { grid-template-columns: 1fr; }
   .tx-cat-banner { height: clamp(220px, 50vw, 340px); }
   .tx-footer__top { flex-direction: column; }
+  .tx-footer__cols { align-items: flex-start; }
+  .tx-footer__logo-wrap { margin-left: 0; }
 }
 
 @media (max-width: 460px) {

@@ -71,19 +71,19 @@ function FooterInner() {
               hola@cafemoriah.com
             </a>
           </div>
-        </div>
-      </div>
 
-      {/* ── Logo circular centrado ── */}
-      <div className="tx-footer__logo-wrap">
-        <img
-          src="/images/logo-moriah.png"
-          alt="MORIAH Café"
-          width={120}
-          height={120}
-          className="tx-footer__logo"
-          loading="lazy"
-        />
+          {/* logo Moriah a la derecha, centrado verticalmente */}
+          <div className="tx-footer__logo-wrap">
+            <img
+              src="/images/logo-moriah.png"
+              alt="MORIAH Café"
+              width={120}
+              height={120}
+              className="tx-footer__logo"
+              loading="lazy"
+            />
+          </div>
+        </div>
       </div>
 
       {/* ── Franja de políticas + copyright ── */}
@@ -95,18 +95,6 @@ function FooterInner() {
           Política de datos personales
         </Link>
         <span>MORIAH © {year}</span>
-      </div>
-
-      {/* ── Foto lifestyle full-width al fondo (el "wow" de Tropicalia) ── */}
-      <div className="tx-footer__photo">
-        <img
-          src="/images/monte-moriah.webp"
-          alt="Monte Moriah"
-          width={1920}
-          height={700}
-          loading="lazy"
-          className="tx-footer__photo-img"
-        />
       </div>
     </footer>
   );
