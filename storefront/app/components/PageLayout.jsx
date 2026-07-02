@@ -1,5 +1,6 @@
 import {Await, Link} from 'react-router';
 import {Suspense, useId} from 'react';
+import {AnnouncementBar} from '~/components/AnnouncementBar';
 import {Aside} from '~/components/Aside';
 import {Footer} from '~/components/Footer';
 import {Header, HeaderMenu} from '~/components/Header';
@@ -26,6 +27,7 @@ export function PageLayout({
       <CartAside cart={cart} />
       <SearchAside />
       <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
+      <AnnouncementBar />
       {header && (
         <Header
           header={header}
@@ -50,7 +52,7 @@ export function PageLayout({
 function CartAside({cart}) {
   return (
     <Aside type="cart" heading="TU CARRITO">
-      <Suspense fallback={<p>Cargando carrito…</p>}>
+      <Suspense fallback={<CartSkeleton />}>
         <Await resolve={cart}>
           {(cart) => {
             return <CartMain cart={cart} layout="aside" />;
@@ -58,6 +60,29 @@ function CartAside({cart}) {
         </Await>
       </Suspense>
     </Aside>
+  );
+}
+
+/** Skeleton con shimmer mientras resuelve el carrito diferido. */
+function CartSkeleton() {
+  return (
+    <div className="cart-skeleton" aria-label="Cargando carrito" role="status">
+      <div className="cart-skeleton__bar" />
+      <div className="cart-skeleton__line">
+        <div className="cart-skeleton__img" />
+        <div className="cart-skeleton__text">
+          <div className="cart-skeleton__row" />
+          <div className="cart-skeleton__row cart-skeleton__row--short" />
+        </div>
+      </div>
+      <div className="cart-skeleton__line">
+        <div className="cart-skeleton__img" />
+        <div className="cart-skeleton__text">
+          <div className="cart-skeleton__row" />
+          <div className="cart-skeleton__row cart-skeleton__row--short" />
+        </div>
+      </div>
+    </div>
   );
 }
 
