@@ -89,11 +89,9 @@ export const meta = ({data}) => {
                 : 'https://schema.org/OutOfStock',
             }
           : undefined,
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue: '5',
-          reviewCount: '128',
-        },
+        // aggregateRating intencionalmente omitido: solo debe emitirse con
+        // reseñas reales (p. ej. Judge.me) — un rating inventado arriesga
+        // penalización de rich snippets en Google.
       },
     },
   ];
@@ -230,7 +228,7 @@ function SeedBundlePage() {
           <h1 className="pdp-title">{BUNDLE.title}</h1>
           <p className="pdp-origin">Kit de degustación · los 3 orígenes MORIAH</p>
           <a href="#reseñas" style={{width: 'max-content'}}>
-            <StarRating rating={5} count={128} />
+            <StarRating rating={5} />
           </a>
           <div className="pdp-pricerow">
             <span className="price price--sale">
@@ -309,7 +307,7 @@ function SeedProductPage({cafe}) {
           />
 
           <a href="#reseñas" style={{width: 'max-content'}}>
-            <StarRating rating={5} count={128} />
+            <StarRating rating={5} />
           </a>
 
           {cafe.notes && (
@@ -465,7 +463,7 @@ function ShopifyProductPage({product}) {
           />
 
           <a href="#reseñas" style={{width: 'max-content'}}>
-            <StarRating rating={5} count={128} />
+            <StarRating rating={5} />
           </a>
 
           <div className="pdp-pricerow">
@@ -655,7 +653,7 @@ function ReviewsBlock() {
         <div className="section-head section-head--center">
           <span className="eyebrow">Reseñas verificadas</span>
           <h2 className="display-h2">Lo que dicen quienes ya lo probaron</h2>
-          <StarRating rating={5} count={128} />
+          <StarRating rating={5} />
         </div>
         <div className="reviews">
           {reviews.map((rev) => (

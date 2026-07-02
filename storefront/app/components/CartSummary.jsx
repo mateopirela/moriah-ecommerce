@@ -1,7 +1,31 @@
 import {CartForm} from '@shopify/hydrogen';
 import {Money} from '~/components/Money';
+import {IconShield} from '~/components/Icons';
 import {useEffect, useId, useRef, useState} from 'react';
 import {useFetcher} from 'react-router';
+
+/**
+ * Suma los totales de línea como respaldo cuando el carrito optimista
+ * aún no trae `cost.subtotalAmount` (evita mostrar "-" tras agregar).
+ * @param {CartSummaryProps['cart']} cart
+ */
+function getSubtotal(cart) {
+  const direct = cart?.cost?.subtotalAmount;
+  if (direct?.amount) return direct;
+
+  const lines = cart?.lines?.nodes ?? [];
+  let total = 0;
+  let currencyCode = 'COP';
+  for (const line of lines) {
+    const amount = Number(line?.cost?.totalAmount?.amount ?? 0);
+    if (line?.cost?.totalAmount?.currencyCode) {
+      currencyCode = line.cost.totalAmount.currencyCode;
+    }
+    total += amount;
+  }
+  if (total > 0) return {amount: String(total), currencyCode};
+  return null;
+}
 
 /**
  * @param {CartSummaryProps}
@@ -14,20 +38,28 @@ export function CartSummary({cart, layout}) {
   const discountCodeInputId = useId();
   const giftCardHeadingId = useId();
   const giftCardInputId = useId();
+  const subtotal = getSubtotal(cart);
 
   return (
     <div aria-labelledby={summaryId} className={className}>
-      <h4 id={summaryId}>Totals</h4>
+      <p id={summaryId} className="sr-only">
+        Resumen del pedido
+      </p>
       <dl role="group" className="cart-subtotal">
         <dt>Subtotal</dt>
-        <dd>
-          {cart?.cost?.subtotalAmount?.amount ? (
-            <Money data={cart?.cost?.subtotalAmount} />
-          ) : (
-            '-'
-          )}
-        </dd>
+        <dd>{subtotal ? <Money data={subtotal} /> : <span aria-label="Calculando">…</span>}</dd>
       </dl>
+      <p className="cart-subtotal__note">
+        Envío e impuestos se calculan en el checkout.
+      </p>
+      <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
+      <p className="cart-payments">
+        <IconShield width={15} height={15} aria-hidden="true" />
+        <span>
+          Pago seguro · <strong>Nequi</strong> · <strong>PSE</strong> ·{' '}
+          <strong>Tarjetas</strong>
+        </span>
+      </p>
       <CartDiscounts
         discountCodes={cart?.discountCodes}
         discountsHeadingId={discountsHeadingId}
@@ -38,7 +70,6 @@ export function CartSummary({cart, layout}) {
         giftCardHeadingId={giftCardHeadingId}
         giftCardInputId={giftCardInputId}
       />
-      <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
     </div>
   );
 }
@@ -50,12 +81,10 @@ function CartCheckoutActions({checkoutUrl}) {
   if (!checkoutUrl) return null;
 
   return (
-    <div>
-      <a href={checkoutUrl} target="_self">
-        <p>Continue to Checkout &rarr;</p>
-      </a>
-      <br />
-    </div>
+    <a className="cart-checkout-btn" href={checkoutUrl} target="_self">
+      Finalizar compra
+      <span aria-hidden="true">&rarr;</span>
+    </a>
   );
 }
 
@@ -77,45 +106,47 @@ function CartDiscounts({
       ?.map(({code}) => code) || [];
 
   return (
-    <section aria-label="Discounts">
-      {/* Have existing discount, display it with a remove option */}
-      <dl hidden={!codes.length}>
+    <section aria-label="Códigos de descuento">
+      {/* Código aplicado: mostrarlo con opción de quitar */}
+      <dl hidden={!codes.length} className="cart-code-applied">
         <div>
-          <dt id={discountsHeadingId}>Discounts</dt>
+          <dt id={discountsHeadingId}>Descuento aplicado</dt>
           <UpdateDiscountForm>
-            <div
+            <dd
               className="cart-discount"
               role="group"
               aria-labelledby={discountsHeadingId}
             >
               <code>{codes?.join(', ')}</code>
-              &nbsp;
-              <button type="submit" aria-label="Remove discount">
-                Remove
+              <button type="submit" aria-label="Quitar descuento">
+                Quitar
               </button>
-            </div>
+            </dd>
           </UpdateDiscountForm>
         </div>
       </dl>
 
-      {/* Show an input to apply a discount */}
-      <UpdateDiscountForm discountCodes={codes}>
-        <div>
-          <label htmlFor={discountCodeInputId} className="sr-only">
-            Discount code
-          </label>
-          <input
-            id={discountCodeInputId}
-            type="text"
-            name="discountCode"
-            placeholder="Discount code"
-          />
-          &nbsp;
-          <button type="submit" aria-label="Apply discount code">
-            Apply
-          </button>
-        </div>
-      </UpdateDiscountForm>
+      {!codes.length && (
+        <details className="cart-code">
+          <summary>¿Tienes un código de descuento?</summary>
+          <UpdateDiscountForm discountCodes={codes}>
+            <div className="cart-code__form">
+              <label htmlFor={discountCodeInputId} className="sr-only">
+                Código de descuento
+              </label>
+              <input
+                id={discountCodeInputId}
+                type="text"
+                name="discountCode"
+                placeholder="Código de descuento"
+              />
+              <button type="submit" aria-label="Aplicar código de descuento">
+                Aplicar
+              </button>
+            </div>
+          </UpdateDiscountForm>
+        </details>
+      )}
     </section>
   );
 }
@@ -195,10 +226,10 @@ function CartGiftCard({giftCardCodes, giftCardHeadingId, giftCardInputId}) {
   };
 
   return (
-    <section aria-label="Gift cards">
+    <section aria-label="Tarjetas de regalo">
       {giftCardCodes && giftCardCodes.length > 0 && (
-        <dl>
-          <dt id={giftCardHeadingId}>Applied Gift Card(s)</dt>
+        <dl className="cart-code-applied">
+          <dt id={giftCardHeadingId}>Tarjeta de regalo aplicada</dt>
           {giftCardCodes.map((giftCard) => (
             <dd key={giftCard.id} className="cart-discount">
               <RemoveGiftCardForm
@@ -222,28 +253,30 @@ function CartGiftCard({giftCardCodes, giftCardHeadingId, giftCardInputId}) {
         </dl>
       )}
 
-      <AddGiftCardForm fetcherKey="gift-card-add">
-        <div>
-          <label htmlFor={giftCardInputId} className="sr-only">
-            Gift card code
-          </label>
-          <input
-            id={giftCardInputId}
-            type="text"
-            name="giftCardCode"
-            placeholder="Gift card code"
-            ref={giftCardCodeInput}
-          />
-          &nbsp;
-          <button
-            type="submit"
-            disabled={giftCardAddFetcher.state !== 'idle'}
-            aria-label="Apply gift card code"
-          >
-            Apply
-          </button>
-        </div>
-      </AddGiftCardForm>
+      <details className="cart-code">
+        <summary>¿Tienes una tarjeta de regalo?</summary>
+        <AddGiftCardForm fetcherKey="gift-card-add">
+          <div className="cart-code__form">
+            <label htmlFor={giftCardInputId} className="sr-only">
+              Código de tarjeta de regalo
+            </label>
+            <input
+              id={giftCardInputId}
+              type="text"
+              name="giftCardCode"
+              placeholder="Código de tarjeta de regalo"
+              ref={giftCardCodeInput}
+            />
+            <button
+              type="submit"
+              disabled={giftCardAddFetcher.state !== 'idle'}
+              aria-label="Aplicar tarjeta de regalo"
+            >
+              Aplicar
+            </button>
+          </div>
+        </AddGiftCardForm>
+      </details>
     </section>
   );
 }
@@ -294,11 +327,11 @@ function RemoveGiftCardForm({
       &nbsp;
       <button
         type="submit"
-        aria-label={`Remove gift card ending in ${lastCharacters}`}
+        aria-label={`Quitar tarjeta de regalo terminada en ${lastCharacters}`}
         onClick={onRemoveClick}
         ref={buttonRef}
       >
-        Remove
+        Quitar
       </button>
     </CartForm>
   );

@@ -3,6 +3,7 @@ import {Link} from 'react-router';
 import {useAside} from '~/components/Aside';
 import {CartLineItem} from '~/components/CartLineItem';
 import {CartSummary} from './CartSummary';
+import {CartUpsell} from '~/components/CartUpsell';
 import {FreeShipBar} from '~/components/FreeShipBar';
 import {IconBag} from '~/components/Icons';
 /**
@@ -79,6 +80,7 @@ export function CartMain({layout, cart: originalCart}) {
               );
             })}
           </ul>
+          {cartHasItems && layout === 'aside' && <CartUpsell cart={cart} />}
         </div>
         {cartHasItems && <CartSummary cart={cart} layout={layout} />}
       </div>

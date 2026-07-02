@@ -1,6 +1,16 @@
+import {useState} from 'react';
 import {Link} from 'react-router';
 import {formatCop} from '~/data/cafes';
 import {MERCH} from '~/data/merch';
+import {Marquee} from '~/components/Marquee';
+import {useReveal} from '~/lib/useReveal';
+import {
+  IconTruck,
+  IconLeaf,
+  IconShield,
+  IconClock,
+  StarRating,
+} from '~/components/Icons';
 
 /** @type {Route.MetaFunction} */
 export const meta = () => [
@@ -24,18 +34,23 @@ export async function loader(args) {
 }
 
 export default function Homepage() {
+  useReveal();
   return (
     <div className="tx">
       <BannerHome />
+      <Marquee />
       <LineasSection />
       <InfaltablesSection />
+      <ValuePropsSection />
       <GaleriaSection />
+      <TestimoniosSection />
+      <NewsletterSection />
     </div>
   );
 }
 
 /* ============================================================
-   BANNER HOME — imagen full-width con texto (Tropicalia)
+   BANNER HOME — video full-width con texto (Tropicalia)
    ============================================================ */
 function BannerHome() {
   return (
@@ -51,6 +66,7 @@ function BannerHome() {
       <video
         className="tx-banner__video"
         src="/videos/cafe.mp4"
+        poster="/images/tostado-moriah.webp"
         autoPlay
         muted
         loop
@@ -108,15 +124,15 @@ function LineasSection() {
   return (
     <section className="tx-section tx-lineas-section" id="lineas">
       <div className="tx-container">
-        <div className="tx-lineas-head">
+        <div className="tx-lineas-head" data-reveal>
           <div className="tx-titulo-eyebrow">Ahora puedes tener</div>
           <h2 className="tx-display tx-h2">
             La riqueza de nuestra tierra<br /> en tus manos
           </h2>
         </div>
-        <div className="tx-lineas-grid">
+        <div className="tx-lineas-grid" data-reveal>
           {LINEAS.map((l) => (
-            <article className="tx-linea" key={l.key}>
+            <article className="tx-linea" data-reveal-child key={l.key}>
               <div className="tx-linea__media">
                 <img
                   src={l.img}
@@ -153,7 +169,7 @@ function InfaltablesSection() {
   return (
     <section className="tx-section tx-infaltables-section">
       <div className="tx-container">
-        <div className="tx-infaltables-head">
+        <div className="tx-infaltables-head" data-reveal>
           <h2 className="tx-display tx-h2">Nuestros infaltables</h2>
           <Link
             className="tx-btn tx-btn--ink tx-desktop-only"
@@ -162,10 +178,11 @@ function InfaltablesSection() {
             Ver todos
           </Link>
         </div>
-        <div className="tx-products">
+        <div className="tx-products" data-reveal>
           {featured.map((m) => (
             <Link
               className="tx-product-card"
+              data-reveal-child
               to="/collections/cafes"
               key={m.handle}
             >
@@ -199,6 +216,50 @@ function InfaltablesSection() {
 }
 
 /* ============================================================
+   VALUE PROPS — franja de confianza (SVG, sin emojis)
+   ============================================================ */
+const VALUE_PROPS = [
+  {
+    icon: IconTruck,
+    title: 'Envío gratis',
+    desc: 'En compras desde $100.000, a todo el país',
+  },
+  {
+    icon: IconLeaf,
+    title: 'Tostado fresco',
+    desc: 'Tostamos cada semana, sellado al vacío',
+  },
+  {
+    icon: IconShield,
+    title: 'Pago seguro',
+    desc: 'Nequi, PSE y tarjetas, sin complicaciones',
+  },
+  {
+    icon: IconClock,
+    title: 'Entrega 2–4 días',
+    desc: 'Bogotá 2–3 días · Nacional 3–5 días',
+  },
+];
+
+function ValuePropsSection() {
+  return (
+    <section className="tx-valueprops" aria-label="Nuestras garantías">
+      <div className="tx-container tx-valueprops__grid" data-reveal>
+        {VALUE_PROPS.map((vp) => (
+          <div className="tx-valueprop" data-reveal-child key={vp.title}>
+            <vp.icon width={26} height={26} aria-hidden="true" />
+            <div>
+              <p className="tx-valueprop__title">{vp.title}</p>
+              <p className="tx-valueprop__desc">{vp.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
    GALERÍA / INSPIRADOS (Tropicalia: tienda)
    ============================================================ */
 const FOTOS = [
@@ -214,7 +275,7 @@ function GaleriaSection() {
   return (
     <section className="tx-section tx-galeria-section">
       <aside className="tx-galeria-split">
-        <div className="tx-galeria-split__fotos">
+        <div className="tx-galeria-split__fotos" data-reveal>
           <div className="tx-gallery">
             {FOTOS.map((src, i) => (
               <img
@@ -228,7 +289,7 @@ function GaleriaSection() {
             ))}
           </div>
         </div>
-        <div className="tx-galeria-split__body tx-container">
+        <div className="tx-galeria-split__body tx-container" data-reveal>
           <span className="tx-eyebrow">Un lugar para reunirse y conversar</span>
           <h2 className="tx-display tx-h2">
             Inspirados en nuestra tierra
@@ -243,6 +304,106 @@ function GaleriaSection() {
           </Link>
         </div>
       </aside>
+    </section>
+  );
+}
+
+/* ============================================================
+   TESTIMONIOS — voces de la comunidad
+   ============================================================ */
+const TESTIMONIOS = [
+  {
+    quote:
+      'Aroma increíble apenas abres la bolsa. Se nota el tostado artesanal y la frescura del sellado al vacío.',
+    name: 'Laura M.',
+    city: 'Bogotá',
+  },
+  {
+    quote:
+      'Llegó en dos días, impecable. La experiencia completa se siente premium, volveré a pedir.',
+    name: 'Andrés R.',
+    city: 'Medellín',
+  },
+  {
+    quote:
+      'Saber de qué finca viene hace la diferencia. Un café con propósito y con sabor.',
+    name: 'Valentina G.',
+    city: 'Cali',
+  },
+];
+
+function TestimoniosSection() {
+  return (
+    <section className="tx-section tx-testimonios">
+      <div className="tx-container">
+        <div className="tx-testimonios__head" data-reveal>
+          <span className="tx-eyebrow">Voces de nuestra comunidad</span>
+          <h2 className="tx-display tx-h2">Un café que se comparte</h2>
+        </div>
+        <div className="tx-testimonios__grid" data-reveal>
+          {TESTIMONIOS.map((t) => (
+            <figure className="tx-testimonio" data-reveal-child key={t.name}>
+              <StarRating rating={5} />
+              <blockquote>{t.quote}</blockquote>
+              <figcaption>
+                {t.name} · <span>{t.city}</span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
+   NEWSLETTER — Club de la Memoria (captura de email)
+   ============================================================ */
+function NewsletterSection() {
+  const [sent, setSent] = useState(false);
+
+  /** @param {React.FormEvent<HTMLFormElement>} event */
+  function handleSubmit(event) {
+    event.preventDefault();
+    // TODO: conectar con Shopify Email / Klaviyo. Por ahora confirmamos
+    // en UI para no perder el momento de conversión.
+    setSent(true);
+  }
+
+  return (
+    <section className="tx-newsletter" id="club">
+      <div className="tx-container tx-newsletter__inner" data-reveal>
+        <span className="tx-eyebrow">Club de la Memoria</span>
+        <h2 className="tx-display tx-h2 tx-newsletter__title">
+          Tu primer café, con <em>10% de regalo</em>
+        </h2>
+        <p className="tx-newsletter__lede">
+          Únete y recibe historias de origen, lanzamientos de micro-lotes y un
+          10% de descuento en tu primer pedido.
+        </p>
+        {sent ? (
+          <p className="tx-newsletter__ok" role="status">
+            ¡Listo! Muy pronto llegará tu código a tu correo.
+          </p>
+        ) : (
+          <form className="tx-newsletter__form" onSubmit={handleSubmit}>
+            <label htmlFor="newsletter-email" className="sr-only">
+              Tu correo electrónico
+            </label>
+            <input
+              id="newsletter-email"
+              type="email"
+              name="email"
+              required
+              placeholder="tu@correo.com"
+              autoComplete="email"
+            />
+            <button type="submit" className="tx-btn">
+              Quiero mi 10%
+            </button>
+          </form>
+        )}
+      </div>
     </section>
   );
 }
