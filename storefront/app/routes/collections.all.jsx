@@ -2,6 +2,16 @@ import {Link, useLoaderData} from 'react-router';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {formatCop} from '~/data/cafes';
+import {useReveal} from '~/lib/useReveal';
+
+// Pills de navegación — espejo de las categorías de /collections/$handle
+const SHOP_FILTERS = [
+  {handle: 'all', label: 'Todos'},
+  {handle: 'cafes', label: 'Cafés'},
+  {handle: 'micro-lotes', label: 'Micro-lotes'},
+  {handle: 'club-de-la-memoria', label: 'Club de la Memoria'},
+  {handle: 'kit-el-legado', label: 'Kit El Legado'},
+];
 
 /**
  * @type {Route.MetaFunction}
@@ -56,12 +66,13 @@ function loadDeferredData() {
 export default function Collection() {
   /** @type {LoaderReturnData} */
   const {products} = useLoaderData();
+  useReveal();
 
   return (
     <div className="tx tx-shop-page">
       <section className="tx-section">
         <div className="tx-container">
-          <header className="tx-shop-banner">
+          <header className="tx-shop-banner" data-reveal>
             <img
               src="/images/cafe-cafes.webp"
               alt="La tienda de MORIAH Café"
@@ -78,18 +89,33 @@ export default function Collection() {
               </h1>
             </div>
           </header>
-          <PaginatedResourceSection
-            connection={products}
-            resourcesClassName="tx-col-grid"
-          >
-            {({node: product, index}) => (
-              <AllProductCard
-                key={product.id}
-                product={product}
-                index={index}
-              />
-            )}
-          </PaginatedResourceSection>
+          <nav className="tx-cat-pills" aria-label="Categorías">
+            <div className="tx-cat-pills__row">
+              {SHOP_FILTERS.map((f) => (
+                <Link
+                  key={f.handle}
+                  to={`/collections/${f.handle}`}
+                  className={`tx-cat-pill${f.handle === 'all' ? ' tx-cat-pill--active' : ''}`}
+                >
+                  {f.label}
+                </Link>
+              ))}
+            </div>
+          </nav>
+          <div data-reveal>
+            <PaginatedResourceSection
+              connection={products}
+              resourcesClassName="tx-col-grid"
+            >
+              {({node: product, index}) => (
+                <AllProductCard
+                  key={product.id}
+                  product={product}
+                  index={index}
+                />
+              )}
+            </PaginatedResourceSection>
+          </div>
         </div>
       </section>
     </div>
@@ -108,6 +134,7 @@ function AllProductCard({product, index}) {
     <Link
       to={`/products/${product.handle}`}
       className="tx-col-card"
+      data-reveal-child
       prefetch="intent"
     >
       <div className="tx-col-card__media">
