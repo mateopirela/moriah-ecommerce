@@ -1,92 +1,72 @@
-# MORIAH Café — Tienda (Shopify Hydrogen)
+# MORIAH Café — storefront
 
-Storefront headless de **MORIAH Café** construido con [Shopify Hydrogen](https://shopify.dev/custom-storefronts/hydrogen) (React Router 7 + Oxygen). Diseño premium "Un café para el alma": verde pino + oro, tipografía editorial (Fraunces + Inter), checkout nativo de Shopify.
+Tienda en línea de MORIAH Café. React Router 7 (framework mode) + Vite, sin
+dependencias de Shopify: el catálogo vive en código, el carrito en una cookie
+firmada, los pagos en **Wompi (Bancolombia)** y los pedidos/suscripciones en
+Postgres vía Drizzle.
 
 ## Stack
 
-- Hydrogen 2026.4 · React Router 7 · Oxygen (edge)
-- Vite · Shopify CLI · GraphQL codegen
-- CSS con design tokens (sin framework de utilidades)
+| Capa | Tecnología |
+| --- | --- |
+| UI / SSR | React 18 · React Router 7 · Vite 8 |
+| Catálogo | `app/data/cafes.js`, `app/data/merch.js` (fuente de verdad de precios y textos) |
+| Carrito | Cookie firmada (`SESSION_SECRET`) — `app/lib/cart*.js` |
+| Pagos únicos | Wompi Web Checkout (redirección) — `app/routes/checkout*.jsx` |
+| Suscripciones | Tokenización de tarjeta + fuentes de pago Wompi — `app/routes/suscripcion*.jsx` |
+| Base de datos | Postgres (Drizzle ORM). PGlite embebido en desarrollo. |
+| Emails | Klaviyo (opcional) — eventos `Placed Order`, `Subscription Started`, … |
+| Hosting | Proyecto existente en Vercel (Root Directory `storefront`) + Vercel Cron |
 
-## Requisitos
-
-- Node.js 22 o 24
-
-## Desarrollo local
+## Desarrollo
 
 ```bash
+cp .env.example .env   # completa SESSION_SECRET y las llaves de Wompi
 npm install
-npm run dev          # http://localhost:3000  (usa Mock.shop hasta que conectes la tienda)
+npm run dev            # http://localhost:5173
 ```
 
-> Nota: el proyecto vive en una ruta con espacio (`Moriah E-commerce`). Por eso
-> `vite.config.js` define un alias explícito `~ → app`; no lo elimines o fallará
-> la resolución de módulos en local.
-
-## Conectar la tienda real (cafemoriah)
-
-1. Autentícate y vincula la tienda:
-   ```bash
-   npx shopify auth login
-   npx shopify hydrogen link        # elige la tienda cafemoriah
-   npx shopify hydrogen env pull    # escribe las variables en .env
-   ```
-2. O copia `.env.example` a `.env` y completa los tokens del Storefront API
-   (Shopify admin → Headless / Hydrogen channel).
-3. Reinicia `npm run dev`. La home y la colección leerán productos reales.
-
-### Datos que la tienda espera en Shopify
-
-- **Colección con handle `cafes`** → alimenta la grilla "Nuestros cafés" y el nav.
-- **Productos** (Bourbon Rosado, Geisha, Blend Catillo Caturra…) con:
-  - Imágenes (la galería del PDP usa hasta 8).
-  - Variantes (p. ej. tamaño 250g/500g/1kg, molienda grano/molido).
-  - **Metafields** opcionales (namespace `custom`) que enriquecen el PDP:
-    | key | ejemplo |
-    |-----|---------|
-    | `flavor_notes` | Chocolate, Piel de Naranja, Grosella Negra |
-    | `origin` | Finca La Esmeralda, Colombia |
-    | `roast` | Tueste Medio |
-    | `process` | Lavado / Honey / Natural |
-    | `altitude` | 1.700–1.900 msnm |
-- **Menú `main-menu`** (opcional): si no existe, se usa el menú de respaldo
-  (Cafés · Tienda · Nuestra Historia · Proceso · Envíos).
-
-## Tracking (opcional)
-
-Define en `.env` para activar GA4 + Meta Pixel conectados a los eventos de
-funnel (`view_item`, `add_to_cart`, `search`, `page_view`):
-
-```
-PUBLIC_GA4_ID="G-XXXXXXXX"
-PUBLIC_META_PIXEL_ID="123456789"
-```
-
-El evento **purchase** lo dispara el checkout de Shopify (Customer Events / canal
-de Meta con CAPI), no este storefront — actívalo en el admin de Shopify.
-
-## Build y deploy
+Sin `DATABASE_URL`, la app usa una base PGlite en `./.data` (se crea sola y se
+migra al arrancar). Con `DATABASE_URL`, aplica las migraciones con
+`npm run db:migrate`.
 
 ```bash
-npm run build        # build de producción (Oxygen)
-npm run preview      # previsualiza el build localmente
+npm test               # vitest (firma/checksum Wompi, carrito, suscripciones)
+npm run lint
+npm run build          # build/ + manifiesto del preset de Vercel
+npm run db:generate    # genera SQL en ./drizzle tras cambiar app/db/schema.js
 ```
 
-Deploy automático: al hacer push a la rama conectada, **Oxygen** construye y
-publica desde GitHub. Las variables `PUBLIC_*`/`PRIVATE_*` se inyectan desde el
-panel de Hydrogen en el admin de Shopify (no se commitean).
+## Flujo de pagos
+
+1. **Compra única** — `/checkout` valida el formulario, crea el pedido
+   (`orders`, estado `pending`) y redirige al Web Checkout de Wompi con la
+   firma de integridad. Wompi vuelve a `/checkout/gracias?ref=…&id=…`, donde
+   se consulta la transacción, se actualiza el pedido y se vacía el carrito.
+2. **Club de la Memoria** — `/suscripcion` tokeniza la tarjeta en el navegador
+   (llave pública), el servidor crea la fuente de pago y la suscripción, y
+   ejecuta el primer cobro. El cron diario (`/api/cron/subscriptions`) cobra
+   las suscripciones vencidas; 3 fallos seguidos → `past_due`.
+3. **Webhook** — `/api/wompi/events` verifica el checksum, guarda el evento
+   (idempotente) y sincroniza pedido + suscripción. Configura la URL en el
+   panel de Wompi → Desarrolladores → Eventos.
+4. **Gestión** — `/suscripcion/gestionar?token=…` (pausar, reanudar, cambiar
+   frecuencia, cancelar). El enlace llega por correo (Klaviyo).
+
+## Variables de entorno
+
+Ver `.env.example`. Imprescindibles en producción: `SESSION_SECRET`,
+`PUBLIC_SITE_URL`, `WOMPI_*`, `DATABASE_URL`, `CRON_SECRET`.
 
 ## Estructura
 
 ```
 app/
-├── components/        # Header, Footer, Cart, ProductForm, Gallery, StickyAtc, Icons, Tracking…
-├── routes/            # _index (home), products.$handle (PDP), collections.$handle, cart…
-├── styles/            # tokens · base · components · layout · home · product (design system)
-└── root.jsx           # fuentes, CSS, analytics, CSP
-public/images/         # logo + fotografía de marca (optimizada a webp)
+  data/        catálogo, descuentos, políticas, departamentos
+  db/          esquema Drizzle + cliente (Postgres / PGlite)
+  lib/         catalog, cart, wompi, orders, subscriptions, klaviyo, analytics
+  components/  UI (header, carrito, PDP, formularios)
+  routes/      páginas, checkout, suscripción, APIs (cart-upsell, search, webhook, cron)
+drizzle/       migraciones SQL generadas
+scripts/       migrate.mjs (se ejecuta en el build de producción)
 ```
-
----
-
-Diseño y build siguiendo el framework StoreForge (clarity > trust > speed > friction).

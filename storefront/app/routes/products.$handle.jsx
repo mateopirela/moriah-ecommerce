@@ -1,170 +1,81 @@
-import {useLoaderData, Link} from 'react-router';
-import {
-  getSelectedProductOptions,
-  Analytics,
-  useOptimisticVariant,
-  getProductOptions,
-  getAdjacentAndFirstAvailableVariants,
-  useSelectedOptionInUrlParam,
-} from '@shopify/hydrogen';
-import {Money} from '~/components/Money';
-import {ProductForm} from '~/components/ProductForm';
-import {ProductGallery} from '~/components/ProductGallery';
-import {StickyAtc} from '~/components/StickyAtc';
-import {redirectIfHandleIsLocalized} from '~/lib/redirect';
-import {getCafe, formatCop, BUNDLE, bundlePrice} from '~/data/cafes';
+import {useEffect, useState} from 'react';
+import {Link, useLoaderData} from 'react-router';
+import {AddToCartButton} from '~/components/AddToCartButton';
+import {useAside} from '~/components/Aside';
 import {PurchaseOptions} from '~/components/PurchaseOptions';
 import {RoastMeter} from '~/components/RoastMeter';
+import {StickyAtc} from '~/components/StickyAtc';
 import {
-  IconLeaf,
+  IconBag,
   IconCheck,
+  IconLeaf,
   IconPlus,
   IconUser,
   StarRating,
 } from '~/components/Icons';
+import {formatCop, getCafe} from '~/data/cafes';
+import {getProduct} from '~/lib/catalog';
+import {analytics} from '~/lib/analytics';
 
-/**
- * @type {Route.MetaFunction}
- */
+/** @type {import('react-router').MetaFunction} */
 export const meta = ({data}) => {
-  if (data?.seedBundle) {
-    return [
-      {title: `${BUNDLE.title} · MORIAH Café`},
-      {name: 'description', content: BUNDLE.description?.slice(0, 160)},
-      {rel: 'canonical', href: `/products/${BUNDLE.handle}`},
-    ];
-  }
-  if (data?.seedCafe) {
-    const c = data.seedCafe;
-    return [
-      {title: `${c.title} · MORIAH Café`},
-      {name: 'description', content: c.description?.slice(0, 160)},
-      {rel: 'canonical', href: `/products/${c.handle}`},
-      {
-        'script:ld+json': {
-          '@context': 'https://schema.org',
-          '@type': 'Product',
-          name: c.title,
-          brand: {'@type': 'Brand', name: 'MORIAH Café'},
-          description: c.description,
-          offers: {
-            '@type': 'Offer',
-            price: String(c.price),
-            priceCurrency: c.currency,
-            availability: 'https://schema.org/InStock',
-          },
-        },
-      },
-    ];
-  }
-  const product = data?.product;
-  if (!product) return [{title: 'MORIAH Café'}];
-  const price = product.selectedOrFirstAvailableVariant?.price;
+  const p = data?.product;
+  if (!p) return [{title: 'MORIAH Café'}];
   return [
-    {title: `${product.title} · MORIAH Café`},
-    {
-      name: 'description',
-      content:
-        product.seo?.description ||
-        product.description?.slice(0, 160) ||
-        `${product.title}, café colombiano de especialidad de MORIAH.`,
-    },
-    {rel: 'canonical', href: `/products/${product.handle}`},
+    {title: `${p.title} · MORIAH Café`},
+    {name: 'description', content: p.description?.slice(0, 160)},
+    {rel: 'canonical', href: `/products/${p.handle}`},
     {
       'script:ld+json': {
         '@context': 'https://schema.org',
         '@type': 'Product',
-        name: product.title,
-        brand: {'@type': 'Brand', name: product.vendor || 'MORIAH Café'},
-        description: product.description?.slice(0, 300),
-        image: product.selectedOrFirstAvailableVariant?.image?.url,
-        offers: price
-          ? {
-              '@type': 'Offer',
-              price: price.amount,
-              priceCurrency: price.currencyCode,
-              availability: product.selectedOrFirstAvailableVariant
-                ?.availableForSale
-                ? 'https://schema.org/InStock'
-                : 'https://schema.org/OutOfStock',
-            }
-          : undefined,
-        // aggregateRating intencionalmente omitido: solo debe emitirse con
-        // reseñas reales (p. ej. Judge.me) — un rating inventado arriesga
-        // penalización de rich snippets en Google.
+        name: p.title,
+        brand: {'@type': 'Brand', name: 'MORIAH Café'},
+        description: p.description,
+        image: p.image,
+        offers: {
+          '@type': 'Offer',
+          price: String(p.price),
+          priceCurrency: 'COP',
+          availability: 'https://schema.org/InStock',
+        },
       },
     },
   ];
 };
 
-/**
- * @param {Route.LoaderArgs} args
- */
-export async function loader(args) {
-  const deferredData = loadDeferredData(args);
-  const criticalData = await loadCriticalData(args);
-  return {...deferredData, ...criticalData};
+/** @param {import('react-router').LoaderFunctionArgs} args */
+export function loader({params}) {
+  const product = getProduct(params.handle);
+  if (!product) throw new Response(null, {status: 404});
+  // `raw` contiene funciones/valores no serializables solo en teoría; lo
+  // dejamos fuera y cada vista recarga el detalle desde el catálogo.
+  const {raw, ...serializable} = product;
+  return {product: serializable};
+}
+
+export default function Product() {
+  const {product} = useLoaderData();
+
+  useEffect(() => {
+    analytics.viewItem(product);
+  }, [product]);
+
+  if (product.kind === 'cafe') return <CafeProductPage cafe={getCafe(product.handle)} />;
+  if (product.kind === 'bundle') return <BundleProductPage product={product} />;
+  return <MerchProductPage product={product} />;
 }
 
 /**
- * @param {Route.LoaderArgs}
- */
-async function loadCriticalData({context, params, request}) {
-  const {handle} = params;
-  const {storefront} = context;
-
-  if (!handle) {
-    throw new Error('Expected product handle to be defined');
-  }
-
-  const {product} = await storefront
-    .query(PRODUCT_QUERY, {
-      variables: {handle, selectedOptions: getSelectedProductOptions(request)},
-    })
-    .catch(() => ({product: null}));
-
-  if (!product?.id) {
-    // Fall back to the local café catalog so the seed cards have a PDP
-    // before the product exists in Shopify.
-    const seedCafe = getCafe(handle);
-    if (seedCafe) {
-      return {product: null, seedCafe, seedBundle: false};
-    }
-    if (handle === BUNDLE.handle) {
-      return {product: null, seedCafe: null, seedBundle: true};
-    }
-    throw new Response(null, {status: 404});
-  }
-
-  redirectIfHandleIsLocalized(request, {handle, data: product});
-
-  return {product, seedCafe: null, seedBundle: false};
-}
-
-/**
- * @param {Route.LoaderArgs}
- */
-function loadDeferredData() {
-  return {};
-}
-
-/** Reads a `custom.<key>` metafield value from the product. */
-function metaValue(product, key) {
-  const mf = product.metafields?.find((m) => m && m.key === key);
-  return mf?.value || null;
-}
-
-/**
- * Fila de 5 iconos de metafield — Tropicalia: .div-block-385.cafe
- * Muestra solo los campos con valor.
+ * Fila de 5 iconos de metadatos — Tropicalia: .div-block-385.cafe
  */
 function MetaIconsRow({variety, heroe, territory, farm, proceso}) {
   const items = [
-    {icon: '/icons/icono-cafe-dorado.svg',     label: 'Variedad',   value: variety},
-    {icon: '/icons/icono-heroe-dorado.svg',    label: 'Héroe',      value: heroe},
+    {icon: '/icons/icono-cafe-dorado.svg', label: 'Variedad', value: variety},
+    {icon: '/icons/icono-heroe-dorado.svg', label: 'Héroe', value: heroe},
     {icon: '/icons/icono-colombia-dorado.svg', label: 'Territorio', value: territory},
-    {icon: '/icons/icono-finca-dorado.svg',    label: 'Finca',      value: farm},
-    {icon: '/icons/icono-empaque-dorado.svg',  label: 'Proceso',    value: proceso},
+    {icon: '/icons/icono-finca-dorado.svg', label: 'Finca', value: farm},
+    {icon: '/icons/icono-empaque-dorado.svg', label: 'Proceso', value: proceso},
   ].filter((it) => it.value);
 
   if (!items.length) return null;
@@ -173,14 +84,7 @@ function MetaIconsRow({variety, heroe, territory, farm, proceso}) {
     <div className="tx-meta-icons">
       {items.map((it) => (
         <div key={it.label} className="tx-meta-icon-item">
-          <img
-            src={it.icon}
-            alt=""
-            aria-hidden="true"
-            width={38}
-            height={38}
-            className="tx-meta-icon"
-          />
+          <img src={it.icon} alt="" aria-hidden="true" width={38} height={38} className="tx-meta-icon" />
           <div className="tx-meta-icon-text">
             <span className="tx-titulo">{it.label}</span>
             <span className="tx-parrafo">{it.value}</span>
@@ -191,93 +95,8 @@ function MetaIconsRow({variety, heroe, territory, farm, proceso}) {
   );
 }
 
-export default function Product() {
-  /** @type {LoaderReturnData} */
-  const {product, seedCafe, seedBundle} = useLoaderData();
-
-  if (seedBundle) {
-    return <SeedBundlePage />;
-  }
-  if (seedCafe) {
-    return <SeedProductPage cafe={seedCafe} />;
-  }
-
-  return <ShopifyProductPage product={product} />;
-}
-
-/** PDP for the launch bundle ("Kit Tres Orígenes -15%"). */
-function SeedBundlePage() {
-  const price = bundlePrice();
-  const items = BUNDLE.includes.map((h) => getCafe(h)).filter(Boolean);
-  const waText = encodeURIComponent(
-    `Hola MORIAH, quiero el ${BUNDLE.title} (${formatCop(price)}).`,
-  );
-  return (
-    <div className="product-page">
-      <div className="container pdp">
-        <div className="pdp-gallery">
-          <div className="pdp-gallery__main">
-            <img src={BUNDLE.image} alt={BUNDLE.title} width={1400} height={934} />
-          </div>
-        </div>
-        <div className="pdp-info">
-          <nav className="breadcrumb" aria-label="Migas de pan">
-            <Link to="/">Inicio</Link> · <Link to="/collections/cafes">Cafés</Link>{' '}
-            · <span>{BUNDLE.title}</span>
-          </nav>
-          <h1 className="pdp-title">{BUNDLE.title}</h1>
-          <p className="pdp-origin">Kit de degustación · los 3 orígenes MORIAH</p>
-          <a href="#reseñas" style={{width: 'max-content'}}>
-            <StarRating rating={5} />
-          </a>
-          <div className="pdp-pricerow">
-            <span className="price price--sale">
-              {formatCop(price)}
-              <s>{formatCop(BUNDLE.includes.reduce((a, h) => a + (getCafe(h)?.price ?? 0), 0))}</s>
-            </span>
-          </div>
-          <div className="flavor-notes">
-            <div className="flavor-notes__label">
-              <IconLeaf width={16} height={16} /> Incluye
-            </div>
-            <p className="flavor-notes__list">
-              {items.map((c) => c.title).join(' · ')}
-            </p>
-          </div>
-          <div className="pdp-buy">
-            <a className="btn btn--lg btn--block" href={`https://wa.me/?text=${waText}`} target="_blank" rel="noopener noreferrer">
-              Pedir el kit · {formatCop(price)}
-            </a>
-            <p className="pay-line">
-              <IconCheck width={14} height={14} /> Paga con Nequi, PSE o tarjeta ·
-              Entrega 2–4 días
-            </p>
-          </div>
-          <ShippingBadges />
-          <div className="accordion">
-            <details className="accordion__item" open>
-              <summary className="accordion__trigger">
-                Descripción <IconPlus className="accordion__icon" />
-              </summary>
-              <div className="accordion__panel">{BUNDLE.description}</div>
-            </details>
-          </div>
-        </div>
-      </div>
-      <ReviewsBlock />
-      <FinalCta />
-    </div>
-  );
-}
-
-/**
- * PDP for a local (seed) café, shown before the product exists in Shopify.
- * Full "Pergamino-style" anatomy: roast meter, origin subtitle, social proof,
- * flavor notes, tech spec, purchase options (one-time / subscription), producer
- * block and a specific origin story.
- * @param {{cafe: import('~/data/cafes').CafeSeed}}
- */
-function SeedProductPage({cafe}) {
+/** PDP de un café: medidor de tueste, origen, notas, ficha técnica, compra/suscripción, productor e historia. */
+function CafeProductPage({cafe}) {
   return (
     <div className="product-page">
       <div className="container pdp">
@@ -289,8 +108,8 @@ function SeedProductPage({cafe}) {
 
         <div className="pdp-info">
           <nav className="breadcrumb" aria-label="Migas de pan">
-            <Link to="/">Inicio</Link> · <Link to="/collections/cafes">Cafés</Link>{' '}
-            · <span>{cafe.title}</span>
+            <Link to="/">Inicio</Link> · <Link to="/collections/cafes">Cafés</Link> ·{' '}
+            <span>{cafe.title}</span>
           </nav>
 
           {cafe.roast && <RoastMeter level={cafe.roastLevel} label={cafe.roast} />}
@@ -375,8 +194,8 @@ function SeedProductPage({cafe}) {
                 Preparación recomendada <IconPlus className="accordion__icon" />
               </summary>
               <div className="accordion__panel">
-                Usa agua a 92–96 °C y proporción 1:16 (café:agua). Disfruta dentro
-                de los 30 días tras abrir la bolsa.
+                Usa agua a 92–96 °C y proporción 1:16 (café:agua). Disfruta dentro de los 30
+                días tras abrir la bolsa.
               </div>
             </details>
             <details className="accordion__item">
@@ -384,8 +203,8 @@ function SeedProductPage({cafe}) {
                 Envíos y devoluciones <IconPlus className="accordion__icon" />
               </summary>
               <div className="accordion__panel">
-                Enviamos a todo Colombia en 2–4 días hábiles (24–48 h express en
-                ciudades principales). Envío gratis desde $100.000.
+                Enviamos a todo Colombia en 2–4 días hábiles (24–48 h express en ciudades
+                principales). Envío gratis desde $100.000.
               </div>
             </details>
           </div>
@@ -398,175 +217,151 @@ function SeedProductPage({cafe}) {
   );
 }
 
-/**
- * @param {{product: any}}
- */
-function ShopifyProductPage({product}) {
-  const selectedVariant = useOptimisticVariant(
-    product.selectedOrFirstAvailableVariant,
-    getAdjacentAndFirstAvailableVariants(product),
-  );
-
-  useSelectedOptionInUrlParam(selectedVariant.selectedOptions);
-
-  const productOptions = getProductOptions({
-    ...product,
-    selectedOrFirstAvailableVariant: selectedVariant,
-  });
-
-  const {title, descriptionHtml, vendor} = product;
-  const images = product.images?.nodes ?? [];
-  const flavorNotes = metaValue(product, 'flavor_notes');
-  const origin = metaValue(product, 'origin') || vendor;
-  const roast = metaValue(product, 'roast');
-  const altitude = metaValue(product, 'altitude');
-  const processMethod = metaValue(product, 'process');
-  const variety = metaValue(product, 'variety');
-  const farm = metaValue(product, 'farm');
-
-  const compareAt = selectedVariant?.compareAtPrice;
-  const onSale =
-    compareAt &&
-    Number(compareAt.amount) > Number(selectedVariant?.price?.amount ?? 0);
-  const qtyAvailable = selectedVariant?.quantityAvailable;
-  const lowStock =
-    typeof qtyAvailable === 'number' && qtyAvailable > 0 && qtyAvailable <= 8;
-
-  const monthly = selectedVariant?.price
-    ? Number(selectedVariant.price.amount) / 4
-    : null;
-
+/** PDP del kit de lanzamiento ("Kit Tres Orígenes −15%"). */
+function BundleProductPage({product}) {
+  const {open} = useAside();
+  const items = product.includes.map((h) => getCafe(h)).filter(Boolean);
   return (
     <div className="product-page">
       <div className="container pdp">
-        <ProductGallery
-          images={images}
-          selectedImage={selectedVariant?.image}
-          title={title}
-        />
-
+        <div className="pdp-gallery">
+          <div className="pdp-gallery__main">
+            <img src={product.image} alt={product.title} width={1400} height={934} />
+          </div>
+        </div>
         <div className="pdp-info">
           <nav className="breadcrumb" aria-label="Migas de pan">
-            <Link to="/">Inicio</Link> ·{' '}
-            <Link to="/collections/cafes">Cafés</Link> · <span>{title}</span>
+            <Link to="/">Inicio</Link> · <Link to="/collections/cafes">Cafés</Link> ·{' '}
+            <span>{product.title}</span>
           </nav>
-
-          <h1 className="pdp-title">{title}</h1>
-          {origin && <p className="pdp-origin">{origin}</p>}
-
-          <MetaIconsRow
-            variety={variety}
-            heroe={vendor}
-            territory={origin}
-            farm={farm}
-            proceso={processMethod}
-          />
-
+          <h1 className="pdp-title">{product.title}</h1>
+          <p className="pdp-origin">{product.subtitle}</p>
           <a href="#reseñas" style={{width: 'max-content'}}>
             <StarRating rating={5} />
           </a>
-
           <div className="pdp-pricerow">
-            <span className={`price ${onSale ? 'price--sale' : ''}`}>
-              {selectedVariant?.price ? (
-                <Money as="span" data={selectedVariant.price} />
-              ) : null}
-              {onSale && (
-                <s>
-                  <Money as="span" data={compareAt} />
-                </s>
-              )}
+            <span className="price price--sale">
+              {formatCop(product.price)}
+              <s>{formatCop(product.compareAtPrice)}</s>
             </span>
           </div>
-          {monthly && (
-            <p className="pdp-installments">
-              o 4 cuotas de{' '}
-              <strong>
-                <Money
-                  as="span"
-                  data={{
-                    amount: monthly.toFixed(2),
-                    currencyCode: selectedVariant.price.currencyCode,
-                  }}
-                />
-              </strong>{' '}
-              sin interés
-            </p>
-          )}
-
-          {flavorNotes && (
-            <div className="flavor-notes">
-              <div className="flavor-notes__label">
-                <IconLeaf width={16} height={16} /> Notas de sabor
-              </div>
-              <p className="flavor-notes__list">{flavorNotes}</p>
+          <div className="flavor-notes">
+            <div className="flavor-notes__label">
+              <IconLeaf width={16} height={16} /> Incluye
             </div>
-          )}
-
-          {(roast || altitude || processMethod) && (
-            <div className="tag-row">
-              {roast && <span className="tag">{roast}</span>}
-              {processMethod && <span className="tag">{processMethod}</span>}
-              {altitude && <span className="tag">{altitude}</span>}
-            </div>
-          )}
-
-          <ProductForm
-            productOptions={productOptions}
-            selectedVariant={selectedVariant}
-            product={product}
-          />
-
-          <div className="pdp-meta">
-            <div className="pdp-meta__row">
-              <IconCheck /> Entrega estimada: 2–4 días hábiles
-            </div>
-            {lowStock && (
-              <div className="pdp-meta__row">
-                <span className="stock-low">
-                  ¡Solo quedan {qtyAvailable} unidades!
-                </span>
-              </div>
-            )}
+            <p className="flavor-notes__list">{items.map((c) => c.title).join(' · ')}</p>
           </div>
-
+          <div className="pdp-buy">
+            <AddToCartButton
+              className="btn btn--lg btn--block"
+              handle={product.handle}
+              product={product}
+              onClick={() => open('cart')}
+            >
+              <IconBag width={18} height={18} />
+              Agregar el kit · {formatCop(product.price)}
+            </AddToCartButton>
+            <p className="pay-line">
+              <IconCheck width={14} height={14} /> Paga con Nequi, PSE o tarjeta · Entrega 2–4
+              días
+            </p>
+          </div>
           <ShippingBadges />
-
-          <ProductAccordions descriptionHtml={descriptionHtml} />
+          <div className="accordion">
+            <details className="accordion__item" open>
+              <summary className="accordion__trigger">
+                Descripción <IconPlus className="accordion__icon" />
+              </summary>
+              <div className="accordion__panel">{product.description}</div>
+            </details>
+          </div>
         </div>
       </div>
-
       <ReviewsBlock />
       <FinalCta />
-
-      <StickyAtc
-        product={product}
-        selectedVariant={selectedVariant}
-        image={selectedVariant?.image}
-      />
-
-      <Analytics.ProductView
-        data={{
-          products: [
-            {
-              id: product.id,
-              title: product.title,
-              price: selectedVariant?.price?.amount || '0',
-              vendor: product.vendor,
-              variantId: selectedVariant?.id || '',
-              variantTitle: selectedVariant?.title || '',
-              quantity: 1,
-            },
-          ],
-        }}
-      />
+      <StickyAtc product={product} price={product.price} />
     </div>
   );
 }
 
-/**
- * Shipping info badges — Tropicalia: .div-block-523
- */
+/** PDP de merch: imagen, categoría, precio, descripción y compra. */
+function MerchProductPage({product}) {
+  const {open} = useAside();
+  const [qty, setQty] = useState(1);
+  return (
+    <div className="product-page">
+      <div className="container pdp">
+        <div className="pdp-gallery">
+          <div className="pdp-gallery__main">
+            <img src={product.image} alt={product.title} width={1200} height={1200} />
+          </div>
+        </div>
+        <div className="pdp-info">
+          <nav className="breadcrumb" aria-label="Migas de pan">
+            <Link to="/">Inicio</Link> · <Link to="/collections/merch">Merch</Link> ·{' '}
+            <span>{product.title}</span>
+          </nav>
+          {product.badge && <span className="badge badge--gold">{product.badge}</span>}
+          <h1 className="pdp-title">{product.title}</h1>
+          <p className="pdp-origin">{product.subtitle}</p>
+          <div className="pdp-pricerow">
+            <span className="price">{formatCop(product.price)}</span>
+          </div>
+          {product.short && <p className="lede">{product.short}</p>}
+          <div className="pdp-buy">
+            <div className="pdp-buy__row">
+              <div className="qty-stepper" aria-label="Cantidad">
+                <button type="button" aria-label="Disminuir cantidad" onClick={() => setQty((q) => Math.max(1, q - 1))}>
+                  &minus;
+                </button>
+                <output>{qty}</output>
+                <button type="button" aria-label="Aumentar cantidad" onClick={() => setQty((q) => Math.min(99, q + 1))}>
+                  +
+                </button>
+              </div>
+              <AddToCartButton
+                className="btn btn--lg btn--block"
+                handle={product.handle}
+                quantity={qty}
+                product={product}
+                onClick={() => open('cart')}
+              >
+                <IconBag width={18} height={18} />
+                Agregar al carrito · {formatCop(product.price * qty)}
+              </AddToCartButton>
+            </div>
+            <p className="pay-line">
+              <IconCheck width={14} height={14} /> Paga con Nequi, PSE o tarjeta · Entrega 2–4
+              días
+            </p>
+          </div>
+          <ShippingBadges />
+          <div className="accordion">
+            <details className="accordion__item" open>
+              <summary className="accordion__trigger">
+                Descripción <IconPlus className="accordion__icon" />
+              </summary>
+              <div className="accordion__panel">{product.description}</div>
+            </details>
+            <details className="accordion__item">
+              <summary className="accordion__trigger">
+                Cambios y devoluciones <IconPlus className="accordion__icon" />
+              </summary>
+              <div className="accordion__panel">
+                Aceptamos cambios de merch sin uso dentro de los 30 días siguientes a la entrega.
+                Ver <Link to="/policies/refund-policy">política de cambios</Link>.
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+      <FinalCta />
+      <StickyAtc product={product} price={product.price} />
+    </div>
+  );
+}
+
+/** Shipping info badges — Tropicalia: .div-block-523 */
 function ShippingBadges() {
   return (
     <div className="tx-shipping-row">
@@ -578,53 +373,6 @@ function ShippingBadges() {
         <img src="/icons/icono-nacional-dorado.svg" alt="" aria-hidden="true" width={28} height={28} />
         <p>Nacional: 3–5 días hábiles · gratis desde $100.000.</p>
       </div>
-    </div>
-  );
-}
-
-/**
- * @param {{descriptionHtml: string}}
- */
-function ProductAccordions({descriptionHtml}) {
-  const items = [
-    {
-      title: 'Descripción',
-      content: (
-        <div dangerouslySetInnerHTML={{__html: descriptionHtml || ''}} />
-      ),
-    },
-    {
-      title: 'Preparación recomendada',
-      content: (
-        <p>
-          Usa agua a 92–96 °C y una proporción de 1:16 (café:agua). Para
-          métodos filtrados, muele medio-fino; para prensa francesa, grueso.
-          Disfruta dentro de los 30 días posteriores a abrir la bolsa.
-        </p>
-      ),
-    },
-    {
-      title: 'Envíos y devoluciones',
-      content: (
-        <p>
-          Enviamos a todo Colombia en 2–4 días hábiles (24–48 h express en
-          ciudades principales). Envío gratis desde $100.000. Si algo no está
-          perfecto, escríbenos y lo resolvemos.
-        </p>
-      ),
-    },
-  ];
-  return (
-    <div className="accordion">
-      {items.map((it) => (
-        <details className="accordion__item" key={it.title}>
-          <summary className="accordion__trigger">
-            {it.title}
-            <IconPlus className="accordion__icon" />
-          </summary>
-          <div className="accordion__panel">{it.content}</div>
-        </details>
-      ))}
     </div>
   );
 }
@@ -689,135 +437,3 @@ function FinalCta() {
     </section>
   );
 }
-
-const PRODUCT_VARIANT_FRAGMENT = `#graphql
-  fragment ProductVariant on ProductVariant {
-    availableForSale
-    quantityAvailable
-    compareAtPrice {
-      amount
-      currencyCode
-    }
-    id
-    image {
-      __typename
-      id
-      url
-      altText
-      width
-      height
-    }
-    price {
-      amount
-      currencyCode
-    }
-    product {
-      title
-      handle
-    }
-    selectedOptions {
-      name
-      value
-    }
-    sku
-    title
-    unitPrice {
-      amount
-      currencyCode
-    }
-  }
-`;
-
-const PRODUCT_FRAGMENT = `#graphql
-  fragment Product on Product {
-    id
-    title
-    vendor
-    handle
-    descriptionHtml
-    description
-    encodedVariantExistence
-    encodedVariantAvailability
-    images(first: 8) {
-      nodes {
-        id
-        url
-        altText
-        width
-        height
-      }
-    }
-    metafields(identifiers: [
-      {namespace: "custom", key: "flavor_notes"},
-      {namespace: "custom", key: "origin"},
-      {namespace: "custom", key: "roast"},
-      {namespace: "custom", key: "altitude"},
-      {namespace: "custom", key: "process"},
-      {namespace: "custom", key: "variety"},
-      {namespace: "custom", key: "farm"}
-    ]) {
-      key
-      value
-    }
-    options {
-      name
-      optionValues {
-        name
-        firstSelectableVariant {
-          ...ProductVariant
-        }
-        swatch {
-          color
-          image {
-            previewImage {
-              url
-            }
-          }
-        }
-      }
-    }
-    sellingPlanGroups(first: 5) {
-      nodes {
-        name
-        options {
-          name
-          values
-        }
-        sellingPlans(first: 10) {
-          nodes {
-            id
-            name
-          }
-        }
-      }
-    }
-    selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {
-      ...ProductVariant
-    }
-    adjacentVariants (selectedOptions: $selectedOptions) {
-      ...ProductVariant
-    }
-    seo {
-      description
-      title
-    }
-  }
-  ${PRODUCT_VARIANT_FRAGMENT}
-`;
-
-const PRODUCT_QUERY = `#graphql
-  query Product(
-    $country: CountryCode
-    $handle: String!
-    $language: LanguageCode
-    $selectedOptions: [SelectedOptionInput!]!
-  ) @inContext(country: $country, language: $language) {
-    product(handle: $handle) {
-      ...Product
-    }
-  }
-  ${PRODUCT_FRAGMENT}
-`;
-
-/** @typedef {import('./+types/products.$handle').Route} Route */
-/** @typedef {ReturnType<typeof useLoaderData<typeof loader>>} LoaderReturnData */

@@ -25,4 +25,4 @@ export function ProductPrice({price, compareAtPrice}) {
   );
 }
 
-/** @typedef {import('@shopify/hydrogen/storefront-api-types').MoneyV2} MoneyV2 */
+/** @typedef {{amount: string|number, currencyCode?: string}} MoneyV2 */

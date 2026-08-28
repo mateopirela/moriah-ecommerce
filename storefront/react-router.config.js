@@ -1,14 +1,12 @@
-import {hydrogenPreset} from '@shopify/hydrogen/react-router-preset';
+import {vercelPreset} from '@vercel/react-router/vite';
 
 /**
- * React Router 7.9.x Configuration for Hydrogen
- *
- * This configuration uses the official Hydrogen preset to provide optimal
- * React Router settings for Shopify Oxygen deployment. The preset enables
- * validated performance optimizations while ensuring compatibility.
+ * React Router 7 (framework mode) configuration.
+ * The Vercel preset emits the Build Output API directory for the existing
+ * Vercel project; locally `react-router dev` / `react-router-serve` work as usual.
+ * @type {import('@react-router/dev/config').Config}
  */
 export default {
-  presets: [hydrogenPreset()],
+  ssr: true,
+  presets: [vercelPreset()],
 };
-
-/** @typedef {import('@react-router/dev/config').Config} Config */

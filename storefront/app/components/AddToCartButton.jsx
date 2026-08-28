@@ -1,60 +1,64 @@
-import {CartForm} from '@shopify/hydrogen';
 import {useEffect, useRef, useState} from 'react';
+import {CART_ACTIONS, CartForm} from '~/components/CartForm';
 import {IconCheck} from '~/components/Icons';
+import {analytics} from '~/lib/analytics';
+
+const SUCCESS_FLASH_MS = 1600;
 
 /**
+ * Botón "Agregar al carrito" con confirmación visual.
  * @param {{
- *   analytics?: unknown;
- *   children: React.ReactNode;
- *   className?: string;
- *   disabled?: boolean;
- *   lines: Array<OptimisticCartLineInput>;
- *   onClick?: () => void;
- * }}
+ *   handle: string,
+ *   size?: string|null,
+ *   grind?: string|null,
+ *   quantity?: number,
+ *   product?: {handle: string, title: string, price?: number, unitPrice?: number},
+ *   children: React.ReactNode,
+ *   className?: string,
+ *   disabled?: boolean,
+ *   onClick?: () => void,
+ * }} props
  */
 export function AddToCartButton({
-  analytics,
+  handle,
+  size,
+  grind,
+  quantity = 1,
+  product,
   children,
   className,
   disabled,
-  lines,
   onClick,
 }) {
   return (
-    <CartForm route="/cart" inputs={{lines}} action={CartForm.ACTIONS.LinesAdd}>
+    <CartForm
+      action={CART_ACTIONS.ADD}
+      fetcherKey={`add-${handle}-${size ?? ''}-${grind ?? ''}`}
+      inputs={{handle, size, grind, quantity}}
+    >
       {(fetcher) => (
-        <>
-          <input
-            name="analytics"
-            type="hidden"
-            value={JSON.stringify(analytics)}
-          />
-          <AtcButton
-            fetcher={fetcher}
-            className={className}
-            onClick={onClick}
-            disabled={disabled}
-          >
-            {children}
-          </AtcButton>
-        </>
+        <AtcButton
+          fetcher={fetcher}
+          className={className}
+          disabled={disabled}
+          onClick={() => {
+            if (product) analytics.addToCart(product, quantity);
+            onClick?.();
+          }}
+        >
+          {children}
+        </AtcButton>
       )}
     </CartForm>
   );
 }
 
-const SUCCESS_FLASH_MS = 1600;
-
 /**
- * Botón con feedback de confirmación: al completar el agregado muestra
- * brevemente un check + "Agregado" antes de volver al estado normal.
+ * Al completar el agregado muestra brevemente un check + "Agregado".
  * @param {{
- *   fetcher: FetcherWithComponents;
- *   children: React.ReactNode;
- *   className?: string;
- *   disabled?: boolean;
- *   onClick?: () => void;
- * }}
+ *   fetcher: import('react-router').FetcherWithComponents<any>,
+ *   children: React.ReactNode, className?: string, disabled?: boolean, onClick?: () => void,
+ * }} props
  */
 function AtcButton({fetcher, children, className, disabled, onClick}) {
   const [justAdded, setJustAdded] = useState(false);
@@ -63,7 +67,7 @@ function AtcButton({fetcher, children, className, disabled, onClick}) {
   useEffect(() => {
     if (fetcher.state !== 'idle') {
       wasSubmitting.current = true;
-      return;
+      return undefined;
     }
     if (wasSubmitting.current) {
       wasSubmitting.current = false;
@@ -71,6 +75,7 @@ function AtcButton({fetcher, children, className, disabled, onClick}) {
       const timeout = setTimeout(() => setJustAdded(false), SUCCESS_FLASH_MS);
       return () => clearTimeout(timeout);
     }
+    return undefined;
   }, [fetcher.state]);
 
   return (
@@ -92,6 +97,3 @@ function AtcButton({fetcher, children, className, disabled, onClick}) {
     </button>
   );
 }
-
-/** @typedef {import('react-router').FetcherWithComponents} FetcherWithComponents */
-/** @typedef {import('@shopify/hydrogen').OptimisticCartLineInput} OptimisticCartLineInput */

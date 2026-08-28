@@ -3,7 +3,6 @@
  *
  * Cada pieza es una extensión del léxico del manifiesto (pausa, abundancia,
  * afán, verdad, legado). No es merch decorativo: es el manifiesto hecho objeto.
- * Se usa como catálogo local mientras Shopify no tenga la colección `merch`.
  */
 
 export const MERCH = [

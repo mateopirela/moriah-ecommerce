@@ -1,11 +1,11 @@
-import {useEffect} from 'react';
-import {useAnalytics} from '@shopify/hydrogen';
+import {useEffect, useRef} from 'react';
+import {useLocation} from 'react-router';
+import {analytics} from '~/lib/analytics';
 
 /**
- * Injects GA4 + Meta Pixel base snippets. Dormant unless the matching
- * env IDs are provided (PUBLIC_GA4_ID / PUBLIC_META_PIXEL_ID).
- * Rendered with the request nonce so it satisfies the CSP.
- * @param {{gaId?: string|null, metaPixelId?: string|null, nonce?: string}}
+ * Inyecta GA4 + Meta Pixel. Inactivo mientras no existan los IDs en el entorno
+ * (PUBLIC_GA4_ID / PUBLIC_META_PIXEL_ID). Usa el nonce de la CSP.
+ * @param {{gaId?: string|null, metaPixelId?: string|null, nonce?: string}} props
  */
 export function Tracking({gaId, metaPixelId, nonce}) {
   if (!gaId && !metaPixelId) return null;
@@ -35,82 +35,20 @@ export function Tracking({gaId, metaPixelId, nonce}) {
           }}
         />
       )}
+      <PageViewTracker />
     </>
   );
 }
 
-/**
- * Bridges Hydrogen's analytics funnel events to GA4 + Meta Pixel.
- * Mount inside <Analytics.Provider>. No-ops when no pixels are loaded.
- */
-export function CustomAnalytics() {
-  const {subscribe, register} = useAnalytics();
-
+/** Emite page_view en cada navegación del cliente. */
+function PageViewTracker() {
+  const {pathname, search} = useLocation();
+  const last = useRef(null);
   useEffect(() => {
-    const {ready} = register('moriah-custom-analytics');
-
-    const gtag = (...args) => {
-      if (typeof window !== 'undefined' && window.gtag) window.gtag(...args);
-    };
-    const fbq = (...args) => {
-      if (typeof window !== 'undefined' && window.fbq) window.fbq(...args);
-    };
-
-    const money = (p) => ({
-      value: Number(p?.price ?? p?.totalAmount?.amount ?? 0),
-      currency: p?.currencyCode ?? 'COP',
-    });
-
-    subscribe('page_viewed', () => {
-      gtag('event', 'page_view');
-      fbq('track', 'PageView');
-    });
-
-    subscribe('product_viewed', ({products}) => {
-      const p = products?.[0];
-      if (!p) return;
-      gtag('event', 'view_item', {
-        currency: 'COP',
-        value: Number(p.price ?? 0),
-        items: [{item_id: p.id, item_name: p.title, price: Number(p.price ?? 0)}],
-      });
-      fbq('track', 'ViewContent', {
-        content_name: p.title,
-        content_ids: [p.id],
-        content_type: 'product',
-        value: Number(p.price ?? 0),
-        currency: 'COP',
-      });
-    });
-
-    subscribe('collection_viewed', ({collection}) => {
-      gtag('event', 'view_item_list', {item_list_id: collection?.handle});
-    });
-
-    subscribe('product_added_to_cart', ({currentLine}) => {
-      if (!currentLine) return;
-      const m = money(currentLine.cost?.totalAmount);
-      gtag('event', 'add_to_cart', {
-        currency: m.currency,
-        value: m.value,
-        items: [{item_id: currentLine.merchandise?.product?.id, quantity: currentLine.quantity}],
-      });
-      fbq('track', 'AddToCart', {
-        content_ids: [currentLine.merchandise?.product?.id],
-        content_type: 'product',
-        value: m.value,
-        currency: m.currency,
-      });
-    });
-
-    subscribe('search_viewed', ({searchTerm}) => {
-      gtag('event', 'search', {search_term: searchTerm});
-      fbq('track', 'Search', {search_string: searchTerm});
-    });
-
-    ready();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+    const key = pathname + search;
+    if (last.current === key) return;
+    last.current = key;
+    analytics.pageView();
+  }, [pathname, search]);
   return null;
 }

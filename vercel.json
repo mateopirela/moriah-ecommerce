@@ -1,6 +1,0 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": null,
-  "installCommand": "cd storefront && npm ci",
-  "buildCommand": "cd storefront && npm run build && node scripts/vercel-build.mjs"
-}

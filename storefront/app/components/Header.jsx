@@ -1,12 +1,12 @@
-import {Suspense, useEffect, useState} from 'react';
-import {Await, NavLink, Link, useAsyncValue, useLocation} from 'react-router';
-import {useAnalytics, useOptimisticCart} from '@shopify/hydrogen';
+import {useEffect, useState} from 'react';
+import {Link, NavLink, useLocation} from 'react-router';
 import {useAside} from '~/components/Aside';
-import {IconSearch, IconBag, IconUser, IconMenu} from '~/components/Icons';
+import {IconBag, IconMenu, IconSearch} from '~/components/Icons';
+import {useOptimisticCartCount} from '~/components/CartMain';
 
 /**
  * Navbar — réplica de la estructura de tropicaliacoffee.com:
- * logo · CAFÉ▾ · MERCH▾ · CATACIÓN · PREPARA TU CAFÉ · TIENDA · BLOG · CONTACTO · iconos
+ * logo · CAFÉ▾ · MERCH▾ · CATACIÓN · PREPARA TU CAFÉ · TIENDA · CONTACTO · iconos
  */
 const TX_NAV = [
   {
@@ -14,32 +14,31 @@ const TX_NAV = [
     url: '/collections/cafes',
     items: [
       {title: 'Todos', url: '/collections/cafes', img: '/images/lineup-bolsas.webp'},
-      {title: 'Línea de Origen', url: '/collections/cafes', img: '/images/cafe-bolsa.webp'},
-      {title: 'Micro-lotes', url: '/collections/cafes', img: '/images/producto-bolsa.webp'},
-      {title: 'Club de la Memoria', url: '/#club', img: '/images/kit-bolsas.webp'},
+      {title: 'Línea de Origen', url: '/collections/linea-origen', img: '/images/cafe-bolsa.webp'},
+      {title: 'Micro-lotes', url: '/collections/micro-lotes', img: '/images/producto-bolsa.webp'},
+      {title: 'Club de la Memoria', url: '/collections/club-de-la-memoria', img: '/images/kit-bolsas.webp'},
     ],
   },
   {
     title: 'Merch',
-    url: '/collections/all',
+    url: '/collections/merch',
     items: [
-      {title: 'Pocillos', url: '/collections/all', img: '/images/equipo-moriah.webp'},
-      {title: 'Para vestir', url: '/collections/all', img: '/images/tostado-moriah.webp'},
-      {title: 'Accesorios', url: '/collections/all', img: '/images/hero-bolsa.webp'},
-      {title: 'Caja regalo', url: '/collections/all', img: '/images/kit-bolsas.webp'},
+      {title: 'Pocillos', url: '/collections/pocillos', img: '/images/equipo-moriah.webp'},
+      {title: 'Para vestir', url: '/collections/para-vestir', img: '/images/tostado-moriah.webp'},
+      {title: 'Accesorios', url: '/collections/accesorios', img: '/images/hero-bolsa.webp'},
+      {title: 'Caja regalo', url: '/collections/caja-regalo', img: '/images/kit-bolsas.webp'},
     ],
   },
   {title: 'Catación', url: '/quiz'},
   {title: 'Prepara tu café', url: '/pages/prepara-tu-cafe'},
-  {title: 'Tienda', url: '/collections/cafes'},
+  {title: 'Tienda', url: '/collections/all'},
   {title: 'Contacto', url: '/pages/contacto'},
 ];
 
 /**
- * @param {HeaderProps}
+ * @param {{cart: import('~/lib/cart').Cart}} props
  */
-export function Header({header, isLoggedIn, cart}) {
-  const {shop} = header;
+export function Header({cart}) {
   const {pathname} = useLocation();
   const isHome = pathname === '/';
   const [scrolled, setScrolled] = useState(false);
@@ -61,14 +60,14 @@ export function Header({header, isLoggedIn, cart}) {
       <NavLink prefetch="intent" to="/" className="header__brand" end>
         <img
           src="/images/logo-moriah.png"
-          alt={`${shop.name} — Un café para el alma`}
+          alt="MORIAH Café — Un café para el alma"
           width={38}
           height={38}
         />
         <span className="header__wordmark">MORIAH</span>
       </NavLink>
       <TropicaliaNav />
-      <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+      <HeaderCtas cart={cart} />
     </header>
   );
 }
@@ -117,21 +116,11 @@ function TropicaliaNav() {
   );
 }
 
-/**
- * @param {Pick<HeaderProps, 'isLoggedIn' | 'cart'>}
- */
-function HeaderCtas({isLoggedIn, cart}) {
+/** @param {{cart: import('~/lib/cart').Cart}} props */
+function HeaderCtas({cart}) {
   return (
     <nav className="header-ctas" role="navigation" aria-label="Acciones">
       <SearchToggle />
-      <NavLink prefetch="intent" to="/account" className="icon-btn">
-        <Suspense fallback={<IconUser />}>
-          <Await resolve={isLoggedIn} errorElement={<IconUser />}>
-            {() => <IconUser />}
-          </Await>
-        </Suspense>
-        <span className="sr-only">Cuenta</span>
-      </NavLink>
       <CartToggle cart={cart} />
       <HeaderMenuMobileToggle />
     </nav>
@@ -161,15 +150,11 @@ function SearchToggle() {
   );
 }
 
-/**
- * Mobile aside menu — reuses the Tropicalia nav items.
- */
+/** Menú lateral móvil — reutiliza los ítems de la nav Tropicalia. */
 export function HeaderMenu({viewport}) {
   const {close} = useAside();
   if (viewport !== 'mobile') return null;
-  const flat = TX_NAV.flatMap((item) =>
-    item.items ? [item, ...item.items] : [item],
-  );
+  const flat = TX_NAV.flatMap((item) => (item.items ? [item, ...item.items] : [item]));
   return (
     <nav className="header-menu-mobile" role="navigation" aria-label="Principal">
       <NavLink end onClick={close} prefetch="intent" className="header-menu-item" to="/">
@@ -191,12 +176,10 @@ export function HeaderMenu({viewport}) {
   );
 }
 
-/**
- * @param {{count: number}}
- */
-function CartBadge({count}) {
+/** @param {{cart: import('~/lib/cart').Cart}} props */
+function CartToggle({cart}) {
   const {open} = useAside();
-  const {publish, shop, cart, prevCart} = useAnalytics();
+  const count = useOptimisticCartCount(cart);
 
   return (
     <a
@@ -205,12 +188,6 @@ function CartBadge({count}) {
       onClick={(e) => {
         e.preventDefault();
         open('cart');
-        publish('cart_viewed', {
-          cart,
-          prevCart,
-          shop,
-          url: window.location.href || '',
-        });
       }}
     >
       <IconBag />
@@ -219,35 +196,3 @@ function CartBadge({count}) {
     </a>
   );
 }
-
-/**
- * @param {Pick<HeaderProps, 'cart'>}
- */
-function CartToggle({cart}) {
-  return (
-    <Suspense fallback={<CartBadge count={0} />}>
-      <Await resolve={cart}>
-        <CartBanner />
-      </Await>
-    </Suspense>
-  );
-}
-
-function CartBanner() {
-  const originalCart = useAsyncValue();
-  const cart = useOptimisticCart(originalCart);
-  return <CartBadge count={cart?.totalQuantity ?? 0} />;
-}
-
-/** @typedef {'desktop' | 'mobile'} Viewport */
-/**
- * @typedef {Object} HeaderProps
- * @property {HeaderQuery} header
- * @property {Promise<CartApiQueryFragment|null>} cart
- * @property {Promise<boolean>} isLoggedIn
- * @property {string} publicStoreDomain
- */
-
-/** @typedef {import('@shopify/hydrogen').CartViewPayload} CartViewPayload */
-/** @typedef {import('storefrontapi.generated').HeaderQuery} HeaderQuery */
-/** @typedef {import('storefrontapi.generated').CartApiQueryFragment} CartApiQueryFragment */
