@@ -2322,3 +2322,134 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
   60% { transform: scale(1.08); }
   100% { transform: scale(1); opacity: 1; }
 }
+
+/* ============================================================
+   MÓVIL — ajustes finos (pasada de responsive)
+   ============================================================ */
+
+/* Las píldoras de categoría se desplazan lateralmente: un degradado avisa
+   de que hay más y se oculta la barra de scroll. */
+.tx-cat-pills__row {
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.tx-cat-pills__row::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  /* Iconos de metadatos del PDP: en fila flex desbordaban el viewport y
+     provocaban scroll horizontal en toda la página. */
+  .tx-meta-icons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 0.75rem;
+  }
+  .tx-meta-icon-item {
+    flex: initial;
+    min-width: 0;
+  }
+  .tx-meta-icon-text {
+    min-width: 0;
+  }
+  .tx-meta-icon-text .tx-parrafo,
+  .tx-meta-icon-text .tx-titulo {
+    overflow-wrap: anywhere;
+  }
+
+  /* Degradado que insinúa el scroll de categorías. */
+  .tx-cat-pills {
+    position: relative;
+  }
+  .tx-cat-pills::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    right: 0;
+    width: 2.5rem;
+    pointer-events: none;
+    background: linear-gradient(to right, transparent, var(--tx-cream, #f7f3ea));
+  }
+}
+
+@media (max-width: 620px) {
+  /* "Nuestras líneas": cada tarjeta lleva un párrafo largo; en dos columnas
+     quedaban ~150px de ancho y los títulos se partían con guion. */
+  .tx-lineas-grid {
+    grid-template-columns: 1fr;
+    gap: 2.25rem;
+  }
+  .tx-linea {
+    max-width: 30rem;
+    margin-inline: auto;
+  }
+  .tx-linea__media {
+    min-height: 260px;
+  }
+
+  /* Galería y testimonios a una columna. */
+  .tx-testimonios__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 460px) {
+  /* Sobrescribe la regla anterior que forzaba 2 columnas en móvil. */
+  .tx-lineas-grid {
+    grid-template-columns: 1fr;
+    gap: 2.25rem;
+  }
+
+  /* "Eliminar" del carrito deja de pegarse al borde del cajón. */
+  .cart-line-quantity {
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+  }
+}
+
+/* ============================================================
+   MÓVIL — áreas táctiles del carrito y los cajones laterales
+   ============================================================ */
+@media (hover: none), (max-width: 760px) {
+  /* Los controles del carrito medían 30px: por debajo del mínimo cómodo
+     para el dedo. (Especificidad alineada con la regla de home.css.) */
+  .cart-line-quantity .cart-line-stepper button,
+  .cart-line-stepper button {
+    width: 44px;
+    height: 44px;
+    font-size: 1.05rem;
+  }
+  .cart-line-stepper output {
+    min-width: 34px;
+  }
+  .cart-line-remove {
+    min-height: 44px;
+    width: auto;
+    padding-inline: 0.35rem;
+    font-size: 0.8rem;
+  }
+
+  /* Cerrar el cajón (carrito, búsqueda, menú). */
+  .overlay aside .close {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* El botón "Eliminar" vive dentro de un <form> (CartForm); sin esto el form
+   se encogía como ítem flex y recortaba el texto a ~30px. */
+.cart-line-quantity > form {
+  flex: 0 0 auto;
+  display: flex;
+}
+.cart-line-remove {
+  white-space: nowrap;
+}
+
+/* Botón "Agregar" del upsell: alto cómodo para el dedo. */
+@media (hover: none), (max-width: 760px) {
+  .cart-upsell__add {
+    min-height: 40px;
+    padding-inline: 0.85rem;
+  }
+}

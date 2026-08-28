@@ -301,9 +301,11 @@ export default function Subscribe() {
           <fieldset className="checkout__group">
             <legend>Tarjeta para los cobros</legend>
             <p className="checkout__pay-note">
-              <IconShield width={16} height={16} aria-hidden="true" /> Los datos de tu tarjeta van
-              directo a <strong>Wompi (Bancolombia)</strong>; nunca pasan por nuestros servidores.
-              Aceptamos Visa y Mastercard.
+              <IconShield width={16} height={16} aria-hidden="true" />
+              <span>
+                Los datos de tu tarjeta van directo a <strong>Wompi (Bancolombia)</strong>; nunca
+                pasan por nuestros servidores. Aceptamos Visa y Mastercard.
+              </span>
             </p>
             {errors.card && (
               <p className="form-error" role="alert">
