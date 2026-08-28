@@ -1,0 +1,314 @@
+/* ============================================================
+   Checkout, suscripción y páginas de estado — MORIAH
+   ============================================================ */
+
+.checkout,
+.status-page,
+.subscribe {
+  padding: clamp(2rem, 5vw, 4rem) 0 5rem;
+}
+
+.checkout__grid {
+  display: grid;
+  gap: 2.5rem;
+  margin-top: 1.5rem;
+}
+@media (min-width: 900px) {
+  .checkout__grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(300px, 1fr);
+    align-items: start;
+  }
+  .checkout__summary {
+    position: sticky;
+    top: 6rem;
+  }
+}
+
+.checkout__group {
+  border: 0;
+  padding: 0;
+  margin: 0 0 2rem;
+  min-width: 0;
+}
+.checkout__group legend {
+  font-family: var(--font-display, inherit);
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: var(--primary);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  min-width: 0;
+}
+.field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-dark);
+}
+.field input,
+.field select,
+.field textarea {
+  font: inherit;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid rgba(25, 51, 47, 0.25);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text-dark);
+  width: 100%;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: 2px solid var(--gold-400, #cf8e08);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+.field--error input,
+.field--error select,
+.field--error textarea {
+  border-color: #b3261e;
+}
+.field__error,
+.form-error {
+  color: #b3261e;
+  font-size: 0.85rem;
+  margin: 0.25rem 0 0;
+}
+.field-row {
+  display: grid;
+  gap: 0 1rem;
+}
+@media (min-width: 600px) {
+  .field-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.checkout__pay-note {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+.checkout__legal {
+  font-size: 0.8rem;
+  color: rgba(25, 51, 47, 0.7);
+  margin-top: 0.75rem;
+}
+.checkout__legal a {
+  text-decoration: underline;
+}
+
+.checkout__summary {
+  background: var(--cream-100, #f7f3ea);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+.checkout__lines {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  display: grid;
+  gap: 0.9rem;
+}
+.checkout__line {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+.checkout__line img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.checkout__line-title {
+  font-weight: 600;
+  margin: 0;
+}
+.checkout__line-opts {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(25, 51, 47, 0.7);
+}
+.checkout__totals {
+  margin: 1rem 0 0;
+  border-top: 1px solid rgba(25, 51, 47, 0.15);
+  padding-top: 1rem;
+}
+.checkout__totals > div {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.35rem 0;
+}
+.checkout__totals dd {
+  margin: 0;
+}
+.checkout__total {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-top: 0.75rem !important;
+}
+.checkout__edit {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+.cart-subtotal--total {
+  font-weight: 700;
+}
+
+/* ---- Páginas de estado (gracias / pendiente / rechazado) ---- */
+.status-card {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+  background: var(--cream-100, #f7f3ea);
+  border-radius: 16px;
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+.status-card__icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+  background: var(--primary);
+  color: var(--cream-50, #fff);
+}
+.status-card--declined .status-card__icon,
+.status-card--error .status-card__icon,
+.status-card--voided .status-card__icon {
+  background: #b3261e;
+}
+.status-card--pending .status-card__icon {
+  background: var(--gold-400, #cf8e08);
+}
+.status-card__summary {
+  text-align: left;
+  margin: 2rem 0 1rem;
+  border-top: 1px solid rgba(25, 51, 47, 0.15);
+  padding-top: 1rem;
+}
+.status-card__summary > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0.4rem 0;
+}
+.status-card__summary dd {
+  margin: 0;
+  white-space: nowrap;
+}
+.status-card__total {
+  font-weight: 700;
+  border-top: 1px solid rgba(25, 51, 47, 0.15);
+  padding-top: 0.6rem;
+}
+.status-card__actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ---- Suscripción ---- */
+.subscribe__grid {
+  display: grid;
+  gap: 2.5rem;
+  margin-top: 1.5rem;
+}
+@media (min-width: 900px) {
+  .subscribe__grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(300px, 1fr);
+    align-items: start;
+  }
+}
+.card-fields {
+  display: grid;
+  gap: 0 1rem;
+  grid-template-columns: 1fr 1fr;
+}
+.card-fields .field--full {
+  grid-column: 1 / -1;
+}
+.checkbox {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0.75rem 0;
+}
+.checkbox input {
+  margin-top: 0.25rem;
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+}
+.checkbox a {
+  text-decoration: underline;
+}
+.club-note {
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+  background: var(--cream-100, #f7f3ea);
+  border-radius: 16px;
+  padding: 2rem;
+}
+@media (min-width: 800px) {
+  .club-note {
+    grid-template-columns: 1fr auto;
+  }
+}
+.manage-card {
+  background: var(--cream-100, #f7f3ea);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 720px;
+  margin: 1.5rem auto 0;
+}
+.manage-card dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1.5rem;
+  margin: 1rem 0;
+}
+.manage-card dd {
+  margin: 0;
+}
+.manage-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+.status-pill {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--primary);
+  color: var(--cream-50, #fff);
+}
+.status-pill--paused {
+  background: var(--gold-400, #cf8e08);
+}
+.status-pill--past_due,
+.status-pill--cancelled {
+  background: #b3261e;
+}

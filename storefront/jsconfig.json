@@ -19,7 +19,6 @@
     "*.js",
     "*.jsx",
     "*.d.ts",
-    ".graphqlrc.js",
     ".react-router/types/**/*"
   ]
 }

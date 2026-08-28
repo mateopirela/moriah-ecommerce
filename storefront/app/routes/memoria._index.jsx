@@ -1,6 +1,7 @@
 import {redirect, data} from 'react-router';
 import {z} from 'zod';
 import {MemoryForm} from '~/components/MemoryForm';
+import {getKlaviyo} from '~/lib/klaviyo.server';
 import {IconArrowRight} from '~/components/Icons';
 
 export const meta = () => [
@@ -42,7 +43,8 @@ export async function loader() {
  * - Track event in Klaviyo (if available)
  * - Redirect to confirmation page
  */
-export async function action({request, context}) {
+export async function action({request}) {
+  const klaviyo = getKlaviyo();
   if (request.method !== 'POST') {
     return data({errors: {general: 'Method not allowed'}}, {status: 405});
   }
@@ -64,9 +66,9 @@ export async function action({request, context}) {
   const {nombre, email, ciudad, historia, consent} = result.data;
 
   // Track in Klaviyo (gracefully degrade if not available)
-  if (context.klaviyo) {
+  if (klaviyo) {
     try {
-      const upsertResult = await context.klaviyo.upsertProfile({
+      const upsertResult = await klaviyo.upsertProfile({
         email,
         firstName: nombre,
         city: ciudad,
@@ -77,7 +79,7 @@ export async function action({request, context}) {
       });
 
       if (upsertResult.success) {
-        await context.klaviyo.trackEvent({
+        await klaviyo.trackEvent({
           metric: {name: 'Story Submitted'},
           profile: {email},
           properties: {

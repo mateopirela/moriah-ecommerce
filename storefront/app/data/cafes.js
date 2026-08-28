@@ -3,9 +3,8 @@
  *
  * Fuente: contenido real de cafemoriah.com + estructura inspirada en los
  * mejores e-commerce de café de especialidad (Pergamino, Colo, Café Britt,
- * BUNA, Café Orfeu). Se usa como catálogo mientras no esté conectado el
- * Storefront API de Shopify. Cuando Shopify tenga la colección `cafes` con
- * productos, esos reemplazan automáticamente a este seed.
+ * BUNA, Café Orfeu). Es la fuente de verdad del catálogo: precios, opciones
+ * y textos de cada café viven aquí.
  *
  * NOTA: los campos `altitude`, `producer`, `variety` y `story` son
  * placeholders editables — reemplázalos con los datos reales de cada finca

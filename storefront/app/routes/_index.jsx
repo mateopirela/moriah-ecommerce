@@ -1,6 +1,5 @@
-import {useState} from 'react';
-import {Link} from 'react-router';
-import {formatCop} from '~/data/cafes';
+import {Link, useFetcher} from 'react-router';
+import {CAFES, formatCop} from '~/data/cafes';
 import {MERCH} from '~/data/merch';
 import {Marquee} from '~/components/Marquee';
 import {useReveal} from '~/lib/useReveal';
@@ -25,12 +24,9 @@ export const meta = () => [
   {property: 'og:image', content: '/images/hero-lifestyle.webp'},
 ];
 
-/** @param {Route.LoaderArgs} args */
-export async function loader(args) {
-  const {collection} = await args.context.storefront
-    .query(HOME_CAFES_QUERY, {variables: {handle: 'cafes'}})
-    .catch(() => ({collection: null}));
-  return {cafes: collection?.products?.nodes ?? null};
+/** El home se sirve del catálogo local (sin llamadas externas). */
+export function loader() {
+  return {cafes: CAFES};
 }
 
 export default function Homepage() {
@@ -360,15 +356,8 @@ function TestimoniosSection() {
    NEWSLETTER — Club de la Memoria (captura de email)
    ============================================================ */
 function NewsletterSection() {
-  const [sent, setSent] = useState(false);
-
-  /** @param {React.FormEvent<HTMLFormElement>} event */
-  function handleSubmit(event) {
-    event.preventDefault();
-    // TODO: conectar con Shopify Email / Klaviyo. Por ahora confirmamos
-    // en UI para no perder el momento de conversión.
-    setSent(true);
-  }
+  const fetcher = useFetcher();
+  const sent = fetcher.data?.ok === true;
 
   return (
     <section className="tx-newsletter" id="club">
@@ -383,10 +372,10 @@ function NewsletterSection() {
         </p>
         {sent ? (
           <p className="tx-newsletter__ok" role="status">
-            ¡Listo! Muy pronto llegará tu código a tu correo.
+            ¡Listo! Tu código es <strong>MIPRIMERTINTO10</strong>: úsalo en el carrito.
           </p>
         ) : (
-          <form className="tx-newsletter__form" onSubmit={handleSubmit}>
+          <fetcher.Form method="post" action="/api/newsletter" className="tx-newsletter__form">
             <label htmlFor="newsletter-email" className="sr-only">
               Tu correo electrónico
             </label>
@@ -401,26 +390,11 @@ function NewsletterSection() {
             <button type="submit" className="tx-btn">
               Quiero mi 10%
             </button>
-          </form>
+          </fetcher.Form>
         )}
       </div>
     </section>
   );
 }
-
-/* ============================================================
-   GRAPHQL
-   ============================================================ */
-const HOME_CAFES_QUERY = `#graphql
-  query HomeCafes($handle: String!, $country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    collection(handle: $handle) {
-      id
-      products(first: 6, sortKey: PRICE) {
-        nodes { id title handle }
-      }
-    }
-  }
-`;
 
 /** @typedef {import('./+types/_index').Route} Route */

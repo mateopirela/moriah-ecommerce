@@ -1,7 +1,7 @@
 import {formatCop} from '~/data/cafes';
 
 /**
- * Drop-in replacement del <Money> de Hydrogen con formato colombiano
+ * Formatea un monto en pesos colombianos
  * ($ 45.000, sin decimales). Evita el mismatch de hidratación del Money
  * original: el ICU del servidor (workerd) formatea COP con 2 decimales y el
  * del navegador con 0, lo que rompe la hidratación. Aquí ambos lados usan el

@@ -1,43 +1,23 @@
-import {Suspense} from 'react';
-import {Await, Link} from 'react-router';
-import {
-  IconInstagram,
-  IconWhatsapp,
-  IconFacebook,
-} from '~/components/Icons';
+import {Link} from 'react-router';
+import {IconFacebook, IconInstagram, IconWhatsapp} from '~/components/Icons';
 
-/**
- * @param {FooterProps}
- */
-export function Footer({footer: footerPromise}) {
-  return (
-    <Suspense>
-      <Await resolve={footerPromise}>
-        {() => <FooterInner />}
-      </Await>
-    </Suspense>
-  );
-}
-
-function FooterInner() {
+export function Footer() {
   const year = new Date().getFullYear();
   return (
     <footer className="tx-footer">
       {/* ── Banda superior: tagline + navegación + contacto ── */}
       <div className="tx-footer__top tx-container">
-        <div className="tx-footer__tagline">
-          Tostadores de cafés de especialidad
-        </div>
+        <div className="tx-footer__tagline">Tostadores de cafés de especialidad</div>
 
         <div className="tx-footer__cols">
-          {/* nav links */}
           <nav className="tx-footer__nav" aria-label="Empresa">
             <Link to="/pages/nuestra-historia">Nuestra historia</Link>
             <Link to="/collections/cafes">Nuestros cafés</Link>
+            <Link to="/collections/club-de-la-memoria">Club de la Memoria</Link>
+            <Link to="/suscripcion/gestionar">Gestionar mi suscripción</Link>
             <Link to="/pages/contacto">Contacto</Link>
           </nav>
 
-          {/* social + contacto */}
           <div className="tx-footer__contact">
             <div className="tx-footer__social">
               <a
@@ -65,14 +45,15 @@ function FooterInner() {
                 <IconFacebook />
               </a>
             </div>
-            <a href="tel:+57" className="tx-footer__link">+57 300 000 0000</a>
+            <a href="tel:+57" className="tx-footer__link">
+              +57 300 000 0000
+            </a>
             <span className="tx-footer__link">Bogotá · Colombia</span>
             <a href="mailto:hola@cafemoriah.com" className="tx-footer__link">
               hola@cafemoriah.com
             </a>
           </div>
 
-          {/* logo Moriah a la derecha, centrado verticalmente */}
           <div className="tx-footer__logo-wrap">
             <img
               src="/images/logo-moriah.png"
@@ -91,21 +72,17 @@ function FooterInner() {
         <Link to="/policies/shipping-policy" className="tx-footer__policy">
           Política de envíos
         </Link>
+        <Link to="/policies/refund-policy" className="tx-footer__policy">
+          Cambios y devoluciones
+        </Link>
         <Link to="/policies/privacy-policy" className="tx-footer__policy">
           Política de datos personales
+        </Link>
+        <Link to="/policies/terms-of-service" className="tx-footer__policy">
+          Términos y condiciones
         </Link>
         <span>MORIAH © {year}</span>
       </div>
     </footer>
   );
 }
-
-/**
- * @typedef {Object} FooterProps
- * @property {Promise<FooterQuery|null>} footer
- * @property {HeaderQuery} header
- * @property {string} publicStoreDomain
- */
-
-/** @typedef {import('storefrontapi.generated').FooterQuery} FooterQuery */
-/** @typedef {import('storefrontapi.generated').HeaderQuery} HeaderQuery */

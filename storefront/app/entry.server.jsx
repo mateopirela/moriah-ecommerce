@@ -1,92 +1,86 @@
+import {PassThrough} from 'node:stream';
+import {randomBytes} from 'node:crypto';
+import {createReadableStreamFromReadable} from '@react-router/node';
 import {ServerRouter} from 'react-router';
 import {isbot} from 'isbot';
-import {renderToReadableStream} from 'react-dom/server';
-import {createContentSecurityPolicy} from '@shopify/hydrogen';
+import {renderToPipeableStream} from 'react-dom/server';
+import {NonceProvider} from '~/lib/nonce';
+
+export const streamTimeout = 5_000;
 
 /**
  * @param {Request} request
  * @param {number} responseStatusCode
  * @param {Headers} responseHeaders
- * @param {EntryContext} reactRouterContext
- * @param {HydrogenRouterContextProvider} context
+ * @param {import('react-router').EntryContext} routerContext
  */
-export default async function handleRequest(
+export default function handleRequest(
   request,
   responseStatusCode,
   responseHeaders,
-  reactRouterContext,
-  context,
+  routerContext,
 ) {
-  const {nonce, header, NonceProvider} = createContentSecurityPolicy({
-    shop: {
-      checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
-      storeDomain: context.env.PUBLIC_STORE_DOMAIN,
-    },
-    // Tipografías de marca: Satoshi (Fontshare) + Fraunces (Google Fonts).
-    styleSrc: [
-      "'self'",
-      "'unsafe-inline'",
-      'https://fonts.googleapis.com',
-      'https://api.fontshare.com',
-    ],
-    fontSrc: [
-      "'self'",
-      'https://fonts.gstatic.com',
-      'https://cdn.fontshare.com',
-      'data:',
-    ],
-    // Analytics: GA4 + Meta Pixel (dormant unless env IDs are set).
-    scriptSrc: [
-      "'self'",
-      'https://cdn.shopify.com',
-      'https://www.googletagmanager.com',
-      'https://connect.facebook.net',
-    ],
-    connectSrc: [
-      "'self'",
-      'https://www.google-analytics.com',
-      'https://*.google-analytics.com',
-      'https://www.facebook.com',
-    ],
-    imgSrc: [
-      "'self'",
-      'data:',
-      'https://cdn.shopify.com',
-      'https://www.google-analytics.com',
-      'https://www.facebook.com',
-    ],
-  });
+  return new Promise((resolve, reject) => {
+    let shellRendered = false;
+    const userAgent = request.headers.get('user-agent');
+    const waitForAll = (userAgent && isbot(userAgent)) || routerContext.isSpaMode;
+    const nonce = randomBytes(16).toString('base64');
 
-  const body = await renderToReadableStream(
-    <NonceProvider>
-      <ServerRouter
-        context={reactRouterContext}
-        url={request.url}
-        nonce={nonce}
-      />
-    </NonceProvider>,
-    {
-      nonce,
-      signal: request.signal,
-      onError(error) {
-        console.error(error);
-        responseStatusCode = 500;
+    const {pipe, abort} = renderToPipeableStream(
+      <NonceProvider value={nonce}>
+        <ServerRouter context={routerContext} url={request.url} nonce={nonce} />
+      </NonceProvider>,
+      {
+        nonce,
+        [waitForAll ? 'onAllReady' : 'onShellReady']() {
+          shellRendered = true;
+          const body = new PassThrough();
+          const stream = createReadableStreamFromReadable(body);
+
+          responseHeaders.set('Content-Type', 'text/html');
+          if (process.env.NODE_ENV === 'production') {
+            responseHeaders.set('Content-Security-Policy', contentSecurityPolicy(nonce));
+          }
+
+          resolve(
+            new Response(stream, {
+              headers: responseHeaders,
+              status: responseStatusCode,
+            }),
+          );
+          pipe(body);
+        },
+        onShellError(error) {
+          reject(error);
+        },
+        onError(error) {
+          responseStatusCode = 500;
+          if (shellRendered) console.error(error);
+        },
       },
-    },
-  );
+    );
 
-  if (isbot(request.headers.get('user-agent'))) {
-    await body.allReady;
-  }
-
-  responseHeaders.set('Content-Type', 'text/html');
-  responseHeaders.set('Content-Security-Policy', header);
-
-  return new Response(body, {
-    headers: responseHeaders,
-    status: responseStatusCode,
+    setTimeout(abort, streamTimeout + 1000);
   });
 }
 
-/** @typedef {import('@shopify/hydrogen').HydrogenRouterContextProvider} HydrogenRouterContextProvider */
-/** @typedef {import('react-router').EntryContext} EntryContext */
+/**
+ * CSP de producción. Permite las fuentes de marca, GA4/Meta (si se configuran)
+ * y la API de Wompi para tokenizar tarjetas desde el navegador.
+ * @param {string} nonce
+ */
+function contentSecurityPolicy(nonce) {
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://connect.facebook.net`,
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://api.fontshare.com",
+    "font-src 'self' data: https://fonts.gstatic.com https://cdn.fontshare.com",
+    "img-src 'self' data: blob: https://www.google-analytics.com https://www.facebook.com",
+    "media-src 'self'",
+    "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://www.facebook.com https://production.wompi.co https://sandbox.wompi.co",
+    "form-action 'self' https://checkout.wompi.co",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "object-src 'none'",
+  ].join('; ');
+}

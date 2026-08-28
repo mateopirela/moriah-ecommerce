@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "react-router",
+  "buildCommand": "npm run build && npm run db:migrate",
+  "crons": [
+    {
+      "path": "/api/cron/subscriptions",
+      "schedule": "0 12 * * *"
+    }
+  ]
+}

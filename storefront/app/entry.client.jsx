@@ -1,20 +1,18 @@
 import {HydratedRouter} from 'react-router/dom';
 import {startTransition, StrictMode} from 'react';
 import {hydrateRoot} from 'react-dom/client';
-import {NonceProvider} from '@shopify/hydrogen';
+import {NonceProvider} from '~/lib/nonce';
 
-if (!window.location.origin.includes('webcache.googleusercontent.com')) {
-  startTransition(() => {
-    // Extract nonce from existing script tags
-    const existingNonce = document.querySelector('script[nonce]')?.nonce;
+startTransition(() => {
+  // Reuse the nonce the server rendered so injected scripts keep passing the CSP.
+  const existingNonce = document.querySelector('script[nonce]')?.nonce;
 
-    hydrateRoot(
-      document,
-      <StrictMode>
-        <NonceProvider value={existingNonce}>
-          <HydratedRouter />
-        </NonceProvider>
-      </StrictMode>,
-    );
-  });
-}
+  hydrateRoot(
+    document,
+    <StrictMode>
+      <NonceProvider value={existingNonce}>
+        <HydratedRouter />
+      </NonceProvider>
+    </StrictMode>,
+  );
+});
