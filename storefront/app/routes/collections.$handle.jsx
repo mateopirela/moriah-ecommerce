@@ -100,7 +100,6 @@ function CollectionBanner({collection}) {
           width={1400}
           height={525}
           className="tx-shop-banner__img"
-          fetchpriority="high"
           decoding="async"
         />
         <div className="tx-shop-banner__overlay">

@@ -97,7 +97,6 @@ export function BrewGuidePage() {
           width={1920}
           height={600}
           className="tx-brew-banner__img"
-          fetchpriority="high"
         />
         <div className="tx-brew-banner__title">Prepara tu café</div>
       </div>
