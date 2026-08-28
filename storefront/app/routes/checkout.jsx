@@ -96,9 +96,12 @@ export default function Checkout() {
           <fieldset className="checkout__group">
             <legend>Pago</legend>
             <p className="checkout__pay-note">
-              <IconShield width={16} height={16} aria-hidden="true" /> Al continuar te llevamos al
-              checkout seguro de <strong>Wompi (Bancolombia)</strong>: Nequi, PSE, tarjetas débito y
-              crédito. Volverás aquí al terminar.
+              <IconShield width={16} height={16} aria-hidden="true" />
+              <span>
+                Al continuar te llevamos al checkout seguro de{' '}
+                <strong>Wompi (Bancolombia)</strong>: Nequi, PSE, tarjetas débito y crédito.
+                Volverás aquí al terminar.
+              </span>
             </p>
             <button
               className="btn btn--lg btn--block"

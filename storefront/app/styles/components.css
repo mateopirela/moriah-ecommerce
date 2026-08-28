@@ -646,3 +646,33 @@ fieldset:disabled {
     transform: translateY(0);
   }
 }
+
+/* ============================================================
+   MÓVIL — reglas transversales
+   ============================================================ */
+
+/* Un icono dentro de un botón nunca se comprime (se veía como un punto
+   cuando el texto del botón ocupaba varias líneas en pantallas angostas). */
+.btn svg,
+.btn img,
+.cart-checkout-btn svg,
+.quick-add svg {
+  flex-shrink: 0;
+}
+
+/* Ningún medio puede empujar el ancho del documento. */
+img,
+video,
+svg,
+iframe {
+  max-width: 100%;
+}
+
+/* Palabras muy largas (correos, referencias de pedido) no rompen la caja. */
+.tx-footer__link,
+.status-card__summary dt,
+.manage-card dd,
+.field__error,
+.form-error {
+  overflow-wrap: anywhere;
+}

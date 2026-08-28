@@ -685,3 +685,36 @@
 .story-block p {
   color: var(--text-muted);
 }
+
+/* ============================================================
+   MÓVIL — caja de compra
+   ============================================================ */
+@media (max-width: 560px) {
+  /* Cantidad arriba (a lo ancho) y botón de compra debajo: en 390px el
+     botón quedaba estrujado y su texto caía en tres líneas. */
+  .pdp-buy__row {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .pdp-buy__row .qty-stepper {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .pdp-buy__row form,
+  .pdp-buy__row > .btn,
+  .pdp-buy__row > a.btn {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  .pdp-buy__row form .btn {
+    width: 100%;
+  }
+  .qty-stepper button {
+    flex: 1 1 auto;
+  }
+
+  /* Fichas técnicas: dos columnas legibles en vez de tres apretadas. */
+  .specs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

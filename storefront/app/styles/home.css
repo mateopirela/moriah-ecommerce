@@ -703,7 +703,9 @@
   gap: 0.4rem;
   margin-top: var(--space-2);
 }
-.cart-line-quantity button {
+/* Solo los botones +/− del contador. Antes esta regla alcanzaba también a
+   "Eliminar" y lo encajonaba en un cuadro de 30px con el texto recortado. */
+.cart-line-quantity .cart-line-stepper button {
   width: 30px;
   height: 30px;
   border: 1px solid var(--border);
@@ -711,7 +713,7 @@
   border-radius: var(--r-sm);
   font-size: 1rem;
 }
-.cart-line-quantity button:hover:not([disabled]) {
+.cart-line-quantity .cart-line-stepper button:hover:not([disabled]) {
   border-color: var(--pine-800);
 }
 .cart-summary-aside,
