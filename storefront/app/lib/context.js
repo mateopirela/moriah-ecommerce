@@ -1,4 +1,4 @@
-import {createHydrogenContext} from '@shopify/hydrogen';
+import {createHydrogenContext, InMemoryCache} from '@shopify/hydrogen';
 import {AppSession} from '~/lib/session';
 import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
 import {createKlaviyoClient} from '~/lib/integrations/klaviyo';
@@ -15,6 +15,23 @@ function createAdditionalContext(env) {
       env.KLAVIYO_COMMUNITY_LIST_ID,
     ),
   };
+}
+
+/**
+ * Opens the worker Cache API when the runtime provides it (Oxygen / workerd).
+ * Other edge runtimes (e.g. Vercel) don't expose `caches`, so fall back to
+ * Hydrogen's in-memory cache to keep Storefront API sub-request caching working.
+ * @return {Promise<Cache>}
+ */
+async function openCache() {
+  if (typeof caches !== 'undefined' && typeof caches.open === 'function') {
+    try {
+      return await caches.open('hydrogen');
+    } catch {
+      // fall through to the in-memory cache
+    }
+  }
+  return new InMemoryCache();
 }
 
 /**
@@ -36,9 +53,12 @@ export async function createHydrogenRouterContext(
     throw new Error('SESSION_SECRET environment variable is not set');
   }
 
-  const waitUntil = executionContext.waitUntil.bind(executionContext);
+  const waitUntil =
+    typeof executionContext?.waitUntil === 'function'
+      ? executionContext.waitUntil.bind(executionContext)
+      : () => {};
   const [cache, session] = await Promise.all([
-    caches.open('hydrogen'),
+    openCache(),
     AppSession.init(request, [env.SESSION_SECRET]),
   ]);
 
