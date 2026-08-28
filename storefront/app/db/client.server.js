@@ -2,6 +2,7 @@ import {mkdirSync} from 'node:fs';
 import {dirname, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {env, isVercel} from '~/lib/env.server';
+import {parsePostgresUrl} from './url';
 import * as schema from './schema';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -23,13 +24,16 @@ export function getDb() {
 }
 
 async function createDb() {
-  const url = env('DATABASE_URL');
-  if (url) {
+  const configured = env('DATABASE_URL');
+  if (configured) {
     const [{drizzle}, {default: postgres}] = await Promise.all([
       import('drizzle-orm/postgres-js'),
       import('postgres'),
     ]);
-    const client = postgres(url, {max: 1, prepare: false});
+    const {url, options} = parsePostgresUrl(configured);
+    // `max: 1` porque cada invocación serverless es efímera; `prepare: false`
+    // es obligatorio detrás de un pooler en modo transacción (PgBouncer).
+    const client = postgres(url, {max: 1, prepare: false, ...options});
     return drizzle({client, schema});
   }
 
