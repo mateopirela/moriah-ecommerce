@@ -48,9 +48,10 @@ export const meta = ({data}) => {
 export function loader({params}) {
   const product = getProduct(params.handle);
   if (!product) throw new Response(null, {status: 404});
-  // `raw` contiene funciones/valores no serializables solo en teoría; lo
-  // dejamos fuera y cada vista recarga el detalle desde el catálogo.
-  const {raw, ...serializable} = product;
+  // `raw` (el objeto original del catálogo) no viaja al cliente; cada vista
+  // recarga el detalle desde el catálogo.
+  const serializable = {...product};
+  delete serializable.raw;
   return {product: serializable};
 }
 
