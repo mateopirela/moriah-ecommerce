@@ -1268,6 +1268,10 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
   padding-inline: var(--tx-gutter);
   max-width: var(--tx-maxw);
   margin-inline: auto;
+  /* Sin `padding-top` el panel arrancaba pegado al borde inferior de la barra
+     de pestañas: la línea vertical de los pasos nacía justo sobre la línea
+     horizontal y "PASO 1" quedaba encima del filete. */
+  padding-top: clamp(2rem, 4vh, 3.5rem);
   padding-bottom: clamp(3rem, 6vh, 6rem);
 }
 .tx-brew-left {
@@ -1294,6 +1298,8 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
   gap: 1.4rem;
   border-left: 2px solid var(--tx-ink);
   padding-left: clamp(1rem, 2vw, 2rem);
+  /* El filete respira por arriba y por abajo en vez de cortar el texto */
+  padding-block: 0.4rem;
 }
 .tx-brew-step h4 {
   font-family: var(--tx-display);
