@@ -5,16 +5,15 @@
  * Antes el footer mostraba "+57 300 000 0000" con `tel:+57` y un WhatsApp
  * apuntando a `wa.me/57` (número inválido: WhatsApp rechaza el enlace).
  *
- * ⚠️ PENDIENTE: reemplaza `phone` y `whatsapp` por el número real de MORIAH.
- * Mientras estén vacíos, el sitio no pinta enlaces rotos: oculta el teléfono y
- * usa el correo como canal de contacto.
+ * Si algún día se vacían, el sitio no pinta enlaces rotos: oculta el teléfono
+ * y usa el correo como canal de contacto.
  */
 
-/** Teléfono en formato E.164, sin espacios. Ej: '+573001234567' */
-const PHONE_E164 = '';
+/** Teléfono en formato E.164, sin espacios. */
+const PHONE_E164 = '+573045286382';
 
-/** Número de WhatsApp sin '+' ni espacios. Ej: '573001234567' */
-const WHATSAPP_NUMBER = '';
+/** Número de WhatsApp sin '+' ni espacios. */
+const WHATSAPP_NUMBER = '573045286382';
 
 export const CONTACT = {
   /** Formato legible para humanos; se deriva del E.164 si no se define. */
