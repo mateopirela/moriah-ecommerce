@@ -950,7 +950,7 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
 
 .tx-col-card__info {
   display: grid;
-  gap: 0.2rem;
+  gap: 0.3rem;
   padding-inline: 0.1rem;
   text-align: center;
   justify-items: center;
@@ -980,9 +980,11 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
 .tx-shop-banner {
   position: relative;
   display: block;
-  aspect-ratio: 16 / 6;
-  min-height: 240px;
-  max-height: 460px;
+  /* Más bajo (antes 16/6 con tope de 460px): el banner ocupaba media
+     pantalla y la primera fila de productos quedaba bajo el pliegue. */
+  aspect-ratio: 16 / 4.5;
+  min-height: 200px;
+  max-height: 330px;
   border-radius: clamp(18px, 2vw, 28px);
   overflow: hidden;
   margin-bottom: clamp(2rem, 4vw, 3.5rem);
@@ -1029,9 +1031,9 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
 }
 @media (max-width: 640px) {
   .tx-shop-banner {
-    aspect-ratio: 3 / 2.7;
-    min-height: 300px;
-    max-height: 380px;
+    aspect-ratio: 3 / 2;
+    min-height: 220px;
+    max-height: 280px;
   }
   .tx-shop-banner__title {
     font-size: clamp(1.8rem, 1.2rem + 3.5vw, 2.4rem);
@@ -2271,7 +2273,7 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
   line-height: 1.35;
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -2619,10 +2621,15 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
    ============================================================ */
 .tx-col-grid {
   grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  justify-items: center;
 }
-.tx-collection-page .tx-col-grid,
-.tx-shop-page .tx-col-grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+/* Tope de ancho por tarjeta: `auto-fit` reparte el sobrante entre las
+   columnas existentes, así que con solo 3 cafés cada tarjeta crecía a 383px
+   y la foto cuadrada se comía la pantalla. La tarjeta se queda en 300px y se
+   centra en su columna; la grilla sigue sin dejar huecos. */
+.tx-col-card {
+  width: 100%;
+  max-width: 300px;
 }
 @media (max-width: 640px) {
   .tx-col-grid,
