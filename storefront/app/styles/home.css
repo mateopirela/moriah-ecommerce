@@ -705,13 +705,15 @@
 }
 /* Solo los botones +/− del contador. Antes esta regla alcanzaba también a
    "Eliminar" y lo encajonaba en un cuadro de 30px con el texto recortado. */
+/* 44px en todos los tamaños: antes solo se ampliaban bajo `hover:none`,
+   así que en el carrito de escritorio seguían midiendo 30px. */
 .cart-line-quantity .cart-line-stepper button {
-  width: 30px;
-  height: 30px;
+  width: 44px;
+  height: 44px;
   border: 1px solid var(--border);
   background: var(--white);
   border-radius: var(--r-sm);
-  font-size: 1rem;
+  font-size: 1.05rem;
 }
 .cart-line-quantity .cart-line-stepper button:hover:not([disabled]) {
   border-color: var(--pine-800);
@@ -745,4 +747,12 @@
 }
 .cart-summary-aside a[target='_self'] p:hover {
   background: var(--primary-hover);
+}
+
+
+/* Enlace del título en cada línea del carrito: alto cómodo */
+.cart-line-inner > div > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }

@@ -34,7 +34,7 @@
   font-family: var(--font-display, inherit);
   font-size: 1.25rem;
   margin-bottom: 1rem;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .field {
@@ -48,7 +48,7 @@
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: var(--text-dark);
+  color: var(--text);
 }
 .field input,
 .field select,
@@ -58,8 +58,9 @@
   border: 1px solid rgba(25, 51, 47, 0.25);
   border-radius: 8px;
   background: #fff;
-  color: var(--text-dark);
+  color: var(--text);
   width: 100%;
+  min-height: 48px;
 }
 .field input:focus,
 .field select:focus,
@@ -370,4 +371,36 @@
   .checkout__summary {
     padding: 1.15rem;
   }
+}
+
+/* ============================================================
+   MÓVIL — el resumen del pedido va ANTES del formulario
+   En móvil el <aside> quedaba después del botón de envío: la persona
+   confirmaba la compra (o la suscripción) sin haber visto el total.
+   ============================================================ */
+@media (max-width: 899px) {
+  .checkout__grid,
+  .subscribe__grid {
+    display: flex;
+    flex-direction: column;
+  }
+  .checkout__summary {
+    order: -1;
+  }
+}
+
+/* Resumen de errores del formulario */
+.checkout__form .form-errors ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+.checkout__form .form-errors a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Casillas de consentimiento con área táctil cómoda */
+.checkout__group .checkbox {
+  margin-bottom: 0.75rem;
 }

@@ -1,28 +1,41 @@
-import {useEffect} from 'react';
-import {useFetcher} from 'react-router';
+import {useEffect, useState} from 'react';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {IconPlus} from '~/components/Icons';
 import {formatCop} from '~/lib/catalog';
 
 /**
  * Upsell del carrito: sugiere hasta 2 productos que no estén ya en el carrito.
+ *
+ * Usa `fetch` directo (no `useFetcher`) a propósito: /api/cart-upsell es un
+ * resource route público que devuelve JSON y no necesita estado del router.
+ * Con `useFetcher` la petición se emitía antes de que el cliente descubriera
+ * la ruta (lazy route discovery), salía como `_routes=routes/$`, devolvía `[{}]`
+ * y el error escalaba hasta el ErrorBoundary raíz: el cliente veía "Oops 500"
+ * justo después de agregar un producto.
+ *
  * @param {{cart: import('~/lib/cart').Cart}} props
  */
 export function CartUpsell({cart}) {
-  const fetcher = useFetcher();
+  const [suggested, setSuggested] = useState([]);
 
   const handlesInCart = (cart?.lines ?? []).map((line) => line.handle);
   const excludeKey = [...handlesInCart].sort().join(',');
 
   useEffect(() => {
-    if (fetcher.state === 'idle') {
-      fetcher.load(`/api/cart-upsell?exclude=${encodeURIComponent(excludeKey)}`);
-    }
-    // Solo recargar cuando cambian los productos del carrito
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const controller = new AbortController();
+    fetch(`/api/cart-upsell?exclude=${encodeURIComponent(excludeKey)}`, {
+      signal: controller.signal,
+      headers: {Accept: 'application/json'},
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => setSuggested(data?.products ?? []))
+      .catch(() => {
+        // Una sugerencia fallida nunca debe romper el carrito.
+      });
+    return () => controller.abort();
   }, [excludeKey]);
 
-  const products = (fetcher.data?.products ?? []).filter(
+  const products = suggested.filter(
     (product) => !handlesInCart.includes(product.handle),
   );
 

@@ -91,11 +91,25 @@ p {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: var(--tracking-wide);
-  color: var(--primary);
+  /* Dorado apto para texto: --primary (#cf8e08) da 2.5:1 sobre crema. */
+  color: var(--primary-text);
 }
 
 .eyebrow--muted {
-  color: var(--ink-400);
+  color: var(--ink-500);
+}
+
+/* Sobre superficies oscuras el foil claro sí contrasta (10:1) */
+.eyebrow--on-dark,
+.section--dark .eyebrow,
+.section--pine .eyebrow {
+  color: var(--gold-300);
+}
+
+.lede--on-dark,
+.section--dark .lede,
+.section--pine .lede {
+  color: rgba(240, 222, 189, 0.85);
 }
 
 .display-hero {
@@ -177,6 +191,24 @@ p {
   color: var(--text-muted);
 }
 
+/* Salto al contenido para teclado y lectores de pantalla */
+.skip-link {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -120%);
+  z-index: 1000;
+  padding: 0.75rem 1.25rem;
+  background: var(--pine-800);
+  color: var(--cream-50);
+  border-radius: 0 0 var(--r-md) var(--r-md);
+  font-weight: 600;
+  transition: transform var(--dur-fast) var(--ease);
+}
+.skip-link:focus-visible {
+  transform: translate(-50%, 0);
+}
+
 /* Visually hidden but accessible */
 .sr-only {
   position: absolute;
@@ -190,17 +222,53 @@ p {
   border: 0;
 }
 
-/* Generic route error fallback */
+/* Páginas de error (404 / 500) con identidad de marca */
 .route-error {
-  max-width: 640px;
-  margin: var(--space-7) auto;
-  padding: var(--gutter);
+  max-width: 40rem;
+  margin-inline: auto;
+  padding: var(--space-hero) var(--gutter);
   text-align: center;
+  display: grid;
+  gap: var(--space-3);
+  justify-items: center;
 }
-.route-error pre {
+.route-error__code {
+  font-family: var(--font-sans);
+  font-size: var(--text-eyebrow);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--primary-text);
+}
+.route-error__lede {
+  color: var(--text-muted);
+  max-width: 46ch;
+  line-height: var(--leading-body);
+}
+.route-error__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: center;
+  margin-top: var(--space-2);
+}
+.route-error__help {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  margin-top: var(--space-2);
+}
+.route-error__help a {
+  color: var(--primary-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.route-error__debug {
+  width: 100%;
   text-align: left;
   overflow: auto;
   background: var(--bg-alt);
+  border: 1px solid var(--border);
   padding: var(--space-3);
   border-radius: var(--r-md);
+  font-size: 0.85rem;
 }

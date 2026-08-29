@@ -86,6 +86,15 @@ export function Layout({children}) {
         <link rel="stylesheet" href={checkoutStyles}></link>
         <Meta />
         <Links />
+        {/* Marca que JS está disponible ANTES del primer paint: el
+            scroll-reveal solo oculta secciones cuando puede revelarlas.
+            Sin esto, con JS lento o desactivado la página quedaba en blanco. */}
+        <script
+          nonce={nonce}
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('js')",
+          }}
+        />
       </head>
       <body>
         {children}
@@ -130,18 +139,33 @@ export function ErrorBoundary() {
     errorMessage = error.message;
   }
 
+  const isNotFound = errorStatus === 404;
   const content = (
     <div className="route-error">
-      <h1>{errorStatus === 404 ? 'Página no encontrada' : 'Oops'}</h1>
-      <h2>{errorStatus}</h2>
-      {errorMessage && (
-        <fieldset>
-          <pre>{errorMessage}</pre>
-        </fieldset>
+      <span className="route-error__code">Error {errorStatus}</span>
+      <h1 className="display-h2">
+        {isNotFound ? 'No encontramos esa página' : 'Algo salió mal de nuestro lado'}
+      </h1>
+      <p className="route-error__lede">
+        {isNotFound
+          ? 'Puede que el enlace haya cambiado. Estos son los caminos más cortos de vuelta al café:'
+          : 'Ya estamos revisándolo. Puedes intentar de nuevo o escribirnos y te ayudamos a completar tu pedido.'}
+      </p>
+      <div className="route-error__actions">
+        <Link className="btn" to="/collections/cafes">
+          Ver los cafés
+        </Link>
+        <Link className="btn btn--ghost" to="/">
+          Ir al inicio
+        </Link>
+      </div>
+      <p className="route-error__help">
+        ¿Necesitas ayuda? <Link to="/pages/contacto">Escríbenos</Link> o revisa el{' '}
+        <Link to="/suscripcion/gestionar">estado de tu suscripción</Link>.
+      </p>
+      {errorMessage && process.env.NODE_ENV !== 'production' && (
+        <pre className="route-error__debug">{errorMessage}</pre>
       )}
-      <Link className="btn" to="/">
-        Volver al inicio
-      </Link>
     </div>
   );
 

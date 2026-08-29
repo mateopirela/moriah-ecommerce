@@ -97,7 +97,7 @@ export function PurchaseOptions({cafe}) {
           <ul className="sub-perks">
             {SUBSCRIPTION.perks.map((p) => (
               <li key={p}>
-                <IconCheck width={15} height={15} />
+                <IconCheck width={15} height={15} aria-hidden="true" />
                 {p}
               </li>
             ))}
@@ -178,13 +178,14 @@ export function PurchaseOptions({cafe}) {
               product={{handle: cafe.handle, title: cafe.title, price: oncePrice}}
               onClick={() => open('cart')}
             >
-              <IconBag width={18} height={18} />
-              Agregar al carrito · {formatCop(total)}
+              <IconBag width={18} height={18} aria-hidden="true" />
+              Agregar · {formatCop(total)}
             </AddToCartButton>
           )}
         </div>
         <p className="pay-line">
-          <IconCheck width={14} height={14} /> Paga con Nequi, PSE o tarjeta · Entrega 2–4 días
+          <IconCheck width={14} height={14} aria-hidden="true" /> Paga con Nequi, PSE o tarjeta
+          · Entrega 2–4 días
         </p>
       </div>
 

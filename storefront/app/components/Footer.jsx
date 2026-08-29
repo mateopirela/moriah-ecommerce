@@ -1,5 +1,6 @@
 import {Link} from 'react-router';
 import {IconFacebook, IconInstagram, IconWhatsapp} from '~/components/Icons';
+import {CONTACT, whatsappUrl} from '~/data/contact';
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -13,7 +14,7 @@ export function Footer() {
           <nav className="tx-footer__nav" aria-label="Empresa">
             <Link to="/pages/nuestra-historia">Nuestra historia</Link>
             <Link to="/collections/cafes">Nuestros cafés</Link>
-            <Link to="/collections/club-de-la-memoria">Club de la Memoria</Link>
+            <Link to="/suscripcion">Club de la Memoria</Link>
             <Link to="/suscripcion/gestionar">Gestionar mi suscripción</Link>
             <Link to="/pages/contacto">Contacto</Link>
           </nav>
@@ -21,23 +22,25 @@ export function Footer() {
           <div className="tx-footer__contact">
             <div className="tx-footer__social">
               <a
-                href="https://instagram.com/cafemoriah"
+                href={CONTACT.instagram}
                 aria-label="Instagram"
                 rel="noopener noreferrer"
                 target="_blank"
               >
                 <IconInstagram />
               </a>
+              {CONTACT.hasWhatsapp && (
+                <a
+                  href={whatsappUrl()}
+                  aria-label="WhatsApp"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <IconWhatsapp />
+                </a>
+              )}
               <a
-                href="https://wa.me/57"
-                aria-label="WhatsApp"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <IconWhatsapp />
-              </a>
-              <a
-                href="https://facebook.com/cafemoriah"
+                href={CONTACT.facebook}
                 aria-label="Facebook"
                 rel="noopener noreferrer"
                 target="_blank"
@@ -45,12 +48,14 @@ export function Footer() {
                 <IconFacebook />
               </a>
             </div>
-            <a href="tel:+57" className="tx-footer__link">
-              +57 300 000 0000
-            </a>
-            <span className="tx-footer__link">Bogotá · Colombia</span>
-            <a href="mailto:hola@cafemoriah.com" className="tx-footer__link">
-              hola@cafemoriah.com
+            {CONTACT.phoneHref && (
+              <a href={CONTACT.phoneHref} className="tx-footer__link">
+                {CONTACT.phoneDisplay}
+              </a>
+            )}
+            <span className="tx-footer__link tx-footer__link--static">{CONTACT.city}</span>
+            <a href={CONTACT.emailHref} className="tx-footer__link">
+              {CONTACT.email}
             </a>
           </div>
 
@@ -81,7 +86,7 @@ export function Footer() {
         <Link to="/policies/terms-of-service" className="tx-footer__policy">
           Términos y condiciones
         </Link>
-        <span>MORIAH © {year}</span>
+        <span className="tx-footer__copy">MORIAH © {year}</span>
       </div>
     </footer>
   );

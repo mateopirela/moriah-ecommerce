@@ -61,14 +61,39 @@
 .pdp {
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
-  gap: var(--space-6);
+  grid-template-areas:
+    'gallery head'
+    'gallery info';
+  grid-template-rows: auto 1fr;
+  column-gap: var(--space-6);
+  row-gap: var(--space-4);
   align-items: start;
   padding-block: var(--space-6);
 }
+.pdp-head {
+  grid-area: head;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.pdp-gallery {
+  grid-area: gallery;
+}
+.pdp-info {
+  grid-area: info;
+}
 @media (max-width: 900px) {
+  /* En móvil: nombre y precio primero, luego la foto, luego el detalle.
+     Antes la imagen ocupaba toda la primera pantalla y el nombre del café
+     aparecía ~1.200px más abajo. */
   .pdp {
     grid-template-columns: 1fr;
-    gap: var(--space-5);
+    grid-template-areas:
+      'head'
+      'gallery'
+      'info';
+    grid-template-rows: auto auto 1fr;
+    gap: var(--space-4);
   }
 }
 
@@ -117,6 +142,14 @@
   .pdp-gallery {
     position: static;
   }
+  .pdp-gallery__main {
+    aspect-ratio: 1 / 1;
+    max-height: 58vh;
+  }
+  .pdp-gallery__main img {
+    object-fit: contain;
+    background: var(--cream-100);
+  }
 }
 
 /* Info column */
@@ -143,9 +176,14 @@
 }
 .pdp-pricerow {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: var(--space-3);
-  margin-block: var(--space-2);
+  margin-block: var(--space-1);
+}
+.price__from {
+  font-size: 0.75em;
+  font-weight: 500;
+  color: var(--text-muted);
 }
 .pdp-installments {
   font-size: 0.85rem;
@@ -197,11 +235,15 @@
   gap: var(--space-2);
 }
 .variant-option {
-  padding: 0.6rem 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.6rem 1.25rem;
   border: 1px solid var(--border);
   border-radius: var(--r-pill);
   background: var(--white);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 500;
   transition: all var(--dur-fast) var(--ease);
 }
@@ -515,7 +557,7 @@
   background: radial-gradient(circle, var(--gold-500) 40%, transparent 45%);
 }
 .buy-type__save {
-  font-size: 0.66rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   color: var(--on-primary);
@@ -672,7 +714,7 @@
   border-bottom: 1px solid var(--border);
 }
 .spec__k {
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--ink-400);
@@ -717,4 +759,36 @@
   .specs {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+
+/* ============================================================
+   PDP — migas y textos secundarios legibles
+   ============================================================ */
+.breadcrumb {
+  font-size: 0.88rem;
+  color: var(--ink-500);
+}
+.breadcrumb a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding-block: 0.35rem;
+}
+.producer__label,
+.spec__k {
+  color: var(--ink-500);
+  font-size: 0.78rem;
+}
+/* Migas: alto cómodo para el dedo */
+.breadcrumb a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.roast-meter__label {
+  font-size: 0.8rem;
+}
+.pay-line {
+  font-size: 0.92rem;
+  color: var(--ink-500);
 }

@@ -98,17 +98,18 @@ export function BrewGuidePage() {
           height={600}
           className="tx-brew-banner__img"
         />
-        <div className="tx-brew-banner__title">Prepara tu café</div>
+        <h1 className="tx-brew-banner__title">Prepara tu café</h1>
       </div>
 
       {/* Tabs */}
-      <div style={{background:'var(--tx-bg)', borderBottom:'1px solid var(--tx-line)', padding:'0 var(--tx-gutter)'}}>
+      <div className="tx-brew-tabsbar">
         <nav className="tx-brew-tabs" aria-label="Métodos de preparación">
           {METHODS.map((m) => (
             <button
               key={m.id}
               className="tx-brew-tab"
               data-active={active === m.id ? 'true' : 'false'}
+              aria-pressed={active === m.id}
               onClick={() => setActive(m.id)}
               type="button"
             >

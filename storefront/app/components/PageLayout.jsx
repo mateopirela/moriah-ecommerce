@@ -11,6 +11,9 @@ import {SearchPredictive} from '~/components/SearchPredictive';
 export function PageLayout({cart, children = null}) {
   return (
     <Aside.Provider>
+      <a className="skip-link" href="#contenido">
+        Saltar al contenido
+      </a>
       <Aside type="cart" heading="TU CARRITO">
         <CartMain cart={cart} layout="aside" />
       </Aside>
@@ -22,7 +25,9 @@ export function PageLayout({cart, children = null}) {
       </Aside>
       <AnnouncementBar />
       <Header cart={cart} />
-      <main>{children}</main>
+      <main id="contenido" tabIndex={-1}>
+        {children}
+      </main>
       <Footer />
     </Aside.Provider>
   );
