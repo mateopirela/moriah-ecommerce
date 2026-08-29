@@ -15,9 +15,14 @@
   --pine-700: #234840; /* raised dark surface / cards on dark */
   --pine-600: #2f5b50; /* hover on dark surfaces */
 
-  --gold-500: #cf8e08; /* Yellow Ochre — PRIMARY: CTAs, emblema, links */
+  --gold-500: #cf8e08; /* Yellow Ochre — PRIMARY: rellenos, emblema, iconos */
   --gold-400: #e0a51f; /* hover / highlight (tint de #cf8e08) */
   --gold-300: #f9df7b; /* foil claro — texto/acento dorado sobre oscuro */
+  /* Ocre profundo para TEXTO dorado sobre superficies claras.
+     #cf8e08 sobre crema da 2.5:1 (falla WCAG AA); #845c0a da 5.5:1 sobre
+     crema, 4.5:1 sobre Alabaster y 6:1 sobre blanco. Usa --gold-500 solo
+     para rellenos, iconos y texto ≥24px sobre oscuro. */
+  --gold-700: #845c0a;
 
   --cream-50: #faf4e6; /* fondo de página (tint claro de Alabaster) */
   --cream-100: #f0debd; /* Alabaster Gleam — superficie / cards */
@@ -25,7 +30,8 @@
 
   --ink-900: #1a1a1a; /* body text on light (never pure black) */
   --ink-600: #51514c; /* muted text on light */
-  --ink-400: #8a8a82; /* captions */
+  --ink-500: #5c574e; /* captions legibles (6.5:1 sobre crema) */
+  --ink-400: #8a8a82; /* SOLO decorativo: 3.2:1, no apto para texto */
 
   --white: #ffffff;
 
@@ -42,7 +48,8 @@
   --border: var(--cream-200);
   --primary: var(--gold-500);
   --primary-hover: var(--gold-400);
-  --on-primary: var(--pine-900);
+  --on-primary: var(--pine-900); /* 5.9:1 sobre --gold-500 */
+  --primary-text: var(--gold-700); /* dorado apto para texto sobre claro */
 
   /* --- Typography (BRANDBOARD MORIAH) ---
      Primaria: Satoshi (cuerpo + UI).

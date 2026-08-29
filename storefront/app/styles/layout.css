@@ -230,22 +230,29 @@
   padding: var(--space-4) var(--space-5);
   border-bottom: 1px solid var(--border);
 }
-.overlay aside > header h3 {
+.overlay aside > header h2 {
   font-family: var(--font-display);
   font-size: 1.3rem;
   letter-spacing: 0.04em;
 }
 .overlay aside .close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
   font-size: 1.8rem;
   line-height: 1;
   background: transparent;
   border: 0;
+  border-radius: var(--r-sm);
   color: var(--ink-600);
+  cursor: pointer;
 }
 .overlay aside .close:hover {
   color: var(--ink-900);
 }
-.overlay aside > main {
+.overlay aside > .aside__body {
   flex: 1;
   overflow-y: auto;
   padding: var(--space-5);

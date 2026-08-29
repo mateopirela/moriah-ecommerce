@@ -4,6 +4,7 @@ import {IconShield} from '~/components/Icons';
 import {loadCart} from '~/lib/cart.server';
 import {formatCop, toCents} from '~/lib/catalog';
 import {parseShipping, toShippingRecord} from '~/lib/checkout-form';
+import {useFocusFirstError} from '~/lib/useFocusFirstError';
 import {getDb} from '~/db/client.server';
 import {databaseConfigured, siteUrl} from '~/lib/env.server';
 import {createOrder, orderItemsFromCart, upsertCustomer} from '~/lib/orders.server';
@@ -76,6 +77,8 @@ export default function Checkout() {
   const navigation = useNavigation();
   const submitting = navigation.state !== 'idle';
   const errors = actionData?.errors ?? {};
+  const errorCount = Object.keys(errors).length;
+  useFocusFirstError(actionData?.errors);
 
   return (
     <div className="checkout container">
@@ -86,10 +89,23 @@ export default function Checkout() {
 
       <div className="checkout__grid">
         <Form method="post" className="checkout__form" replace>
-          {errors.general && (
-            <p className="form-error" role="alert">
-              {errors.general}
-            </p>
+          {errorCount > 0 && (
+            <div className="form-errors" role="alert">
+              <p>
+                {errors.general
+                  ? errors.general
+                  : `Revisa ${errorCount === 1 ? 'este dato' : `estos ${errorCount} datos`} para continuar con el pago:`}
+              </p>
+              {!errors.general && (
+                <ul>
+                  {Object.entries(errors).map(([field, message]) => (
+                    <li key={field}>
+                      <a href={`#f-${field}`}>{message}</a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           )}
           <ShippingFields errors={errors} values={actionData?.values} />
 

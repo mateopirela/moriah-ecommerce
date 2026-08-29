@@ -16,6 +16,7 @@ import {
   subscriptionAmounts,
 } from '~/lib/catalog';
 import {parseShipping, toShippingRecord} from '~/lib/checkout-form';
+import {useFocusFirstError} from '~/lib/useFocusFirstError';
 import {databaseConfigured, siteUrl} from '~/lib/env.server';
 import {upsertCustomer} from '~/lib/orders.server';
 import {
@@ -154,6 +155,7 @@ export default function Subscribe() {
   const navigation = useNavigation();
   const submit = useSubmit();
   const errors = actionData?.errors ?? {};
+  useFocusFirstError(actionData?.errors);
 
   const [selection, setSelection] = useState(initial);
   const [card, setCard] = useState({number: '', exp: '', cvc: '', holder: ''});

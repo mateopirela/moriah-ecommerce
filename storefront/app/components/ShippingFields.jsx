@@ -8,9 +8,16 @@ export function ShippingFields({errors = {}, values = {}, notesLabel = 'Notas pa
   const field = (name, label, props = {}) => (
     <div className={`field${errors[name] ? ' field--error' : ''}`}>
       <label htmlFor={`f-${name}`}>{label}</label>
-      <input id={`f-${name}`} name={name} defaultValue={values[name] ?? ''} {...props} />
+      <input
+        id={`f-${name}`}
+        name={name}
+        defaultValue={values[name] ?? ''}
+        aria-invalid={errors[name] ? 'true' : undefined}
+        aria-describedby={errors[name] ? `err-${name}` : undefined}
+        {...props}
+      />
       {errors[name] && (
-        <p className="field__error" role="alert">
+        <p className="field__error" id={`err-${name}`} role="alert">
           {errors[name]}
         </p>
       )}

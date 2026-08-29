@@ -469,168 +469,155 @@
   color: var(--primary);
 }
 
-/* ========== PREMIUM FORM STYLING ========== */
-/* Memory/Contact Form — Dark luxury aesthetic */
+/* ============================================================
+   FORMULARIOS DE CONTENIDO — /memoria, contacto
+   Antes estaban tematizados en oscuro (texto crema) pero se renderizan
+   sobre secciones claras: etiquetas, inputs y ayudas quedaban invisibles.
+   Ahora usan los tokens de superficie clara y heredan color en secciones
+   oscuras mediante .section--dark / .section--pine.
+   ============================================================ */
 .memory-form {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--space-4);
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .form-label {
   font-weight: 600;
-  color: var(--cream-50);
-  font-size: 0.98rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  font-family: var(--font-sans);
+  color: var(--text);
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
 }
 
-/* Premium input styling with gold accents */
-.memory-form input[type="text"],
-.memory-form input[type="email"],
+.memory-form input[type='text'],
+.memory-form input[type='email'],
 .memory-form textarea {
-  padding: 1.2rem;
-  border: 2px solid rgba(201, 162, 75, 0.3);
-  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
   font-family: var(--font-sans);
   width: 100%;
   font-size: 1rem;
-  background: rgba(247, 243, 234, 0.05);
-  color: var(--cream-50);
-  backdrop-filter: blur(10px);
-  transition: all var(--dur) var(--ease-out-cubic);
-  line-height: 1.6;
+  min-height: 48px;
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease);
+  line-height: 1.5;
 }
 
 .memory-form input::placeholder,
 .memory-form textarea::placeholder {
-  color: rgba(247, 243, 234, 0.5);
-  font-style: italic;
+  color: var(--ink-400);
 }
 
-/* Delightful focus state with glow */
 .memory-form input:focus,
 .memory-form textarea:focus {
   outline: none;
-  border-color: var(--gold-400);
-  background: rgba(247, 243, 234, 0.08);
-  box-shadow: 0 0 20px rgba(201, 162, 75, 0.2);
-}
-
-.memory-form input:focus::placeholder,
-.memory-form textarea:focus::placeholder {
-  color: rgba(247, 243, 234, 0.4);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(207, 142, 8, 0.22);
 }
 
 .memory-form textarea {
   resize: vertical;
   min-height: 160px;
-  font-family: var(--font-sans);
 }
 
 .form-hint {
-  color: var(--gold-300);
+  color: var(--text-muted);
   font-size: 0.85rem;
-  margin-top: 0.5rem;
-  font-style: italic;
+  margin-top: 0.35rem;
 }
 
 .form-error {
-  color: #ff6b6b;
-  font-size: 0.85rem;
+  color: var(--error, #b3261e);
+  font-size: 0.88rem;
   display: block;
-  margin-top: 0.5rem;
+  margin-top: 0.4rem;
   font-weight: 500;
 }
 
 .form-errors {
-  background-color: rgba(255, 107, 107, 0.08);
-  border: 1px solid rgba(255, 107, 107, 0.3);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  background-color: rgba(179, 38, 30, 0.07);
+  border: 1px solid rgba(179, 38, 30, 0.35);
+  border-radius: var(--r-md);
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1.25rem;
 }
 
 .form-errors p {
-  color: #ff9999;
+  color: var(--error, #b3261e);
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 0.6rem;
 }
 
 .form-errors ul {
-  color: #ff9999;
-  padding-left: 1.5rem;
+  color: var(--error, #b3261e);
+  padding-left: 1.25rem;
+  margin: 0;
 }
 
-/* Checkbox styling */
-.memory-form input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
+/* Consentimiento: fila cómoda para el dedo, casilla de 22px */
+.memory-form .form-consent {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  min-height: 44px;
+}
+
+.memory-form input[type='checkbox'] {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  margin-top: 0.15rem;
   cursor: pointer;
-  accent-color: var(--gold-500);
-  margin-top: 0.25rem;
+  accent-color: var(--primary);
 }
 
-.memory-form input[type="checkbox"]:focus {
-  outline: 2px solid var(--gold-500);
+.memory-form .form-consent label {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.memory-form input[type='checkbox']:focus-visible {
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
-/* Success message animation */
-.memory-form [role="alert"] {
-  background-color: rgba(63, 125, 82, 0.1);
-  border: 1px solid rgba(63, 125, 82, 0.3);
-  border-radius: 12px;
-  padding: 2rem;
-  text-align: center;
-  animation: successPulse 0.6s var(--ease-out-cubic);
-}
-
-@keyframes successPulse {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Disabled fieldset during submission */
 fieldset:disabled {
   opacity: 0.6;
   pointer-events: none;
 }
 
-/* Success message for form submission */
+/* Confirmación de envío */
 .form-success-message {
-  background: linear-gradient(135deg, rgba(63, 125, 82, 0.12) 0%, rgba(63, 125, 82, 0.08) 100%);
-  border: 1px solid rgba(63, 125, 82, 0.3);
-  border-radius: 16px;
-  padding: 2.5rem 2rem;
+  background: rgba(63, 125, 82, 0.1);
+  border: 1px solid rgba(63, 125, 82, 0.35);
+  border-radius: var(--r-lg);
+  padding: 2rem;
   text-align: center;
   margin-top: 2rem;
-  animation: successSlideIn 0.6s var(--ease-out-cubic);
-  box-shadow: 0 10px 30px rgba(63, 125, 82, 0.1);
+  animation: successSlideIn 0.5s var(--ease-out-cubic);
 }
 
 .form-success-title {
+  font-family: var(--font-display);
   font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--cream-50);
-  margin: 0 0 0.75rem 0;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 0.6rem;
 }
 
 .form-success-text {
-  color: rgba(247, 243, 234, 0.85);
+  color: var(--text-muted);
   font-size: 0.95rem;
   line-height: 1.6;
   margin: 0;
@@ -645,6 +632,16 @@ fieldset:disabled {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Sobre superficies oscuras el formulario se invierte con tokens, no con hex */
+.section--dark .memory-form,
+.section--pine .memory-form {
+  --border: rgba(240, 222, 189, 0.32);
+  --surface: rgba(250, 244, 230, 0.08);
+  --text: var(--cream-50);
+  --text-muted: rgba(240, 222, 189, 0.82);
+  --ink-400: rgba(240, 222, 189, 0.55);
 }
 
 /* ============================================================
@@ -675,4 +672,246 @@ iframe {
 .field__error,
 .form-error {
   overflow-wrap: anywhere;
+}
+
+
+/* ============================================================
+   BÚSQUEDA PREDICTIVA — panel lateral y página /search
+   ============================================================ */
+.predictive-search__status {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+}
+.predictive-search__empty {
+  display: grid;
+  gap: 0.4rem;
+  margin-bottom: var(--space-3);
+}
+.predictive-search__hint {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+.link-inline {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--primary-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.predictive-search-result ul {
+  display: grid;
+  gap: var(--space-2);
+}
+.predictive-search-result-item a {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.5rem;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  transition: border-color var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease);
+}
+.predictive-search-result-item a:hover {
+  border-color: var(--gold-300);
+  box-shadow: var(--shadow-sm);
+}
+.predictive-search-result-item img {
+  border-radius: var(--r-sm);
+  background: var(--bg-alt);
+}
+.predictive-search-result-item__title {
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+.predictive-search-result-item__price {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.predictive-search__all {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: var(--space-3);
+  font-weight: 600;
+  color: var(--primary-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ============================================================
+   CAMPOS DE FORMULARIO — utilidades compartidas
+   ============================================================ */
+.field__optional {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-height: 44px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  cursor: pointer;
+}
+.checkbox input[type='checkbox'] {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  margin-top: 0.15rem;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* ============================================================
+   PÁGINA /memoria — Banco de Recuerdos
+   ============================================================ */
+.memory-hero {
+  text-align: center;
+  max-width: 46rem;
+}
+.memory-hero .lede {
+  margin-inline: auto;
+}
+.memory-form-wrap {
+  max-width: 40rem;
+}
+.memory-form-intro {
+  margin-bottom: var(--space-6);
+  display: grid;
+  gap: var(--space-3);
+}
+.memory-form-intro p {
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+.memory-form-intro__note {
+  color: var(--primary-text);
+  font-weight: 600;
+}
+.memory-benefits {
+  max-width: 44rem;
+  text-align: center;
+}
+.memory-benefits__grid {
+  list-style: none;
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-5);
+}
+.memory-benefits__grid li {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  color: var(--cream-50);
+}
+.memory-benefits__figure {
+  display: grid;
+  place-items: center;
+  min-height: 40px;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--gold-300);
+}
+.memory-benefits__figure svg {
+  color: var(--gold-300);
+}
+.memory-cta {
+  text-align: center;
+  max-width: 40rem;
+}
+.memory-cta .lede {
+  margin: var(--space-3) auto var(--space-5);
+}
+
+/* ============================================================
+   CONTACTO — extras del formulario
+   ============================================================ */
+.tx-contact-sub {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+.tx-contact-ok {
+  display: grid;
+  gap: 0.5rem;
+  padding: var(--space-5);
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  color: var(--text);
+}
+.tx-contact-alt {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+}
+.tx-contact-alt a {
+  color: var(--primary-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ============================================================
+   RESEÑAS — tipografía de datos
+   ============================================================ */
+.price,
+.cart-subtotal dd,
+.checkout__totals dd,
+.tx-col-card__price,
+.tx-product-card__price,
+.sticky-atc__price,
+.buy-type__price {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   Correcciones finales de formularios
+   ============================================================ */
+/* Los <fieldset> agrupan campos por semántica, no por decoración. */
+.memory-form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+/* La regla genérica `.field input` (padding + min-height 48px) estiraba
+   también las casillas de verificación. */
+.field input[type='checkbox'],
+.checkbox input[type='checkbox'] {
+  width: 22px;
+  height: 22px;
+  min-height: 0;
+  padding: 0;
+  flex: none;
+  margin: 0.1rem 0 0;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+.field > .checkbox {
+  flex-direction: row;
+  align-items: flex-start;
+}
+.checkbox span {
+  flex: 1;
 }

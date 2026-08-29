@@ -1,15 +1,11 @@
+import {useEffect, useRef, useState} from 'react';
 import {Link, useFetcher} from 'react-router';
 import {CAFES, formatCop} from '~/data/cafes';
 import {MERCH} from '~/data/merch';
 import {Marquee} from '~/components/Marquee';
 import {useReveal} from '~/lib/useReveal';
-import {
-  IconTruck,
-  IconLeaf,
-  IconShield,
-  IconClock,
-  StarRating,
-} from '~/components/Icons';
+import {IconTruck, IconLeaf, IconShield, IconClock} from '~/components/Icons';
+import {Testimonials} from '~/components/Testimonials';
 
 /** @type {Route.MetaFunction} */
 export const meta = () => [
@@ -39,7 +35,7 @@ export default function Homepage() {
       <InfaltablesSection />
       <ValuePropsSection />
       <GaleriaSection />
-      <TestimoniosSection />
+      <Testimonials />
       <NewsletterSection />
     </div>
   );
@@ -49,27 +45,64 @@ export default function Homepage() {
    BANNER HOME — video full-width con texto (Tropicalia)
    ============================================================ */
 function BannerHome() {
+  const videoRef = useRef(null);
+  const [motionOff, setMotionOff] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return undefined;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    // `saveData` cuando el usuario pide ahorrar datos; el vídeo pesa 2 MB.
+    const saveData = navigator.connection?.saveData === true;
+
+    const apply = () => {
+      const off = reduced.matches || saveData;
+      setMotionOff(off);
+      if (off) {
+        video.pause();
+        video.removeAttribute('autoplay');
+      } else if (video.paused) {
+        video.play().catch(() => {});
+      }
+    };
+
+    apply();
+    reduced.addEventListener('change', apply);
+    return () => reduced.removeEventListener('change', apply);
+  }, []);
+
   return (
     <section className="tx-banner">
       <div className="tx-banner__texto">
         <h1 className="tx-display tx-banner__h1">
           Yo no aprendí a querer el café. <em>Lo heredé.</em>
         </h1>
-        <a className="tx-btn" href="#lineas">
-          Conoce más
-        </a>
+        <div className="tx-banner__acciones">
+          <Link className="tx-btn" to="/collections/cafes">
+            Comprar café
+          </Link>
+          <a className="tx-btn tx-btn--fantasma" href="#lineas">
+            Conoce nuestras líneas
+          </a>
+        </div>
       </div>
+      {/* 720p · 10 s · 2 MB (antes: 1080p, 14 s, 7,4 MB con preload="auto").
+          Con reduced-motion o ahorro de datos se queda en el póster. */}
       <video
+        ref={videoRef}
         className="tx-banner__video"
-        src="/videos/cafe.mp4"
-        poster="/images/tostado-moriah.webp"
-        autoPlay
+        poster="/images/hero-poster.webp"
+        autoPlay={!motionOff}
         muted
         loop
         playsInline
-        preload="auto"
-        aria-label="MORIAH Café — Un café para el alma"
-      />
+        preload="metadata"
+        aria-hidden="true"
+        tabIndex={-1}
+      >
+        <source src="/videos/cafe.mp4" type="video/mp4" />
+      </video>
     </section>
   );
 }
@@ -83,8 +116,8 @@ const LINEAS = [
     name: 'Línea de Origen',
     subtitle: 'Cafés con propósito',
     desc: 'Dedicados a los auténticos exploradores, aquellos que encuentran valor en las pequeñas cosas que otorgan sentido a la vida. Cafés 100% colombianos de alta montaña, cultivados con intención y respeto por la tierra.',
-    img: '/images/producto-bolsa-cut.png',
-    to: '/collections/cafes',
+    img: '/images/producto-bolsa-cut.webp',
+    to: '/collections/linea-origen',
     mod: 'origen',
   },
   {
@@ -92,8 +125,8 @@ const LINEAS = [
     name: 'Micro-lotes',
     subtitle: 'Cafés sublimes',
     desc: 'Un privilegio reservado para los verdaderos amantes del café. Nano-lotes y varietales extraordinarios, de sabores inolvidables. Aquí encontrarás una selección de genética pura y cafés de competición.',
-    img: '/images/cafe-bolsa-cut.png',
-    to: '/collections/cafes',
+    img: '/images/cafe-bolsa-cut.webp',
+    to: '/collections/micro-lotes',
     mod: 'micro',
   },
   {
@@ -101,8 +134,8 @@ const LINEAS = [
     name: 'Club de la Memoria',
     subtitle: 'Tu café, siempre fresco',
     desc: 'Devuélvete el tiempo que importa. Recibe tu café en la frecuencia que elijas, con 15% de descuento permanente. Tostado fresco, sellado al vacío, directo a tu puerta. Sin complicaciones.',
-    img: '/images/producto-bolsa-cut.png',
-    to: '/#club',
+    img: '/images/producto-bolsa-cut.webp',
+    to: '/suscripcion',
     mod: 'club',
   },
   {
@@ -110,8 +143,8 @@ const LINEAS = [
     name: 'Kit El Legado',
     subtitle: 'El ritual completo',
     desc: 'Molino, pocillo y café: la herramienta para heredar una tradición. Todo lo que necesitas para preparar el mejor café en casa y compartir el ritual con quienes más quieres.',
-    img: '/images/kit-bolsas-cut.png',
-    to: '/collections/cafes',
+    img: '/images/kit-bolsas-cut.webp',
+    to: '/products/kit-tres-origenes',
     mod: 'legado',
   },
 ];
@@ -179,8 +212,9 @@ function InfaltablesSection() {
             <Link
               className="tx-product-card"
               data-reveal-child
-              to="/collections/cafes"
+              to={`/products/${m.handle}`}
               key={m.handle}
+              prefetch="intent"
             >
               <div className="tx-product-card__media">
                 {m.badge && (
@@ -300,54 +334,6 @@ function GaleriaSection() {
           </Link>
         </div>
       </aside>
-    </section>
-  );
-}
-
-/* ============================================================
-   TESTIMONIOS — voces de la comunidad
-   ============================================================ */
-const TESTIMONIOS = [
-  {
-    quote:
-      'Aroma increíble apenas abres la bolsa. Se nota el tostado artesanal y la frescura del sellado al vacío.',
-    name: 'Laura M.',
-    city: 'Bogotá',
-  },
-  {
-    quote:
-      'Llegó en dos días, impecable. La experiencia completa se siente premium, volveré a pedir.',
-    name: 'Andrés R.',
-    city: 'Medellín',
-  },
-  {
-    quote:
-      'Saber de qué finca viene hace la diferencia. Un café con propósito y con sabor.',
-    name: 'Valentina G.',
-    city: 'Cali',
-  },
-];
-
-function TestimoniosSection() {
-  return (
-    <section className="tx-section tx-testimonios">
-      <div className="tx-container">
-        <div className="tx-testimonios__head" data-reveal>
-          <span className="tx-eyebrow">Voces de nuestra comunidad</span>
-          <h2 className="tx-display tx-h2">Un café que se comparte</h2>
-        </div>
-        <div className="tx-testimonios__grid" data-reveal>
-          {TESTIMONIOS.map((t) => (
-            <figure className="tx-testimonio" data-reveal-child key={t.name}>
-              <StarRating rating={5} />
-              <blockquote>{t.quote}</blockquote>
-              <figcaption>
-                {t.name} · <span>{t.city}</span>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </div>
     </section>
   );
 }

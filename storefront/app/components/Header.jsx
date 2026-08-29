@@ -1,35 +1,36 @@
 import {useEffect, useState} from 'react';
 import {Link, NavLink, useLocation} from 'react-router';
 import {useAside} from '~/components/Aside';
-import {IconBag, IconMenu, IconSearch} from '~/components/Icons';
+import {IconBag, IconChevronDown, IconMenu, IconSearch} from '~/components/Icons';
 import {useOptimisticCartCount} from '~/components/CartMain';
+import {CONTACT, whatsappUrl} from '~/data/contact';
 
 /**
  * Navbar — réplica de la estructura de tropicaliacoffee.com:
- * logo · CAFÉ▾ · MERCH▾ · CATACIÓN · PREPARA TU CAFÉ · TIENDA · CONTACTO · iconos
+ * logo · CAFÉ▾ · MERCH▾ · ENCUENTRA TU CAFÉ · PREPARA TU CAFÉ · TIENDA · CONTACTO · iconos
  */
 const TX_NAV = [
   {
     title: 'Café',
     url: '/collections/cafes',
     items: [
-      {title: 'Todos', url: '/collections/cafes', img: '/images/lineup-bolsas.webp'},
-      {title: 'Línea de Origen', url: '/collections/linea-origen', img: '/images/cafe-bolsa.webp'},
+      {title: 'Todos los cafés', url: '/collections/cafes', img: '/images/lineup-bolsas-400.webp'},
+      {title: 'Línea de Origen', url: '/collections/linea-origen', img: '/images/cafe-bolsa-400.webp'},
       {title: 'Micro-lotes', url: '/collections/micro-lotes', img: '/images/producto-bolsa.webp'},
-      {title: 'Club de la Memoria', url: '/collections/club-de-la-memoria', img: '/images/kit-bolsas.webp'},
+      {title: 'Club de la Memoria', url: '/collections/club-de-la-memoria', img: '/images/kit-bolsas-400.webp'},
     ],
   },
   {
     title: 'Merch',
     url: '/collections/merch',
     items: [
-      {title: 'Pocillos', url: '/collections/pocillos', img: '/images/equipo-moriah.webp'},
-      {title: 'Para vestir', url: '/collections/para-vestir', img: '/images/tostado-moriah.webp'},
-      {title: 'Accesorios', url: '/collections/accesorios', img: '/images/hero-bolsa.webp'},
-      {title: 'Caja regalo', url: '/collections/caja-regalo', img: '/images/kit-bolsas.webp'},
+      {title: 'Pocillos', url: '/collections/pocillos', img: '/images/equipo-moriah-400.webp'},
+      {title: 'Para vestir', url: '/collections/para-vestir', img: '/images/tostado-moriah-400.webp'},
+      {title: 'Accesorios', url: '/collections/accesorios', img: '/images/hero-bolsa-400.webp'},
+      {title: 'Caja regalo', url: '/collections/caja-regalo', img: '/images/kit-bolsas-400.webp'},
     ],
   },
-  {title: 'Catación', url: '/quiz'},
+  {title: 'Encuentra tu café', url: '/quiz'},
   {title: 'Prepara tu café', url: '/pages/prepara-tu-cafe'},
   {title: 'Tienda', url: '/collections/all'},
   {title: 'Contacto', url: '/pages/contacto'},
@@ -74,12 +75,13 @@ export function Header({cart}) {
 
 function TropicaliaNav() {
   return (
-    <nav className="header-menu-desktop" role="navigation" aria-label="Principal">
+    <nav className="header-menu-desktop" aria-label="Principal">
       {TX_NAV.map((item) =>
         item.items ? (
           <div className="tx-nav-group" key={item.title}>
             <NavLink className="header-menu-item" to={item.url} prefetch="intent">
-              {item.title} <span aria-hidden="true">▾</span>
+              {item.title}
+              <IconChevronDown className="header-menu-item__chevron" aria-hidden="true" />
             </NavLink>
             <div className="tx-nav-panel">
               {item.items.map((sub) => (
@@ -119,7 +121,7 @@ function TropicaliaNav() {
 /** @param {{cart: import('~/lib/cart').Cart}} props */
 function HeaderCtas({cart}) {
   return (
-    <nav className="header-ctas" role="navigation" aria-label="Acciones">
+    <nav className="header-ctas" aria-label="Acciones">
       <SearchToggle />
       <CartToggle cart={cart} />
       <HeaderMenuMobileToggle />
@@ -143,28 +145,67 @@ function HeaderMenuMobileToggle() {
 function SearchToggle() {
   const {open} = useAside();
   return (
-    <button className="icon-btn" onClick={() => open('search')}>
+    <button className="icon-btn" onClick={() => open('search')} aria-label="Buscar">
       <IconSearch />
-      <span className="sr-only">Buscar</span>
     </button>
   );
 }
 
-/** Menú lateral móvil — reutiliza los ítems de la nav Tropicalia. */
+/**
+ * Menú lateral móvil. Antes aplanaba los 15 destinos en una sola lista sin
+ * jerarquía; ahora Café y Merch son secciones desplegables y las acciones de
+ * cliente recurrente (Club, suscripción, contacto) viven al final.
+ */
 export function HeaderMenu({viewport}) {
   const {close} = useAside();
   if (viewport !== 'mobile') return null;
-  const flat = TX_NAV.flatMap((item) => (item.items ? [item, ...item.items] : [item]));
+
+  const groups = TX_NAV.filter((item) => item.items);
+  const flat = TX_NAV.filter((item) => !item.items);
+
   return (
-    <nav className="header-menu-mobile" role="navigation" aria-label="Principal">
+    <nav className="header-menu-mobile" aria-label="Principal">
       <NavLink end onClick={close} prefetch="intent" className="header-menu-item" to="/">
         Inicio
       </NavLink>
-      {flat.map((item, i) => (
+
+      {groups.map((group) => (
+        <details className="header-menu-group" key={group.title}>
+          <summary className="header-menu-item header-menu-group__summary">
+            {group.title}
+            <IconChevronDown className="header-menu-group__chevron" aria-hidden="true" />
+          </summary>
+          <div className="header-menu-group__items">
+            <NavLink
+              end
+              onClick={close}
+              prefetch="intent"
+              className="header-menu-item header-menu-item--sub"
+              to={group.url}
+            >
+              Ver todo {group.title.toLowerCase()}
+            </NavLink>
+            {group.items.map((sub) => (
+              <NavLink
+                end
+                key={sub.url}
+                onClick={close}
+                prefetch="intent"
+                className="header-menu-item header-menu-item--sub"
+                to={sub.url}
+              >
+                {sub.title}
+              </NavLink>
+            ))}
+          </div>
+        </details>
+      ))}
+
+      {flat.map((item) => (
         <NavLink
           className="header-menu-item"
           end
-          key={`${item.title}-${i}`}
+          key={item.url}
           onClick={close}
           prefetch="intent"
           to={item.url}
@@ -172,6 +213,27 @@ export function HeaderMenu({viewport}) {
           {item.title}
         </NavLink>
       ))}
+
+      <div className="header-menu-mobile__foot">
+        <Link className="btn btn--block" to="/suscripcion" onClick={close}>
+          Club de la Memoria · −15%
+        </Link>
+        <Link
+          className="header-menu-mobile__link"
+          to="/suscripcion/gestionar"
+          onClick={close}
+        >
+          Gestionar mi suscripción
+        </Link>
+        <a
+          className="header-menu-mobile__link"
+          href={CONTACT.hasWhatsapp ? whatsappUrl() : CONTACT.emailHref}
+          rel="noopener noreferrer"
+          target={CONTACT.hasWhatsapp ? '_blank' : undefined}
+        >
+          {CONTACT.hasWhatsapp ? 'Escríbenos por WhatsApp' : `Escríbenos a ${CONTACT.email}`}
+        </a>
+      </div>
     </nav>
   );
 }
@@ -185,14 +247,18 @@ function CartToggle({cart}) {
     <a
       href="/cart"
       className="icon-btn cart-count"
+      aria-label={count > 0 ? `Carrito, ${count} productos` : 'Carrito'}
       onClick={(e) => {
         e.preventDefault();
         open('cart');
       }}
     >
       <IconBag />
-      <span className="sr-only">Carrito</span>
-      {count > 0 && <span className="cart-count__badge">{count}</span>}
+      {count > 0 && (
+        <span className="cart-count__badge" aria-hidden="true">
+          {count}
+        </span>
+      )}
     </a>
   );
 }
