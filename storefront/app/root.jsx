@@ -9,7 +9,6 @@ import {
   useRouteError,
   useRouteLoaderData,
 } from 'react-router';
-import favicon from '~/assets/favicon.svg';
 import resetStyles from '~/styles/reset.css?url';
 import tokenStyles from '~/styles/tokens.css?url';
 import baseStyles from '~/styles/base.css?url';
@@ -51,7 +50,8 @@ export function links() {
       rel: 'stylesheet',
       href: 'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&display=swap',
     },
-    {rel: 'icon', type: 'image/svg+xml', href: favicon},
+    {rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32.png'},
+    {rel: 'apple-touch-icon', href: '/apple-touch-icon.png'},
   ];
 }
 
