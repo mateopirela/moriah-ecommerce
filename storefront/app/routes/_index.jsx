@@ -160,6 +160,8 @@ function BannerHome() {
             alt=""
             width={637}
             height={975}
+            // React 18 aún no acepta `fetchPriority` en <img>: va en minúscula.
+            // eslint-disable-next-line react/no-unknown-property
             fetchpriority="high"
           />
         </div>
@@ -345,6 +347,8 @@ function LineasSection() {
           ref={gridRef}
           role="region"
           aria-label="Nuestros cafés"
+          // Región desplazable: debe poder enfocarse para recorrerla con el teclado.
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
           tabIndex={0}
         >
           {CARDS_CAFE.map((c) => (
