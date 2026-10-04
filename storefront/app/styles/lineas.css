@@ -193,3 +193,13 @@
   .tx-oferta { grid-template-columns: 1fr; }
   .tx-oferta__media { height: 170px; }
 }
+
+/* Foto a pleno panel (bolsa sobre granos): sin sombra de recorte ni relleno. */
+.tx-cafe__media--foto { padding: 0; overflow: hidden; }
+.tx-cafe__media--foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: none;
+}

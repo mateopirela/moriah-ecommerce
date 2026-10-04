@@ -241,7 +241,9 @@ const CASA = {
   handle: 'casa',
   title: 'De la casa',
   notas: 'Chocolate, panela y nuez',
-  img: '/images/producto-bolsa-cut.webp',
+  img: '/images/cafe-casa-blend.webp',
+  // Foto de la bolsa sobre granos (no es un recorte): se muestra a pleno panel.
+  foto: true,
   to: '/collections/cafes',
   precio: 42990,
 };
@@ -252,6 +254,7 @@ const CARDS_CAFE = [
     title: CASA.title,
     notas: CASA.notas,
     img: CASA.img,
+    foto: CASA.foto,
     to: CASA.to,
     precio: CASA.precio,
     chip: 'El de siempre',
@@ -269,7 +272,7 @@ const CARDS_CAFE = [
 function CafeTile({c}) {
   return (
     <article className="tx-cafe" data-reveal-child>
-      <Link className="tx-cafe__media" to={c.to} tabIndex={-1} aria-hidden="true">
+      <Link className={`tx-cafe__media${c.foto ? ' tx-cafe__media--foto' : ''}`} to={c.to} tabIndex={-1} aria-hidden="true">
         {c.chip ? <span className="tx-linea__chip">{c.chip}</span> : null}
         <img src={c.img} alt="" width={400} height={480} loading="lazy" />
       </Link>

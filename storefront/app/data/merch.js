@@ -34,7 +34,7 @@ export const MERCH = [
     category: 'accesorios',
     badge: 'Para cargar lo que importa',
     price: 75000,
-    image: '/images/cafe-cafes.webp',
+    image: '/images/merch-tote-bag.webp',
     short: 'Un guiño a "la abundancia de esas mañanas".',
     description:
       'Un guiño sutil a "la abundancia de esas mañanas", ideal para cargar todo lo que importa en el día a día.',
@@ -45,7 +45,7 @@ export const MERCH = [
     category: 'para-vestir',
     badge: 'Baja la velocidad',
     price: 120000,
-    image: '/images/tostado-moriah.webp',
+    image: '/images/merch-gorra.webp',
     short: 'Cubrirse del sol y recordarse que está bien bajar la velocidad.',
     description:
       'El accesorio perfecto para cubrirse del sol y recordarse a uno mismo (y al mundo) que está bien bajar la velocidad.',
