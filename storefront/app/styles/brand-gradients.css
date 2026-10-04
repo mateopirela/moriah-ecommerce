@@ -111,3 +111,16 @@
 @media (hover: hover) {
   .tx-col-card__cta { z-index: 3; background: var(--tx-gold, #cf8e08); color: var(--tx-ink); }
 }
+
+/* Tablet: el menú completo no cabe junto al logo (se solapaba hasta ~1000px),
+   así que se usa el menú de hamburguesa también en esos anchos. */
+@media (max-width: 1024px) {
+  .header-menu-desktop { display: none; }
+  .header-menu-mobile-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+  }
+}
