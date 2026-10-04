@@ -18,11 +18,20 @@ import homeStyles from '~/styles/home.css?url';
 import productStyles from '~/styles/product.css?url';
 import tropicaliaStyles from '~/styles/tropicalia.css?url';
 import checkoutStyles from '~/styles/checkout.css?url';
+import blogStyles from '~/styles/blog.css?url';
+import gradientStyles from '~/styles/brand-gradients.css?url';
+import heroStyles from '~/styles/hero.css?url';
+import quizStyles from '~/styles/quiz.css?url';
+import lineasStyles from '~/styles/lineas.css?url';
+import promesasStyles from '~/styles/promesas.css?url';
+import origenStyles from '~/styles/origen.css?url';
+import aboutStyles from '~/styles/about.css?url';
 import {PageLayout} from '~/components/PageLayout';
 import {Tracking} from '~/components/Tracking';
 import {useNonce} from '~/lib/nonce';
 import {env} from '~/lib/env.server';
 import {loadCart} from '~/lib/cart.server';
+import {whatsappUrl} from '~/data/contact';
 
 /**
  * Evita re-ejecutar el loader raíz en cada navegación: solo tras mutaciones
@@ -84,6 +93,14 @@ export function Layout({children}) {
         {/* Tropicalia template — cargado al final para ganar especificidad */}
         <link rel="stylesheet" href={tropicaliaStyles}></link>
         <link rel="stylesheet" href={checkoutStyles}></link>
+        <link rel="stylesheet" href={blogStyles}></link>
+        <link rel="stylesheet" href={gradientStyles}></link>
+        <link rel="stylesheet" href={heroStyles}></link>
+        <link rel="stylesheet" href={quizStyles}></link>
+        <link rel="stylesheet" href={lineasStyles}></link>
+        <link rel="stylesheet" href={promesasStyles}></link>
+        <link rel="stylesheet" href={origenStyles}></link>
+        <link rel="stylesheet" href={aboutStyles}></link>
         <Meta />
         <Links />
         {/* Marca que JS está disponible ANTES del primer paint: el
@@ -160,7 +177,7 @@ export function ErrorBoundary() {
         </Link>
       </div>
       <p className="route-error__help">
-        ¿Necesitas ayuda? <Link to="/pages/contacto">Escríbenos</Link> o revisa el{' '}
+        ¿Necesitas ayuda? <a href={whatsappUrl('Hola MORIAH, necesito ayuda')} target="_blank" rel="noopener noreferrer">Escríbenos por WhatsApp</a> o revisa el{' '}
         <Link to="/suscripcion/gestionar">estado de tu suscripción</Link>.
       </p>
       {errorMessage && process.env.NODE_ENV !== 'production' && (

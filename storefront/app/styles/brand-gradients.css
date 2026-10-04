@@ -1,0 +1,113 @@
+/* ============================================================
+   MORIAH — Degradados de marca (se carga al final)
+   Una sola receta para todo el sitio:
+   · Superficies oscuras: verde pino con un resplandor ocre arriba a la derecha.
+   · Superficies claras: crema (Alabaster) con un velo ocre muy suave.
+   Para cambiar el look de toda la web, edita estos tokens.
+   ============================================================ */
+
+:root {
+  --tx-grad-pine:
+    radial-gradient(120% 90% at 85% 10%, rgba(207, 142, 8, 0.22), transparent 60%),
+    var(--tx-ink);
+  --tx-grad-pine-wide:
+    radial-gradient(120% 160% at 50% -30%, rgba(207, 142, 8, 0.22), transparent 55%),
+    var(--tx-ink);
+  --tx-grad-cream:
+    radial-gradient(90% 120% at 12% 0%, rgba(207, 142, 8, 0.1), transparent 62%),
+    var(--tx-surface);
+  --tx-grad-page: linear-gradient(180deg, var(--tx-bg) 0%, var(--tx-surface) 100%);
+}
+
+/* ── Superficies oscuras ───────────────────────────────── */
+.announcement,
+.footer,
+.tx-footer,
+.tx-nosotros__col-dark,
+.tx-blog-cta {
+  background: var(--tx-grad-pine);
+}
+.tx-newsletter {
+  background: var(--tx-grad-pine-wide);
+}
+
+/* ── Superficies claras ────────────────────────────────── */
+.tx-valueprops,
+.tx-tambien,
+.tx-blog-body {
+  background: var(--tx-grad-cream);
+}
+/* El tramo de productos se funde de crema a Alabaster y enlaza con las
+   propuestas de valor (que ya son Alabaster), sin corte brusco. */
+.tx-infaltables-section {
+  background: var(--tx-grad-page);
+}
+
+/* ── Hero: el oscurecido usa pino de marca en lugar de negro ── */
+.tx-banner::after {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(16, 34, 31, 0.45) 0%,
+      rgba(16, 34, 31, 0.22) 45%,
+      rgba(16, 34, 31, 0.6) 100%
+    ),
+    radial-gradient(
+      ellipse at 80% 100%,
+      rgba(207, 142, 8, 0.18) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse at center,
+      rgba(16, 34, 31, 0.3) 0%,
+      rgba(16, 34, 31, 0.12) 55%,
+      rgba(16, 34, 31, 0.4) 100%
+    );
+}
+
+/* ── Tarjeta de café: ficha de la etiqueta al pasar el mouse ──
+   Solo en dispositivos con hover; en móvil la tarjeta ya muestra las notas. */
+.tx-col-card__ficha { display: none; }
+@media (hover: hover) {
+  .tx-col-card__ficha {
+    display: grid;
+    align-content: start;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.55rem 0.9rem;
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    margin: 0;
+    padding: 1rem 1.1rem 3.6rem;
+    background: var(--tx-grad-pine);
+    color: var(--tx-surface);
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .tx-col-card:hover .tx-col-card__ficha,
+  .tx-col-card:focus-visible .tx-col-card__ficha {
+    opacity: 1;
+    transform: none;
+  }
+  .tx-col-card__ficha div {
+    display: grid;
+    gap: 0.1rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid rgba(207, 142, 8, 0.45);
+  }
+  .tx-col-card__ficha dt {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--tx-gold, #cf8e08);
+  }
+  .tx-col-card__ficha dd { margin: 0; font-size: 0.85rem; line-height: 1.3; }
+  /* Perfil de sabor ocupa todo el ancho; el resto va de a dos columnas */
+  .tx-col-card__ficha .is-wide { grid-column: 1 / -1; order: -1; }
+}
+@media (hover: hover) {
+  .tx-col-card__cta { z-index: 3; background: var(--tx-gold, #cf8e08); color: var(--tx-ink); }
+}

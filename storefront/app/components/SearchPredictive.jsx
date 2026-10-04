@@ -3,7 +3,7 @@ import {Link, useNavigate} from 'react-router';
 import {useAside} from '~/components/Aside';
 import {formatCop} from '~/lib/catalog';
 
-const SUGERENCIAS = ['bourbon', 'geisha', 'pocillo'];
+const SUGERENCIAS = ['bourbon', 'pacamara', 'tabi', 'pocillo'];
 
 /**
  * Búsqueda instantánea sobre el catálogo (panel lateral).

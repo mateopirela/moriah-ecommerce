@@ -32,7 +32,7 @@ export const POLICIES = {
     sections: [
       {
         heading: 'Café',
-        body: 'Por tratarse de un alimento, no aceptamos devoluciones de café abierto. Si tu pedido llegó dañado, incompleto o con un producto distinto al que compraste, escríbenos dentro de los 5 días siguientes a la entrega a hola@cafemoriah.com con fotos y el número de pedido: lo reemplazamos o te devolvemos el dinero.',
+        body: 'Por tratarse de un alimento, no aceptamos devoluciones de café abierto. Si tu pedido llegó dañado, incompleto o con un producto distinto al que compraste, escríbenos dentro de los 5 días siguientes a la entrega a cafemoriahshop@gmail.com con fotos y el número de pedido: lo reemplazamos o te devolvemos el dinero.',
       },
       {
         heading: 'Merch',
@@ -54,7 +54,7 @@ export const POLICIES = {
     sections: [
       {
         heading: 'Responsable',
-        body: 'MORIAH Café, Bogotá, Colombia. Correo: hola@cafemoriah.com.',
+        body: 'MORIAH Café, Bogotá, Colombia. Correo: cafemoriahshop@gmail.com.',
       },
       {
         heading: 'Datos que recogemos',
@@ -66,7 +66,7 @@ export const POLICIES = {
       },
       {
         heading: 'Tus derechos',
-        body: 'De acuerdo con la Ley 1581 de 2012 puedes conocer, actualizar, rectificar y suprimir tus datos, y revocar la autorización, escribiendo a hola@cafemoriah.com.',
+        body: 'De acuerdo con la Ley 1581 de 2012 puedes conocer, actualizar, rectificar y suprimir tus datos, y revocar la autorización, escribiendo a cafemoriahshop@gmail.com.',
       },
     ],
   },
@@ -88,7 +88,7 @@ export const POLICIES = {
       },
       {
         heading: 'Contacto',
-        body: 'Para cualquier consulta escríbenos a hola@cafemoriah.com o por WhatsApp.',
+        body: 'Para cualquier consulta escríbenos a cafemoriahshop@gmail.com o por WhatsApp.',
       },
     ],
   },

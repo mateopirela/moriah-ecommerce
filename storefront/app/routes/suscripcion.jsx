@@ -3,6 +3,7 @@ import {Link, data, redirect, useActionData, useLoaderData, useNavigation, useSu
 import {ShippingFields} from '~/components/ShippingFields';
 import {IconCheck, IconShield} from '~/components/Icons';
 import {CAFES} from '~/data/cafes';
+import {whatsappUrl} from '~/data/contact';
 import {getDb} from '~/db/client.server';
 import {
   FREQUENCY_DAYS,
@@ -158,6 +159,12 @@ export default function Subscribe() {
   useFocusFirstError(actionData?.errors);
 
   const [selection, setSelection] = useState(initial);
+  // Mientras el cobro en línea no esté activo, el pedido se envía por WhatsApp.
+  const cafeElegido = cafes.find((c) => c.handle === selection.cafe);
+  const mensajeWhatsapp =
+    `Hola MORIAH, quiero suscribirme al Club de la Memoria: ${cafeElegido?.title ?? selection.cafe}, ` +
+    `${selection.size}, ${selection.grind}, ${selection.freq}, ` +
+    `${selection.qty} ${Number(selection.qty) === 1 ? 'bolsa' : 'bolsas'} por entrega.`;
   const [card, setCard] = useState({number: '', exp: '', cvc: '', holder: ''});
   const [accepted, setAccepted] = useState({policy: false, personalData: false});
   const [cardError, setCardError] = useState(null);
@@ -226,6 +233,13 @@ export default function Subscribe() {
         Elige tu café y la frecuencia. Cobramos hoy la primera entrega y luego con la frecuencia
         que elijas. Pausa o cancela cuando quieras.
       </p>
+
+      {!wompi.configured ? (
+        <p className="subscribe__aviso" role="note">
+          <strong>El Club se activa por WhatsApp.</strong> Elige tu café y la frecuencia, y envíanos
+          tu pedido: te ayudamos a activar tu suscripción.
+        </p>
+      ) : null}
 
       <div className="subscribe__grid">
         <form method="post" className="checkout__form" onSubmit={onSubmit} noValidate>
@@ -298,122 +312,141 @@ export default function Subscribe() {
             </div>
           </fieldset>
 
-          <ShippingFields errors={errors} values={actionData?.values} notesLabel="Notas para la entrega (opcional)" />
+          {wompi.configured ? (
+            <>
+            <ShippingFields errors={errors} values={actionData?.values} notesLabel="Notas para la entrega (opcional)" />
 
-          <fieldset className="checkout__group">
-            <legend>Tarjeta para los cobros</legend>
-            <p className="checkout__pay-note">
-              <IconShield width={16} height={16} aria-hidden="true" />
-              <span>
-                Los datos de tu tarjeta van directo a <strong>Wompi (Bancolombia)</strong>; nunca
-                pasan por nuestros servidores. Aceptamos Visa y Mastercard.
-              </span>
-            </p>
-            {errors.card && (
-              <p className="form-error" role="alert">
-                {errors.card}
+            <fieldset className="checkout__group">
+              <legend>Tarjeta para los cobros</legend>
+              <p className="checkout__pay-note">
+                <IconShield width={16} height={16} aria-hidden="true" />
+                <span>
+                  Los datos de tu tarjeta van directo a <strong>Wompi (Bancolombia)</strong>; nunca
+                  pasan por nuestros servidores. Aceptamos Visa y Mastercard.
+                </span>
               </p>
-            )}
-            <div className="card-fields">
-              <div className="field field--full">
-                <label htmlFor="c-number">Número de tarjeta</label>
-                <input
-                  id="c-number"
-                  inputMode="numeric"
-                  autoComplete="cc-number"
-                  placeholder="4242 4242 4242 4242"
-                  value={card.number}
-                  onChange={(e) => setCard({...card, number: e.target.value})}
-                />
+              {errors.card && (
+                <p className="form-error" role="alert">
+                  {errors.card}
+                </p>
+              )}
+              <div className="card-fields">
+                <div className="field field--full">
+                  <label htmlFor="c-number">Número de tarjeta</label>
+                  <input
+                    id="c-number"
+                    inputMode="numeric"
+                    autoComplete="cc-number"
+                    placeholder="4242 4242 4242 4242"
+                    value={card.number}
+                    onChange={(e) => setCard({...card, number: e.target.value})}
+                  />
+                </div>
+                <div className="field">
+                  <label htmlFor="c-exp">Vence (MM/AA)</label>
+                  <input
+                    id="c-exp"
+                    inputMode="numeric"
+                    autoComplete="cc-exp"
+                    placeholder="08/28"
+                    value={card.exp}
+                    onChange={(e) => setCard({...card, exp: e.target.value})}
+                  />
+                </div>
+                <div className="field">
+                  <label htmlFor="c-cvc">CVC</label>
+                  <input
+                    id="c-cvc"
+                    inputMode="numeric"
+                    autoComplete="cc-csc"
+                    placeholder="123"
+                    value={card.cvc}
+                    onChange={(e) => setCard({...card, cvc: e.target.value})}
+                  />
+                </div>
+                <div className="field field--full">
+                  <label htmlFor="c-holder">Nombre en la tarjeta</label>
+                  <input
+                    id="c-holder"
+                    autoComplete="cc-name"
+                    value={card.holder}
+                    onChange={(e) => setCard({...card, holder: e.target.value})}
+                  />
+                </div>
               </div>
-              <div className="field">
-                <label htmlFor="c-exp">Vence (MM/AA)</label>
-                <input
-                  id="c-exp"
-                  inputMode="numeric"
-                  autoComplete="cc-exp"
-                  placeholder="08/28"
-                  value={card.exp}
-                  onChange={(e) => setCard({...card, exp: e.target.value})}
-                />
-              </div>
-              <div className="field">
-                <label htmlFor="c-cvc">CVC</label>
-                <input
-                  id="c-cvc"
-                  inputMode="numeric"
-                  autoComplete="cc-csc"
-                  placeholder="123"
-                  value={card.cvc}
-                  onChange={(e) => setCard({...card, cvc: e.target.value})}
-                />
-              </div>
-              <div className="field field--full">
-                <label htmlFor="c-holder">Nombre en la tarjeta</label>
-                <input
-                  id="c-holder"
-                  autoComplete="cc-name"
-                  value={card.holder}
-                  onChange={(e) => setCard({...card, holder: e.target.value})}
-                />
-              </div>
-            </div>
 
-            <label className="checkbox">
-              <input
-                type="checkbox"
-                checked={accepted.policy}
-                onChange={(e) => setAccepted({...accepted, policy: e.target.checked})}
-              />
-              <span>
-                Acepto los{' '}
-                <Link to="/policies/terms-of-service">términos del Club</Link> y el{' '}
-                {acceptance?.policy?.url ? (
-                  <a href={acceptance.policy.url} target="_blank" rel="noopener noreferrer">
-                    reglamento de Wompi
-                  </a>
-                ) : (
-                  'reglamento de Wompi'
-                )}
-                , y autorizo cobros recurrentes de {formatCop(amounts.total)} {selection.freq.toLowerCase()}.
-              </span>
-            </label>
-            <label className="checkbox">
-              <input
-                type="checkbox"
-                checked={accepted.personalData}
-                onChange={(e) => setAccepted({...accepted, personalData: e.target.checked})}
-              />
-              <span>
-                Autorizo el{' '}
-                {acceptance?.personalData?.url ? (
-                  <a href={acceptance.personalData.url} target="_blank" rel="noopener noreferrer">
-                    tratamiento de mis datos personales
-                  </a>
-                ) : (
-                  'tratamiento de mis datos personales'
-                )}{' '}
-                por parte de Wompi y de MORIAH (<Link to="/policies/privacy-policy">política</Link>).
-              </span>
-            </label>
-            {errors.acceptance && (
-              <p className="form-error" role="alert">
-                {errors.acceptance}
-              </p>
-            )}
+              <label className="checkbox">
+                <input
+                  type="checkbox"
+                  checked={accepted.policy}
+                  onChange={(e) => setAccepted({...accepted, policy: e.target.checked})}
+                />
+                <span>
+                  Acepto los{' '}
+                  <Link to="/policies/terms-of-service">términos del Club</Link> y el{' '}
+                  {acceptance?.policy?.url ? (
+                    <a href={acceptance.policy.url} target="_blank" rel="noopener noreferrer">
+                      reglamento de Wompi
+                    </a>
+                  ) : (
+                    'reglamento de Wompi'
+                  )}
+                  , y autorizo cobros recurrentes de {formatCop(amounts.total)} {selection.freq.toLowerCase()}.
+                </span>
+              </label>
+              <label className="checkbox">
+                <input
+                  type="checkbox"
+                  checked={accepted.personalData}
+                  onChange={(e) => setAccepted({...accepted, personalData: e.target.checked})}
+                />
+                <span>
+                  Autorizo el{' '}
+                  {acceptance?.personalData?.url ? (
+                    <a href={acceptance.personalData.url} target="_blank" rel="noopener noreferrer">
+                      tratamiento de mis datos personales
+                    </a>
+                  ) : (
+                    'tratamiento de mis datos personales'
+                  )}{' '}
+                  por parte de Wompi y de MORIAH (<Link to="/policies/privacy-policy">política</Link>).
+                </span>
+              </label>
+              {errors.acceptance && (
+                <p className="form-error" role="alert">
+                  {errors.acceptance}
+                </p>
+              )}
 
-            <button className="btn btn--lg btn--block" type="submit" disabled={busy || !wompi.configured}>
-              {busy ? 'Procesando…' : `Suscribirme · ${formatCop(amounts.total)} hoy`}
-            </button>
-            {!wompi.configured && (
-              <p className="form-error" role="alert">
-                La suscripción en línea no está disponible en este momento. Escríbenos por WhatsApp.
+              <button className="btn btn--lg btn--block" type="submit" disabled={busy || !wompi.configured}>
+                {busy ? 'Procesando…' : `Suscribirme · ${formatCop(amounts.total)} hoy`}
+              </button>
+              {!wompi.configured && (
+                <p className="form-error" role="alert">
+                  La suscripción en línea no está disponible en este momento. Escríbenos por WhatsApp.
+                </p>
+              )}
+              <noscript>
+                <p className="form-error">Necesitas JavaScript activado para suscribirte.</p>
+              </noscript>
+            </fieldset>
+            </>
+          ) : (
+            <fieldset className="checkout__group">
+              <legend>Haz tu pedido</legend>
+              <a
+                className="btn btn--lg btn--block"
+                href={whatsappUrl(mensajeWhatsapp)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Suscribirme por WhatsApp
+              </a>
+              <p className="checkout__pay-note">
+                Se abre WhatsApp con tu selección ya escrita. Pausa o cancela cuando quieras.
               </p>
-            )}
-            <noscript>
-              <p className="form-error">Necesitas JavaScript activado para suscribirte.</p>
-            </noscript>
-          </fieldset>
+            </fieldset>
+          )}
         </form>
 
         <aside className="checkout__summary" aria-label="Resumen de la suscripción">

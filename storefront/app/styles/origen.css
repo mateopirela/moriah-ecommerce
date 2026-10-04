@@ -1,0 +1,129 @@
+/* ============================================================
+   MORIAH — "Del origen a tu taza" (home)
+   ============================================================ */
+
+.tx-origen {
+  padding-block: clamp(3.5rem, 2.5rem + 4vw, 6rem);
+  color: var(--tx-cream);
+  background: var(--tx-grad-pine, var(--tx-ink));
+}
+.tx-origen__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+  text-align: center;
+}
+.tx-origen__head .tx-eyebrow {
+  color: var(--tx-gold-light);
+}
+.tx-origen__head .tx-display {
+  color: var(--tx-cream);
+}
+
+.tx-origen__pasos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.25rem, 0.8rem + 1.8vw, 2.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tx-origen__paso {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.tx-origen__foto {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  margin-bottom: 1.1rem;
+  overflow: hidden;
+  background: var(--tx-ink);
+  border-radius: 18px;
+  box-shadow: 0 24px 44px -24px rgba(0, 0, 0, 0.55);
+}
+.tx-origen__foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+.tx-origen__paso:hover .tx-origen__foto img {
+  transform: scale(1.04);
+}
+.tx-origen__foto::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 40%;
+  background: linear-gradient(0deg, rgba(16, 34, 31, 0.55), transparent);
+  pointer-events: none;
+}
+.tx-origen__num {
+  position: absolute;
+  left: 1rem;
+  bottom: 0.7rem;
+  z-index: 1;
+  font-family: var(--tx-display);
+  font-size: clamp(2rem, 1.5rem + 1.6vw, 3rem);
+  line-height: 1;
+  color: var(--tx-gold-light);
+}
+.tx-origen__title {
+  margin: 0 0 0.25rem;
+  font-family: var(--tx-display);
+  font-weight: 500;
+  font-size: clamp(1.4rem, 1.15rem + 0.9vw, 1.9rem);
+  color: var(--tx-cream);
+}
+.tx-origen__dato {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tx-gold-light);
+}
+.tx-origen__texto {
+  margin: 0;
+  max-width: 38ch;
+  color: rgba(240, 222, 189, 0.88);
+}
+
+.tx-origen__cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem 1.75rem;
+  margin-top: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+}
+.tx-origen__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 700;
+  color: var(--tx-gold-light);
+  text-decoration: none;
+}
+.tx-origen__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (max-width: 800px) {
+  .tx-origen__pasos {
+    grid-template-columns: 1fr;
+    max-width: 30rem;
+    margin-inline: auto;
+  }
+  /* En móvil la foto es más panorámica para no alargar tanto la página. */
+  .tx-origen__foto {
+    aspect-ratio: 16 / 11;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tx-origen__foto img { transition: none; }
+}

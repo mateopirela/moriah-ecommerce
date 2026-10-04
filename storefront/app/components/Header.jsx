@@ -7,7 +7,7 @@ import {CONTACT, whatsappUrl} from '~/data/contact';
 
 /**
  * Navbar — réplica de la estructura de tropicaliacoffee.com:
- * logo · CAFÉ▾ · MERCH▾ · ENCUENTRA TU CAFÉ · PREPARA TU CAFÉ · TIENDA · CONTACTO · iconos
+ * logo · CAFÉ▾ · MERCH▾ · ENCUENTRA TU CAFÉ · NOTAS DE CAFÉ · CONÓCENOS▾ · iconos
  */
 const TX_NAV = [
   {
@@ -15,8 +15,7 @@ const TX_NAV = [
     url: '/collections/cafes',
     items: [
       {title: 'Todos los cafés', url: '/collections/cafes', img: '/images/lineup-bolsas-400.webp'},
-      {title: 'Línea de Origen', url: '/collections/linea-origen', img: '/images/cafe-bolsa-400.webp'},
-      {title: 'Micro-lotes', url: '/collections/micro-lotes', img: '/images/producto-bolsa.webp'},
+      {title: 'Microlotes', url: '/collections/micro-lotes', img: '/images/cafe-pacamara.webp'},
       {title: 'Club de la Memoria', url: '/collections/club-de-la-memoria', img: '/images/kit-bolsas-400.webp'},
     ],
   },
@@ -31,9 +30,11 @@ const TX_NAV = [
     ],
   },
   {title: 'Encuentra tu café', url: '/quiz'},
-  {title: 'Prepara tu café', url: '/pages/prepara-tu-cafe'},
-  {title: 'Tienda', url: '/collections/all'},
-  {title: 'Contacto', url: '/pages/contacto'},
+  {title: 'Notas de café', url: '/blog'},
+  {
+    title: 'Conócenos',
+    url: '/conocenos',
+  },
 ];
 
 /**
@@ -183,7 +184,7 @@ export function HeaderMenu({viewport}) {
               className="header-menu-item header-menu-item--sub"
               to={group.url}
             >
-              Ver todo {group.title.toLowerCase()}
+              {group.allLabel ?? `Ver todo ${group.title.toLowerCase()}`}
             </NavLink>
             {group.items.map((sub) => (
               <NavLink

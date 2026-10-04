@@ -2,7 +2,7 @@ import {searchProducts} from '~/lib/catalog';
 
 /**
  * Resource route: búsqueda instantánea sobre el catálogo.
- * GET /api/search?q=geisha
+ * GET /api/search?q=pacamara
  * @param {import('react-router').LoaderFunctionArgs} args
  */
 export async function loader({request}) {

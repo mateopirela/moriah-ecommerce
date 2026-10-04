@@ -12,11 +12,12 @@ export function Footer() {
 
         <div className="tx-footer__cols">
           <nav className="tx-footer__nav" aria-label="Empresa">
-            <Link to="/pages/nuestra-historia">Nuestra historia</Link>
+            <Link to="/conocenos">Conócenos</Link>
             <Link to="/collections/cafes">Nuestros cafés</Link>
+            <Link to="/collections/all">Tienda</Link>
+            <Link to="/blog">Blog</Link>
             <Link to="/suscripcion">Club de la Memoria</Link>
             <Link to="/suscripcion/gestionar">Gestionar mi suscripción</Link>
-            <Link to="/pages/contacto">Contacto</Link>
           </nav>
 
           <div className="tx-footer__contact">

@@ -65,6 +65,10 @@ function normalizeCafe(cafe) {
     subtitle: cafe.origin,
     notes: cafe.notes,
     roast: cafe.roast,
+    flavor: cafe.flavor,
+    body: cafe.body,
+    acidity: cafe.acidity,
+    altitude: cafe.altitude,
     tags: cafe.tags ?? [],
     subscribable: true,
     hasSizes: true,
@@ -219,7 +223,7 @@ const COLLECTION_DEFS = {
     filter: (p) => p.kind === 'cafe' && ['core', 'special'].includes(p.raw.tier),
   },
   'micro-lotes': {
-    title: 'Micro-lotes',
+    title: 'Microlotes',
     eyebrow: 'Nuestros cafés',
     description: 'Ediciones limitadas de fincas aliadas. Pocas bolsas, mucha historia.',
     filter: (p) => p.kind === 'cafe' && p.raw.tier === 'premium',
@@ -309,7 +313,7 @@ export function searchProducts(query) {
  * @param {number} [limit]
  */
 export function upsellSuggestions(excludeHandles, limit = 2) {
-  const priority = ['kit-tres-origenes', 'bourbon-rosado', 'pocillo-de-verdad', 'geisha'];
+  const priority = ['kit-tres-origenes', 'bourbon-rosado', 'pocillo-de-verdad', 'pacamara'];
   const all = allProducts();
   const ranked = [
     ...priority.map((h) => all.find((p) => p.handle === h)).filter(Boolean),

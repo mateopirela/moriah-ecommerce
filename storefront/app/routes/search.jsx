@@ -41,7 +41,7 @@ export default function SearchPage() {
 
       {term && products.length === 0 && (
         <p>
-          No encontramos resultados para <q>{term}</q>. Prueba con “bourbon”, “geisha” o
+          No encontramos resultados para <q>{term}</q>. Prueba con “bourbon”, “pacamara” o
           “pocillo”.
         </p>
       )}

@@ -1,0 +1,279 @@
+/* ============================================================
+   MORIAH — Hero con producto (home)
+   Texto y botones a la izquierda, bolsa a la derecha, y una fila de
+   cafés con precio debajo. El video queda de fondo, tintado en pino.
+   ============================================================ */
+
+/* Póster como fondo: se ve desde el primer instante y se queda si el navegador
+   bloquea la reproducción automática. El video aparece encima con un fundido. */
+.tx-banner--split {
+  background: #10221f url('/images/hero-poster.webp') center / cover no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
+  height: auto;
+  min-height: min(100svh, 880px);
+}
+
+/* Oscurecido más fuerte a la izquierda, donde va el texto. */
+.tx-banner--split::after {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(16, 34, 31, 0.62) 0%,
+      rgba(16, 34, 31, 0.36) 48%,
+      rgba(16, 34, 31, 0.08) 100%
+    ),
+    radial-gradient(ellipse at 78% 55%, rgba(207, 142, 8, 0.22) 0%, transparent 55%),
+    linear-gradient(0deg, rgba(16, 34, 31, 0.5) 0%, transparent 32%);
+}
+
+.tx-banner__inner {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: center;
+  gap: clamp(1rem, 4vw, 4rem);
+  width: 100%;
+  max-width: var(--tx-maxw);
+  margin-inline: auto;
+  padding: clamp(2.5rem, 2rem + 4vw, 5rem) var(--tx-gutter) clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.tx-banner--split .tx-banner__texto {
+  align-items: flex-start;
+  text-align: left;
+  padding: 0;
+  gap: 1.25rem;
+}
+.tx-banner--split .tx-banner__h1,
+.tx-banner__sub,
+.tx-banner__eyebrow,
+.tx-banner__confianza {
+  text-shadow: 0 1px 14px rgba(10, 24, 21, 0.7);
+}
+.tx-banner--split .tx-banner__h1 {
+  margin-inline: 0;
+  max-width: 14ch;
+  font-size: clamp(2.5rem, 1.3rem + 4.4vw, 4.6rem);
+}
+.tx-banner__eyebrow {
+  font-family: var(--tx-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--tx-gold-light);
+}
+.tx-banner__sub {
+  margin: 0;
+  max-width: 42ch;
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.2rem);
+  color: rgba(240, 222, 189, 0.92);
+}
+.tx-banner--split .tx-banner__acciones {
+  justify-content: flex-start;
+}
+.tx-banner__confianza {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.4rem;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.82rem;
+  color: rgba(240, 222, 189, 0.85);
+}
+.tx-banner__confianza li::before {
+  content: '✓';
+  margin-right: 0.45em;
+  color: var(--tx-gold-light);
+  font-weight: 700;
+}
+
+/* Bolsa */
+.tx-banner__producto {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+.tx-banner__producto img {
+  width: auto;
+  height: clamp(300px, 52vh, 560px);
+  max-width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.45));
+  animation: txFadeUp 1000ms cubic-bezier(0.16, 1, 0.3, 1) 300ms both;
+}
+/* Al cambiar de bolsa (key distinta) entra con un fundido corto. */
+@keyframes txBagSwap {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.tx-banner__producto img.is-swap {
+  animation: txBagSwap 320ms ease-out both;
+}
+
+/* Fila de cafés con precio */
+.tx-banner__cafes {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  max-width: var(--tx-maxw);
+  margin: 0 auto;
+  padding: 0 var(--tx-gutter) clamp(1rem, 2.5vw, 2rem);
+  gap: clamp(0.5rem, 1.5vw, 1rem);
+}
+.tx-banner__cafe {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-height: 44px;
+  padding: 0.85rem 1.1rem;
+  color: var(--tx-cream);
+  text-decoration: none;
+  background: rgba(16, 34, 31, 0.55);
+  border: 1px solid rgba(249, 223, 123, 0.28);
+  border-radius: 14px;
+  backdrop-filter: blur(6px);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.tx-banner__cafe:hover,
+.tx-banner__cafe:focus-visible {
+  background: rgba(16, 34, 31, 0.85);
+  border-color: var(--tx-gold-light);
+  transform: translateY(-3px);
+}
+.tx-banner__cafe-tier {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tx-gold-light);
+}
+.tx-banner__cafe-name {
+  font-family: var(--tx-display);
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.3rem);
+  line-height: 1.15;
+}
+.tx-banner__cafe-price {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--tx-gold-light);
+}
+
+/* Móvil / tablet: una columna compacta. El encabezado es fijo y flota sobre el
+   hero, así que se reserva su alto arriba. Los cafés van en una fila deslizable. */
+@media (max-width: 899px) {
+  .tx-banner--split {
+    min-height: 0;
+  }
+  .tx-banner__inner {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+    padding-top: 6.9rem;
+    padding-bottom: 0.25rem;
+  }
+  .tx-banner--split .tx-banner__h1 {
+    font-size: clamp(1.9rem, 8.2vw, 2.7rem);
+  }
+  .tx-banner--split .tx-banner__texto {
+    gap: 0.75rem;
+  }
+  .tx-banner__sub {
+    display: none; /* el titular + las garantías ya dicen lo esencial */
+  }
+  /* Los dos botones en una sola fila */
+  .tx-banner--split .tx-banner__acciones {
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .tx-banner--split .tx-banner__acciones .tx-btn {
+    flex: 1 1 auto;
+    padding-inline: 0.9rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .tx-banner--split::after {
+    background:
+      linear-gradient(180deg, rgba(16, 34, 31, 0.62) 0%, rgba(16, 34, 31, 0.3) 50%, rgba(16, 34, 31, 0.72) 100%),
+      radial-gradient(ellipse at 70% 60%, rgba(207, 142, 8, 0.22) 0%, transparent 55%);
+  }
+  .tx-banner__confianza {
+    gap: 0.15rem 1rem;
+    margin: 0;
+    font-size: 0.74rem;
+  }
+  .tx-banner__producto img {
+    height: clamp(170px, 24svh, 230px);
+    transform: translateY(0.5rem);
+  }
+  .tx-banner__cafes {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 1.25rem;
+  }
+  .tx-banner__cafes::-webkit-scrollbar {
+    display: none;
+  }
+  .tx-banner__cafe {
+    flex: 0 0 62%;
+    scroll-snap-align: start;
+  }
+}
+
+/* Botón pausa / reproducir del video de fondo */
+.tx-banner__playpause {
+  position: absolute;
+  right: var(--tx-gutter);
+  bottom: 0.5rem;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--tx-cream);
+  background: rgba(16, 34, 31, 0.6);
+  border: 1px solid rgba(249, 223, 123, 0.4);
+  border-radius: 50%;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.tx-banner__playpause:hover,
+.tx-banner__playpause:focus-visible {
+  background: rgba(16, 34, 31, 0.9);
+  border-color: var(--tx-gold-light);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tx-banner__producto img,
+  .tx-banner__producto img.is-swap {
+    animation: none;
+  }
+  .tx-banner__cafe {
+    transition: none;
+  }
+}
+
+.tx-banner--split .tx-banner__video {
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.tx-banner--split .tx-banner__video.is-ready {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tx-banner--split .tx-banner__video { transition: none; }
+}

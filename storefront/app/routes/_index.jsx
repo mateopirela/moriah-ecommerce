@@ -1,41 +1,49 @@
 import {useEffect, useRef, useState} from 'react';
 import {Link, useFetcher} from 'react-router';
-import {CAFES, formatCop} from '~/data/cafes';
+import {BUNDLE, CAFES, bundlePrice, formatCop, getCafe, subscriptionPrice} from '~/data/cafes';
 import {MERCH} from '~/data/merch';
-import {Marquee} from '~/components/Marquee';
+import {PromesasStrip} from '~/components/PromesasStrip';
 import {useReveal} from '~/lib/useReveal';
-import {IconTruck, IconLeaf, IconShield, IconClock} from '~/components/Icons';
 import {Testimonials} from '~/components/Testimonials';
+import {BlogSection} from '~/components/BlogSection';
+import {OrigenSection} from '~/components/OrigenSection';
+import {seoMeta} from '~/lib/seo';
+import {siteUrl} from '~/lib/env.server';
 
 /** @type {Route.MetaFunction} */
-export const meta = () => [
-  {title: 'MORIAH Café · Un café para el alma'},
-  {
-    name: 'description',
-    content:
-      'Café 100% colombiano de especialidad, tostado artesanal y sellado al vacío. Un café para el alma. Envío gratis desde $100.000.',
-  },
-  {property: 'og:title', content: 'MORIAH Café · Un café para el alma'},
-  {property: 'og:type', content: 'website'},
-  {property: 'og:image', content: '/images/hero-lifestyle.webp'},
-];
+export const meta = ({data}) =>
+  seoMeta({
+    origin: data?.origin ?? '',
+    path: '/',
+    title: 'MORIAH Café · Un café para el alma',
+    description:
+      'Café de especialidad de las montañas de Colombia, para volver a la pausa de cada mañana. Microlotes de Pitalito, Huila, en grano o molido. Entrega en 2–5 días.',
+  });
+
+/** Precarga el póster del hero: es lo primero que se ve mientras llega el video. */
+export function links() {
+  return [{rel: 'preload', as: 'image', href: '/images/hero-poster.webp', fetchpriority: 'high'}];
+}
 
 /** El home se sirve del catálogo local (sin llamadas externas). */
-export function loader() {
-  return {cafes: CAFES};
+export function loader({request}) {
+  return {cafes: CAFES, origin: siteUrl(request)};
 }
+
+/** Pon `true` cuando el merch (caja, pocillo, tote, gorra) esté listo para vender. */
+const SHOW_INFALTABLES = false;
 
 export default function Homepage() {
   useReveal();
   return (
     <div className="tx">
       <BannerHome />
-      <Marquee />
+      <PromesasStrip />
       <LineasSection />
-      <InfaltablesSection />
-      <ValuePropsSection />
-      <GaleriaSection />
+      {SHOW_INFALTABLES ? <InfaltablesSection /> : null}
+      <OrigenSection />
       <Testimonials />
+      <BlogSection />
       <NewsletterSection />
     </div>
   );
@@ -44,60 +52,170 @@ export default function Homepage() {
 /* ============================================================
    BANNER HOME — video full-width con texto (Tropicalia)
    ============================================================ */
+/** Bolsa que se ve en el hero mientras no se apunta a ningún café. */
+const HERO_DEFAULT_BAG = '/images/cafe-bolsa-pacamara-front.webp';
+
 function BannerHome() {
   const videoRef = useRef(null);
-  const [motionOff, setMotionOff] = useState(false);
+  const [playing, setPlaying] = useState(true);
+  const [ready, setReady] = useState(false);
+  const [focused, setFocused] = useState(null);
+  const [swapped, setSwapped] = useState(false);
 
+  const userPaused = useRef(false);
+
+  // El video es decorativo, mudo y de 2 MB: se reproduce siempre (también con
+  // "reducir movimiento" del sistema). Para cumplir accesibilidad hay un botón
+  // visible de pausa/reproducir. Solo se frena con "ahorro de datos".
+  // Los navegadores pausan los videos automáticos cuando la pestaña no se ve:
+  // se reanudan solos al volver, salvo que la persona los haya pausado.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return undefined;
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-    // `saveData` cuando el usuario pide ahorrar datos; el vídeo pesa 2 MB.
     const saveData = navigator.connection?.saveData === true;
+    if (saveData) userPaused.current = true;
 
-    const apply = () => {
-      const off = reduced.matches || saveData;
-      setMotionOff(off);
-      if (off) {
-        video.pause();
-        video.removeAttribute('autoplay');
-      } else if (video.paused) {
+    const onPlay = () => setPlaying(true);
+    const onPause = () => setPlaying(false);
+    // El video aparece con un fundido cuando ya tiene imagen. Si empezó antes de que
+    // React cargara (readyState ya alto), también se muestra: nunca queda oculto.
+    const onReady = () => setReady(true);
+    if (video.readyState >= 2) setReady(true);
+    video.addEventListener('loadeddata', onReady);
+    video.addEventListener('playing', onReady);
+    const resume = () => {
+      if (!userPaused.current && video.paused && document.visibilityState === 'visible') {
         video.play().catch(() => {});
       }
     };
+    video.addEventListener('play', onPlay);
+    video.addEventListener('pause', onPause);
+    document.addEventListener('visibilitychange', resume);
+    window.addEventListener('focus', resume);
 
-    apply();
-    reduced.addEventListener('change', apply);
-    return () => reduced.removeEventListener('change', apply);
+    const observer =
+      'IntersectionObserver' in window
+        ? new IntersectionObserver(([entry]) => entry.isIntersecting && resume(), {
+            threshold: 0.25,
+          })
+        : null;
+    observer?.observe(video);
+
+    if (saveData) video.pause();
+    else resume();
+
+    return () => {
+      video.removeEventListener('play', onPlay);
+      video.removeEventListener('pause', onPause);
+      video.removeEventListener('loadeddata', onReady);
+      video.removeEventListener('playing', onReady);
+      document.removeEventListener('visibilitychange', resume);
+      window.removeEventListener('focus', resume);
+      observer?.disconnect();
+    };
   }, []);
 
+  const toggleVideo = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      userPaused.current = false;
+      video.play().catch(() => {});
+    } else {
+      userPaused.current = true;
+      video.pause();
+    }
+  };
+
+  const cafes = CAFES.slice(0, 3);
+  // La bolsa grande cambia al apuntar (mouse o teclado) a un café con `heroImage`.
+  const bag = cafes.find((c) => c.handle === focused)?.heroImage ?? HERO_DEFAULT_BAG;
+
   return (
-    <section className="tx-banner">
-      <div className="tx-banner__texto">
-        <h1 className="tx-display tx-banner__h1">
-          Yo no aprendí a querer el café. <em>Lo heredé.</em>
-        </h1>
-        <div className="tx-banner__acciones">
-          <Link className="tx-btn" to="/collections/cafes">
-            Comprar café
-          </Link>
-          <a className="tx-btn tx-btn--fantasma" href="#lineas">
-            Conoce nuestras líneas
-          </a>
+    <section className="tx-banner tx-banner--split">
+      <div className="tx-banner__inner">
+        <div className="tx-banner__texto">
+          <span className="tx-banner__eyebrow">Café de especialidad</span>
+          <h1 className="tx-display tx-banner__h1">
+            Yo no aprendí a querer el café. <em>Lo heredé.</em>
+          </h1>
+          <p className="tx-banner__sub">
+            Café de especialidad de las montañas de Colombia, para volver a la pausa de cada mañana.
+          </p>
+          <div className="tx-banner__acciones">
+            <Link className="tx-btn" to="/collections/cafes">
+              Comprar café
+            </Link>
+            <Link className="tx-btn tx-btn--fantasma" to="/quiz">
+              Encuentra tu café
+            </Link>
+          </div>
         </div>
+        <div className="tx-banner__producto" aria-hidden="true">
+          <img
+            key={bag}
+            className={swapped ? 'is-swap' : undefined}
+            src={bag}
+            alt=""
+            width={637}
+            height={975}
+            fetchpriority="high"
+          />
+        </div>
+        <button
+          type="button"
+          className="tx-banner__playpause"
+          onClick={toggleVideo}
+          aria-label={playing ? 'Pausar video de fondo' : 'Reproducir video de fondo'}
+        >
+          {playing ? (
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+              <rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" />
+              <rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+              <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
+            </svg>
+          )}
+        </button>
       </div>
+
+      <nav className="tx-banner__cafes" aria-label="Cafés destacados">
+        {cafes.map((c) => (
+          <Link
+            className="tx-banner__cafe"
+            to={`/products/${c.handle}`}
+            key={c.handle}
+            onMouseEnter={() => {
+              setSwapped(true);
+              setFocused(c.handle);
+            }}
+            onMouseLeave={() => setFocused(null)}
+            onFocus={() => {
+              setSwapped(true);
+              setFocused(c.handle);
+            }}
+            onBlur={() => setFocused(null)}
+          >
+            <span className="tx-banner__cafe-tier">{c.tierLabel}</span>
+            <span className="tx-banner__cafe-name">{c.title}</span>
+            <span className="tx-banner__cafe-price">{formatCop(c.price)}</span>
+          </Link>
+        ))}
+      </nav>
       {/* 720p · 10 s · 2 MB (antes: 1080p, 14 s, 7,4 MB con preload="auto").
-          Con reduced-motion o ahorro de datos se queda en el póster. */}
+          Con ahorro de datos se queda en el póster. */}
       <video
         ref={videoRef}
-        className="tx-banner__video"
+        className={`tx-banner__video${ready ? ' is-ready' : ''}`}
         poster="/images/hero-poster.webp"
-        autoPlay={!motionOff}
+        autoPlay
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="auto"
         aria-hidden="true"
         tabIndex={-1}
       >
@@ -108,48 +226,97 @@ function BannerHome() {
 }
 
 /* ============================================================
-   LÍNEAS — 4 líneas de café (Tropicalia: #lineas)
+   LÍNEAS — 4 formas de comprar (Tropicalia: #lineas)
+   Los precios salen del catálogo (app/data/cafes.js): al cambiarlos allí,
+   esta sección se actualiza sola.
    ============================================================ */
-const LINEAS = [
+const PRECIO_DESDE = Math.min(...CAFES.map((c) => c.price));
+const KIT_PRECIO = bundlePrice();
+const KIT_SUMA = BUNDLE.includes.reduce((acc, h) => acc + (getCafe(h)?.price ?? 0), 0);
+
+/** Café de la casa: aún no está en el catálogo, por eso va aparte (enlaza a todos los cafés). */
+const CASA = {
+  handle: 'casa',
+  title: 'De la casa',
+  notas: 'Chocolate, panela y nuez',
+  img: '/images/producto-bolsa-cut.webp',
+  to: '/collections/cafes',
+  precio: 42990,
+};
+
+const CARDS_CAFE = [
   {
-    key: 'origen',
-    name: 'Línea de Origen',
-    subtitle: 'Cafés con propósito',
-    desc: 'Dedicados a los auténticos exploradores, aquellos que encuentran valor en las pequeñas cosas que otorgan sentido a la vida. Cafés 100% colombianos de alta montaña, cultivados con intención y respeto por la tierra.',
-    img: '/images/producto-bolsa-cut.webp',
-    to: '/collections/linea-origen',
-    mod: 'origen',
+    key: CASA.handle,
+    title: CASA.title,
+    notas: CASA.notas,
+    img: CASA.img,
+    to: CASA.to,
+    precio: CASA.precio,
+    chip: 'El de siempre',
   },
-  {
-    key: 'microlotes',
-    name: 'Micro-lotes',
-    subtitle: 'Cafés sublimes',
-    desc: 'Un privilegio reservado para los verdaderos amantes del café. Nano-lotes y varietales extraordinarios, de sabores inolvidables. Aquí encontrarás una selección de genética pura y cafés de competición.',
-    img: '/images/cafe-bolsa-cut.webp',
-    to: '/collections/micro-lotes',
-    mod: 'micro',
-  },
-  {
-    key: 'club',
-    name: 'Club de la Memoria',
-    subtitle: 'Tu café, siempre fresco',
-    desc: 'Devuélvete el tiempo que importa. Recibe tu café en la frecuencia que elijas, con 15% de descuento permanente. Tostado fresco, sellado al vacío, directo a tu puerta. Sin complicaciones.',
-    img: '/images/producto-bolsa-cut.webp',
-    to: '/suscripcion',
-    mod: 'club',
-  },
-  {
-    key: 'legado',
-    name: 'Kit El Legado',
-    subtitle: 'El ritual completo',
-    desc: 'Molino, pocillo y café: la herramienta para heredar una tradición. Todo lo que necesitas para preparar el mejor café en casa y compartir el ritual con quienes más quieres.',
-    img: '/images/kit-bolsas-cut.webp',
-    to: '/products/kit-tres-origenes',
-    mod: 'legado',
-  },
+  ...CAFES.map((c) => ({
+    key: c.handle,
+    title: c.title,
+    notas: c.flavor ?? c.notes,
+    img: c.heroImage ?? c.image,
+    to: `/products/${c.handle}`,
+    precio: c.price,
+  })),
 ];
 
+function CafeTile({c}) {
+  return (
+    <article className="tx-cafe" data-reveal-child>
+      <Link className="tx-cafe__media" to={c.to} tabIndex={-1} aria-hidden="true">
+        {c.chip ? <span className="tx-linea__chip">{c.chip}</span> : null}
+        <img src={c.img} alt="" width={400} height={480} loading="lazy" />
+      </Link>
+      <h3 className="tx-cafe__name">
+        <Link to={c.to}>{c.title}</Link>
+      </h3>
+      <p className="tx-cafe__precio">{formatCop(c.precio)}</p>
+      <p className="tx-cafe__notas">{c.notas}</p>
+      <Link className="tx-btn tx-btn--peq" to={c.to} aria-label={`Ver café ${c.title}`}>
+        Ver café
+      </Link>
+    </article>
+  );
+}
+
+function OfertaCard({img, imgAlt, eyebrow, title, texto, precio, tachado, cta, to, chip}) {
+  return (
+    <article className="tx-oferta" data-reveal-child>
+      <Link className="tx-oferta__media" to={to} tabIndex={-1} aria-hidden="true">
+        <img src={img} alt={imgAlt} width={400} height={300} loading="lazy" />
+      </Link>
+      <div className="tx-oferta__cuerpo">
+        <span className="tx-linea__eyebrow">
+          {eyebrow} {chip ? <b className="tx-oferta__chip">{chip}</b> : null}
+        </span>
+        <h3 className="tx-oferta__titulo">
+          <Link to={to}>{title}</Link>
+        </h3>
+        <p className="tx-oferta__texto">{texto}</p>
+        <p className="tx-oferta__precio">
+          <strong>{precio}</strong>
+          {tachado ? <s>{tachado}</s> : null}
+        </p>
+        <Link className="tx-btn tx-btn--peq" to={to} aria-label={`${cta}: ${title}`}>
+          {cta}
+        </Link>
+      </div>
+    </article>
+  );
+}
+
 function LineasSection() {
+  const gridRef = useRef(null);
+  const mover = (dir) => {
+    const el = gridRef.current;
+    if (!el) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollBy({left: dir * el.clientWidth * 0.85, behavior: reduce ? 'auto' : 'smooth'});
+  };
   return (
     <section className="tx-section tx-lineas-section" id="lineas">
       <div className="tx-container">
@@ -159,31 +326,57 @@ function LineasSection() {
             La riqueza de nuestra tierra<br /> en tus manos
           </h2>
         </div>
-        <div className="tx-lineas-grid" data-reveal>
-          {LINEAS.map((l) => (
-            <article className="tx-linea" data-reveal-child key={l.key}>
-              <div className="tx-linea__media">
-                <img
-                  src={l.img}
-                  alt={l.name}
-                  width={400}
-                  height={480}
-                  loading="lazy"
-                  className="tx-linea__img"
-                />
-              </div>
-              <div className="tx-linea__contenido">
-                <div className="tx-linea__nombres">
-                  <h3 className="tx-linea__name">{l.name}</h3>
-                  <span className="tx-linea__sub">{l.subtitle}</span>
-                </div>
-                <p className="tx-lede tx-linea__desc">{l.desc}</p>
-                <Link className="tx-btn tx-btn--peq" to={l.to}>
-                  Comprar ahora
-                </Link>
-              </div>
-            </article>
+
+        <h3 className="tx-lineas-grupo__t">Elige tu café</h3>
+        <div className="tx-lineas-hint">
+          <span aria-hidden="true">Desliza para ver más →</span>
+          <span className="tx-lineas-nav">
+            <button type="button" onClick={() => mover(-1)} aria-label="Ver cafés anteriores">
+              ←
+            </button>
+            <button type="button" onClick={() => mover(1)} aria-label="Ver más cafés">
+              →
+            </button>
+          </span>
+        </div>
+        <div
+          className="tx-cafes"
+          data-reveal
+          ref={gridRef}
+          role="region"
+          aria-label="Nuestros cafés"
+          tabIndex={0}
+        >
+          {CARDS_CAFE.map((c) => (
+            <CafeTile c={c} key={c.key} />
           ))}
+        </div>
+
+        <h3 className="tx-lineas-grupo__t">Ahorra 15 %</h3>
+        <div className="tx-ofertas" data-reveal>
+          <OfertaCard
+            img="/images/kit-tres-origenes-cut.webp"
+            imgAlt="Kit con las bolsas de Pacamara, Bourbon Rosado y Tabi"
+            eyebrow="Kit tres variedades"
+            chip="−15 %"
+            title="Pacamara, Bourbon Rosado y Tabi"
+            texto="Pruébalos lado a lado o regálalos."
+            precio={formatCop(KIT_PRECIO)}
+            tachado={formatCop(KIT_SUMA)}
+            cta="Armar mi kit"
+            to="/products/kit-tres-origenes"
+          />
+          <OfertaCard
+            img="/images/cafe-bolsa-tabi-front.webp"
+            imgAlt="Bolsa de café Moriah"
+            eyebrow="Club de la Memoria"
+            chip="−15 % siempre"
+            title="Tu café, siempre en casa"
+            texto="Elige cada 2, 4 o 6 semanas. Pausa cuando quieras."
+            precio={`Desde ${formatCop(subscriptionPrice(PRECIO_DESDE))} por entrega`}
+            cta="Suscribirme"
+            to="/suscripcion"
+          />
         </div>
       </div>
     </section>
@@ -248,96 +441,6 @@ function InfaltablesSection() {
 /* ============================================================
    VALUE PROPS — franja de confianza (SVG, sin emojis)
    ============================================================ */
-const VALUE_PROPS = [
-  {
-    icon: IconTruck,
-    title: 'Envío gratis',
-    desc: 'En compras desde $100.000, a todo el país',
-  },
-  {
-    icon: IconLeaf,
-    title: 'Tostado fresco',
-    desc: 'Tostamos cada semana, sellado al vacío',
-  },
-  {
-    icon: IconShield,
-    title: 'Pago seguro',
-    desc: 'Nequi, PSE y tarjetas, sin complicaciones',
-  },
-  {
-    icon: IconClock,
-    title: 'Entrega 2–4 días',
-    desc: 'Bogotá 2–3 días · Nacional 3–5 días',
-  },
-];
-
-function ValuePropsSection() {
-  return (
-    <section className="tx-valueprops" aria-label="Nuestras garantías">
-      <div className="tx-container tx-valueprops__grid" data-reveal>
-        {VALUE_PROPS.map((vp) => (
-          <div className="tx-valueprop" data-reveal-child key={vp.title}>
-            <vp.icon width={26} height={26} aria-hidden="true" />
-            <div>
-              <p className="tx-valueprop__title">{vp.title}</p>
-              <p className="tx-valueprop__desc">{vp.desc}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ============================================================
-   GALERÍA / INSPIRADOS (Tropicalia: tienda)
-   ============================================================ */
-const FOTOS = [
-  '/images/monte-moriah.webp',
-  '/images/tostado-moriah.webp',
-  '/images/equipo-moriah.webp',
-  '/images/cafe-cafes.webp',
-  '/images/lineup-bolsas.webp',
-  '/images/hero-lifestyle.webp',
-];
-
-function GaleriaSection() {
-  return (
-    <section className="tx-section tx-galeria-section">
-      <aside className="tx-galeria-split">
-        <div className="tx-galeria-split__fotos" data-reveal>
-          <div className="tx-gallery">
-            {FOTOS.map((src, i) => (
-              <img
-                key={src}
-                src={src}
-                alt={`MORIAH Café ${i + 1}`}
-                width={400}
-                height={533}
-                loading="lazy"
-              />
-            ))}
-          </div>
-        </div>
-        <div className="tx-galeria-split__body tx-container" data-reveal>
-          <span className="tx-eyebrow">Un lugar para reunirse y conversar</span>
-          <h2 className="tx-display tx-h2">
-            Inspirados en nuestra tierra
-          </h2>
-          <p className="tx-lede">
-            Un privilegio colombiano, hecho con intención y respeto. En cada
-            taza, la historia de una tierra que da lo mejor de sí. En cada
-            ritual, un momento para volver a lo que importa.
-          </p>
-          <Link className="tx-btn" to="/collections/cafes">
-            Comprar ahora
-          </Link>
-        </div>
-      </aside>
-    </section>
-  );
-}
-
 /* ============================================================
    NEWSLETTER — Club de la Memoria (captura de email)
    ============================================================ */

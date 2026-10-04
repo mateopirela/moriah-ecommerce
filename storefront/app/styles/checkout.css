@@ -5,7 +5,8 @@
 .checkout,
 .status-page,
 .subscribe {
-  padding: clamp(2rem, 5vw, 4rem) 0 5rem;
+  /* Solo arriba y abajo: el margen lateral lo pone `.container`. */
+  padding-block: clamp(2rem, 5vw, 4rem) 5rem;
 }
 
 .checkout__grid {
@@ -403,4 +404,16 @@
 /* Casillas de consentimiento con área táctil cómoda */
 .checkout__group .checkbox {
   margin-bottom: 0.75rem;
+}
+
+/* Aviso del Club cuando la suscripción se hace por WhatsApp */
+.subscribe__aviso {
+  max-width: 44rem;
+  margin: 1.25rem 0 0;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.95rem;
+  color: var(--ink-900, #1a1a1a);
+  background: var(--cream-100, #f0debd);
+  border-left: 4px solid var(--gold-500, #cf8e08);
+  border-radius: 10px;
 }

@@ -10,19 +10,19 @@
  */
 
 /** Teléfono en formato E.164, sin espacios. */
-const PHONE_E164 = '+573045286382';
+const PHONE_E164 = '+573019211731';
 
 /** Número de WhatsApp sin '+' ni espacios. */
-const WHATSAPP_NUMBER = '573045286382';
+const WHATSAPP_NUMBER = '573019211731';
 
 export const CONTACT = {
   /** Formato legible para humanos; se deriva del E.164 si no se define. */
   phoneDisplay: PHONE_E164 ? formatPhone(PHONE_E164) : null,
   phoneHref: PHONE_E164 ? `tel:${PHONE_E164}` : null,
-  email: 'hola@cafemoriah.com',
-  emailHref: 'mailto:hola@cafemoriah.com',
+  email: 'cafemoriahshop@gmail.com',
+  emailHref: 'mailto:cafemoriahshop@gmail.com',
   city: 'Bogotá · Colombia',
-  instagram: 'https://instagram.com/cafemoriah',
+  instagram: 'https://www.instagram.com/_cafemoriah/',
   facebook: 'https://facebook.com/cafemoriah',
   /** true cuando hay un WhatsApp real configurado. */
   hasWhatsapp: Boolean(WHATSAPP_NUMBER),

@@ -65,7 +65,7 @@ async function seedSubscription(overrides = {}) {
     customer,
     paymentSource: {wompiPaymentSourceId: 3891, brand: 'VISA', lastFour: '4242'},
     cafeHandle: 'bourbon-rosado',
-    sizeLabel: '340 g',
+    sizeLabel: '250 g',
     grind: 'Grano entero',
     quantity: 1,
     frequencyDays: 28,

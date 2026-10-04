@@ -78,8 +78,11 @@ body {
   min-height: 100vh;
 }
 
+/* El contenido ocupa todo el ancho: las secciones de color llegan al borde y cada
+   una pone su propio margen interno (antes: 1rem a los lados y abajo, heredado
+   de la plantilla, que "enmarcaba" el sitio con franjas crema). */
 body > main {
-  margin: 0 1rem 1rem 1rem;
+  margin: 0;
 }
 
 section {

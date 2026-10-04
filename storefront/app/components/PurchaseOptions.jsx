@@ -185,7 +185,7 @@ export function PurchaseOptions({cafe}) {
         </div>
         <p className="pay-line">
           <IconCheck width={14} height={14} aria-hidden="true" /> Paga con Nequi, PSE o tarjeta
-          · Entrega 2–4 días
+          · Entrega 2–5 días
         </p>
       </div>
 

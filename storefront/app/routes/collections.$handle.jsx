@@ -7,7 +7,7 @@ import {useReveal} from '~/lib/useReveal';
 const CAFE_FILTERS = [
   {handle: 'cafes', label: 'Todos'},
   {handle: 'linea-origen', label: 'Línea de Origen'},
-  {handle: 'micro-lotes', label: 'Micro-lotes'},
+  {handle: 'micro-lotes', label: 'Microlotes'},
   {handle: 'club-de-la-memoria', label: 'Club de la Memoria'},
   {handle: 'kit-el-legado', label: 'Kit El Legado'},
 ];
@@ -178,6 +178,23 @@ function ProductCard({product, index, club}) {
           loading={index < 4 ? 'eager' : 'lazy'}
           className="tx-col-card__img tx-col-card__img--primary"
         />
+        {product.kind === 'cafe' && (
+          <dl className="tx-col-card__ficha" aria-hidden="true">
+            {[
+              ['Tueste', product.roast?.replace(/^Tueste /i, '').replace(/^./, (c) => c.toUpperCase())],
+              ['Perfil', product.flavor],
+              ['Cuerpo', product.body],
+              ['Acidez', product.acidity],
+            ]
+              .filter(([, v]) => v)
+              .map(([k, v]) => (
+                <div key={k} className={k === 'Perfil' ? 'is-wide' : undefined}>
+                  <dt>{k}</dt>
+                  <dd>{v}</dd>
+                </div>
+              ))}
+          </dl>
+        )}
         <span className="tx-col-card__cta" aria-hidden="true">
           {club ? 'Suscribirme' : product.kind === 'cafe' ? 'Ver café' : 'Ver producto'}{' '}
           <IconArrowRight width={14} height={14} />
@@ -202,7 +219,7 @@ function ProductCard({product, index, club}) {
 function TambienTeInteresa() {
   const items = [
     {label: 'Toda la tienda', sub: 'Cafés, kits y merch', to: '/collections/all', img: '/images/cafe-cafes.webp'},
-    {label: 'Kit El Legado', sub: 'El ritual completo', to: '/products/kit-tres-origenes', img: '/images/kit-bolsas.webp'},
+    {label: 'Kit Tres Variedades', sub: 'Los tres cafés −15%', to: '/products/kit-tres-origenes', img: '/images/kit-tres-origenes.webp'},
     {label: 'Club de la Memoria', sub: 'Suscripción −15%', to: '/collections/club-de-la-memoria', img: '/images/lineup-bolsas.webp'},
   ];
   return (

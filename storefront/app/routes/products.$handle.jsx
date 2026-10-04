@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {Link, useLoaderData} from 'react-router';
+import {Link, redirect, useLoaderData} from 'react-router';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {PurchaseOptions} from '~/components/PurchaseOptions';
@@ -51,8 +51,14 @@ export const meta = ({data}) => {
 };
 
 /** @param {import('react-router').LoaderFunctionArgs} args */
+/** Cafés que salieron del catálogo: sus enlaces viejos llevan a la colección. */
+const RETIRED_COFFEES = new Set(['blend-catillo-caturra']);
+
 export function loader({params, request}) {
   const product = getProduct(params.handle);
+  if (!product && RETIRED_COFFEES.has(params.handle)) {
+    throw redirect('/collections/cafes', 301);
+  }
   if (!product) throw new Response(null, {status: 404});
   // `raw` (el objeto original del catálogo) no viaja al cliente; cada vista
   // recarga el detalle desde el catálogo.
@@ -228,8 +234,8 @@ function CafeProductPage({cafe}) {
                 Envíos y devoluciones <IconPlus className="accordion__icon" />
               </summary>
               <div className="accordion__panel">
-                Enviamos a todo Colombia en 2–4 días hábiles (24–48 h express en ciudades
-                principales). Envío gratis desde $100.000.
+                Enviamos a todo Colombia: Bogotá en 2–3 días hábiles y el resto del país en
+                3–5 días hábiles. Envío gratis desde $100.000.
               </div>
             </details>
           </div>
@@ -242,7 +248,7 @@ function CafeProductPage({cafe}) {
   );
 }
 
-/** PDP del kit de lanzamiento ("Kit Tres Orígenes −15%"). */
+/** PDP del kit de lanzamiento ("Kit Tres Variedades −15%"). */
 function BundleProductPage({product}) {
   const {open} = useAside();
   const items = product.includes.map((h) => getCafe(h)).filter(Boolean);
@@ -262,8 +268,8 @@ function BundleProductPage({product}) {
             <img
               src={product.image}
               alt={`${product.title} de MORIAH`}
-              width={1400}
-              height={934}
+              width={1100}
+              height={1100}
               loading="eager"
               decoding="async"
             />
@@ -289,7 +295,7 @@ function BundleProductPage({product}) {
             </AddToCartButton>
             <p className="pay-line">
               <IconCheck width={14} height={14} aria-hidden="true" /> Paga con Nequi, PSE o
-              tarjeta · Entrega 2–4 días
+              tarjeta · Entrega 2–5 días
             </p>
           </div>
           <ShippingBadges />
@@ -364,7 +370,7 @@ function MerchProductPage({product}) {
             </div>
             <p className="pay-line">
               <IconCheck width={14} height={14} aria-hidden="true" /> Paga con Nequi, PSE o
-              tarjeta · Entrega 2–4 días
+              tarjeta · Entrega 2–5 días
             </p>
           </div>
           <ShippingBadges />
