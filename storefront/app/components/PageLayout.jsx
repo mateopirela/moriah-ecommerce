@@ -4,6 +4,7 @@ import {Footer} from '~/components/Footer';
 import {Header, HeaderMenu} from '~/components/Header';
 import {CartMain} from '~/components/CartMain';
 import {SearchPredictive} from '~/components/SearchPredictive';
+import {WhatsAppFloat} from '~/components/WhatsAppFloat';
 
 /**
  * @param {{cart: import('~/lib/cart').Cart, children?: React.ReactNode}} props
@@ -29,6 +30,7 @@ export function PageLayout({cart, children = null}) {
         {children}
       </main>
       <Footer />
+      <WhatsAppFloat />
     </Aside.Provider>
   );
 }

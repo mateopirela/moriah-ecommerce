@@ -7,6 +7,7 @@ import {useReveal} from '~/lib/useReveal';
 import {Testimonials} from '~/components/Testimonials';
 import {BlogSection} from '~/components/BlogSection';
 import {OrigenSection} from '~/components/OrigenSection';
+import {PrimeraVez} from '~/components/PrimeraVez';
 import {seoMeta} from '~/lib/seo';
 import {siteUrl} from '~/lib/env.server';
 
@@ -41,6 +42,7 @@ export default function Homepage() {
       <PromesasStrip />
       <LineasSection />
       {SHOW_INFALTABLES ? <InfaltablesSection /> : null}
+      <PrimeraVez />
       <OrigenSection />
       <Testimonials />
       <BlogSection />
@@ -266,13 +268,23 @@ const CARDS_CAFE = [
     img: c.heroImage ?? c.image,
     to: `/products/${c.handle}`,
     precio: c.price,
+    tono: c.tono,
+    club: true,
+    // Recorte sin fondo: el arco aporta el color.
+    recorte: true,
   })),
 ];
 
 function CafeTile({c}) {
   return (
     <article className="tx-cafe" data-reveal-child>
-      <Link className={`tx-cafe__media${c.foto ? ' tx-cafe__media--foto' : ''}`} to={c.to} tabIndex={-1} aria-hidden="true">
+      <Link
+        className={`tx-cafe__media${c.foto ? ' tx-cafe__media--foto' : ''}`}
+        style={c.tono ? {'--tono': c.tono} : undefined}
+        to={c.to}
+        tabIndex={-1}
+        aria-hidden="true"
+      >
         {c.chip ? <span className="tx-linea__chip">{c.chip}</span> : null}
         <img src={c.img} alt="" width={400} height={480} loading="lazy" />
       </Link>
@@ -280,6 +292,11 @@ function CafeTile({c}) {
         <Link to={c.to}>{c.title}</Link>
       </h3>
       <p className="tx-cafe__precio">{formatCop(c.precio)}</p>
+      {c.club ? (
+        <p className="tx-club-tag">
+          Club −15 %: {formatCop(subscriptionPrice(c.precio))} por entrega
+        </p>
+      ) : null}
       <p className="tx-cafe__notas">{c.notas}</p>
       <Link className="tx-btn tx-btn--peq" to={c.to} aria-label={`Ver café ${c.title}`}>
         Ver café

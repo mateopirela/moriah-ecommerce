@@ -58,3 +58,71 @@
     gap: 0.7rem;
   }
 }
+
+/* ============================================================
+   "¿Primera vez con café de especialidad?" — tres pasos
+   ============================================================ */
+.tx-primera {
+  padding-block: clamp(3rem, 2rem + 4vw, 5.5rem);
+  background: var(--tx-grad-cream, var(--tx-surface));
+}
+.tx-primera__head {
+  max-width: 48rem;
+  margin: 0 auto clamp(1.8rem, 1.2rem + 2vw, 3rem);
+  text-align: center;
+}
+.tx-primera__head p { margin: 0.6rem 0 0; color: var(--tx-muted); }
+.tx-primera__pasos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 0.5rem + 2vw, 2rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tx-primera__paso {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 1.6rem 1.5rem 1.5rem;
+  background: var(--tx-bg, #fbf6ea);
+  border: 1px solid var(--tx-line);
+  border-radius: 22px;
+}
+.tx-primera__num {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  margin-bottom: 0.4rem;
+  font-family: var(--tx-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--tx-on-gold, #19332f);
+  background: var(--tx-gold, #cf8e08);
+  border-radius: 50%;
+}
+.tx-primera__titulo {
+  margin: 0;
+  font-family: var(--tx-display);
+  font-size: 1.5rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--tx-ink);
+}
+.tx-primera__texto { margin: 0; font-size: 0.95rem; color: var(--tx-text); }
+.tx-primera__cta {
+  margin-top: auto;
+  padding-top: 0.6rem;
+  font-weight: 700;
+  color: var(--tx-gold-deep, #b36d18);
+  text-decoration: none;
+}
+.tx-primera__cta:hover { text-decoration: underline; text-underline-offset: 5px; }
+@media (max-width: 760px) {
+  .tx-primera__pasos { grid-template-columns: 1fr; }
+}
+.tx-primera__head .tx-h2 { font-size: clamp(1.9rem, 1.3rem + 2.2vw, 2.7rem); }

@@ -79,6 +79,8 @@ export const CAFES = [
     tags: ['Café de especialidad', '100% colombiano'],
     price: 45000,
     currency: 'COP',
+    // Tono suave tomado de los colores de la bolsa: tiñe el arco de la tarjeta.
+    tono: '#f1cfd9',
     image: '/images/cafe-bourbon-rosado.webp',
     heroImage: '/images/cafe-bolsa-bourbon-rosado-front.webp',
     quizTags: ['floral', 'ligero', 'frutal', 'solo', 'filtro', 'aeropress'],
@@ -104,6 +106,8 @@ export const CAFES = [
     // ⚠️ PRECIO PROVISIONAL: confirmar con el negocio antes de publicar.
     price: 75000,
     currency: 'COP',
+    // Tono suave tomado de los colores de la bolsa: tiñe el arco de la tarjeta.
+    tono: '#f4dcae',
     image: '/images/cafe-pacamara.webp',
     heroImage: '/images/cafe-bolsa-pacamara-front.webp',
     quizTags: ['equilibrado', 'cuerpo', 'medio', 'ritual', 'especial', 'inmersion', 'espresso', 'leche'],
@@ -131,6 +135,8 @@ export const CAFES = [
     // ⚠️ PRECIO PROVISIONAL: confirmar con el negocio antes de publicar.
     price: 52000,
     currency: 'COP',
+    // Tono suave tomado de los colores de la bolsa: tiñe el arco de la tarjeta.
+    tono: '#c9e3da',
     image: '/images/cafe-tabi.webp',
     heroImage: '/images/cafe-bolsa-tabi-front.webp',
     quizTags: ['equilibrado', 'medio', 'dulce', 'tarde', 'ritual', 'solo', 'endulzado', 'filtro', 'aeropress'],
@@ -156,6 +162,8 @@ export const CAFES = [
     // ⚠️ PRECIO PROVISIONAL: confirmar con el negocio antes de publicar.
     price: 48000,
     currency: 'COP',
+    // Tono suave tomado de los colores de la bolsa: tiñe el arco de la tarjeta.
+    tono: '#efc7ae',
     image: '/images/cafe-papayo.webp',
     heroImage: '/images/cafe-bolsa-papayo-front.webp',
     quizTags: ['equilibrado', 'medio', 'dulce', 'ritual', 'leche', 'endulzado', 'inmersion', 'espresso'],
@@ -181,6 +189,8 @@ export const CAFES = [
     // ⚠️ PRECIO PROVISIONAL: confirmar con el negocio antes de publicar.
     price: 90000,
     currency: 'COP',
+    // Tono suave tomado de los colores de la bolsa: tiñe el arco de la tarjeta.
+    tono: '#f5c6b8',
     image: '/images/cafe-geisha.webp',
     heroImage: '/images/cafe-bolsa-geisha-front.webp',
     quizTags: ['floral', 'ligero', 'frutal', 'especial', 'explorar', 'solo', 'filtro', 'aeropress'],
@@ -206,6 +216,8 @@ export const CAFES = [
     // ⚠️ PRECIO PROVISIONAL: confirmar con el negocio antes de publicar.
     price: 40000,
     currency: 'COP',
+    // Tono suave tomado de los colores de la bolsa: tiñe el arco de la tarjeta.
+    tono: '#dfe6c0',
     image: '/images/cafe-caturra.webp',
     heroImage: '/images/cafe-bolsa-caturra-front.webp',
     quizTags: ['frutal', 'medio', 'explorar', 'tarde', 'solo', 'filtro', 'aeropress'],
@@ -231,6 +243,8 @@ export const CAFES = [
     // ⚠️ PRECIO PROVISIONAL: confirmar con el negocio antes de publicar.
     price: 38000,
     currency: 'COP',
+    // Tono suave tomado de los colores de la bolsa: tiñe el arco de la tarjeta.
+    tono: '#f6d9c2',
     image: '/images/cafe-castillo-lavado.webp',
     heroImage: '/images/cafe-bolsa-castillo-lavado-front.webp',
     quizTags: ['frutal', 'medio', 'ritual', 'solo', 'filtro', 'espresso'],

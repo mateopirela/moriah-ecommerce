@@ -66,6 +66,8 @@ function normalizeCafe(cafe) {
     notes: cafe.notes,
     roast: cafe.roast,
     flavor: cafe.flavor,
+    tono: cafe.tono,
+    cutout: cafe.heroImage,
     body: cafe.body,
     acidity: cafe.acidity,
     altitude: cafe.altitude,

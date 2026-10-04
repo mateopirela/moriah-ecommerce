@@ -31,6 +31,10 @@ const {
 
 let db;
 
+/** Fecha futura relativa a hoy: createSubscription programa el primer cobro con la hora real,
+ *  así que las fechas fijas dejan de funcionar cuando pasa ese día. */
+const fechaPosterior = (dias) => new Date(Date.now() + dias * 86_400_000 + 60_000);
+
 beforeAll(async () => {
   const [{PGlite}, {drizzle}, {migrate}] = await Promise.all([
     import('@electric-sql/pglite'),
@@ -94,7 +98,7 @@ describe('createSubscription', () => {
 
 describe('chargeSubscription', () => {
   it('creates an approved order and schedules the next charge', async () => {
-    const now = new Date('2026-09-01T12:00:00Z');
+    const now = fechaPosterior(1);
     wompi.chargePaymentSource.mockResolvedValue({id: 'tx-1', status: 'PENDING'});
     const {subscription} = await seedSubscription();
 
@@ -115,7 +119,7 @@ describe('chargeSubscription', () => {
   });
 
   it('retries in two days after a decline and pauses as past_due after 3 failures', async () => {
-    const now = new Date('2026-09-01T12:00:00Z');
+    const now = fechaPosterior(1);
     wompi.chargePaymentSource.mockResolvedValue({id: 'tx-d', status: 'DECLINED'});
     let {subscription} = await seedSubscription();
 
@@ -157,7 +161,7 @@ describe('chargeSubscription', () => {
   });
 
   it('lets the webhook resolve a pending charge', async () => {
-    const now = new Date('2026-09-01T12:00:00Z');
+    const now = fechaPosterior(1);
     wompi.chargePaymentSource.mockResolvedValue({id: 'tx-w', status: 'PENDING'});
     const {subscription} = await seedSubscription();
     const {order} = await chargeSubscription(db, subscription, {now});
@@ -180,7 +184,7 @@ describe('chargeSubscription', () => {
 
 describe('chargeDueSubscriptions', () => {
   it('only charges active subscriptions whose date has come', async () => {
-    const now = new Date('2026-09-10T12:00:00Z');
+    const now = fechaPosterior(10);
     wompi.chargePaymentSource.mockResolvedValue({id: 'tx-due', status: 'APPROVED'});
     const {subscription: due} = await seedSubscription();
     const {subscription: future} = await seedSubscription({frequencyDays: 14});
@@ -199,7 +203,7 @@ describe('chargeDueSubscriptions', () => {
 
 describe('manageSubscription', () => {
   it('pauses, resumes, changes frequency and cancels', async () => {
-    const now = new Date('2026-09-01T12:00:00Z');
+    const now = fechaPosterior(1);
     const {subscription} = await seedSubscription();
 
     const paused = await manageSubscription(db, subscription, 'pause', {now});

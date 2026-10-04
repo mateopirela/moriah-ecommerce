@@ -168,10 +168,13 @@ function ProductCard({product, index, club}) {
     : product.price;
   return (
     <Link to={to} className="tx-col-card" data-reveal-child prefetch="intent">
-      <div className="tx-col-card__media">
+      <div
+        className={`tx-col-card__media${product.tono ? ' tx-col-card__media--arco' : ''}`}
+        style={product.tono ? {'--tono': product.tono} : undefined}
+      >
         {product.badge && <span className="tx-col-card__badge">{product.badge}</span>}
         <img
-          src={product.image}
+          src={product.tono && product.cutout ? product.cutout : product.image}
           alt={product.title}
           width={600}
           height={600}
@@ -211,6 +214,11 @@ function ProductCard({product, index, club}) {
           {formatCop(price)}
           {club && product.subscribable && <small> / entrega</small>}
         </div>
+        {!club && product.kind === 'cafe' && product.subscribable && (
+          <span className="tx-club-tag">
+            Club −15 %: {formatCop(Math.round((product.price * (1 - SUBSCRIPTION.discount)) / 100) * 100)}
+          </span>
+        )}
       </div>
     </Link>
   );

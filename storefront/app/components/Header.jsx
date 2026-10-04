@@ -6,35 +6,25 @@ import {useOptimisticCartCount} from '~/components/CartMain';
 import {CONTACT, whatsappUrl} from '~/data/contact';
 
 /**
- * Navbar — réplica de la estructura de tropicaliacoffee.com:
- * logo · CAFÉ▾ · MERCH▾ · ENCUENTRA TU CAFÉ · NOTAS DE CAFÉ · CONÓCENOS▾ · iconos
+ * Menú principal (6 entradas): lo que vende va a la izquierda, lo institucional
+ * a la derecha. `destacado` resalta una sola entrada (el Club).
  */
 const TX_NAV = [
   {
     title: 'Café',
     url: '/collections/cafes',
     items: [
-      {title: 'Todos los cafés', url: '/collections/cafes', img: '/images/lineup-bolsas-400.webp'},
+      {title: 'Todos los cafés', url: '/collections/cafes', img: '/images/nav-todos-cafes.webp'},
+      {title: 'Línea de Origen', url: '/collections/linea-origen', img: '/images/cafe-castillo-lavado.webp'},
       {title: 'Microlotes', url: '/collections/micro-lotes', img: '/images/cafe-pacamara.webp'},
-      {title: 'Club de la Memoria', url: '/collections/club-de-la-memoria', img: '/images/kit-bolsas-400.webp'},
-    ],
-  },
-  {
-    title: 'Merch',
-    url: '/collections/merch',
-    items: [
-      {title: 'Pocillos', url: '/collections/pocillos', img: '/images/equipo-moriah-400.webp'},
-      {title: 'Para vestir', url: '/collections/para-vestir', img: '/images/tostado-moriah-400.webp'},
-      {title: 'Accesorios', url: '/collections/accesorios', img: '/images/hero-bolsa-400.webp'},
-      {title: 'Caja regalo', url: '/collections/caja-regalo', img: '/images/kit-bolsas-400.webp'},
+      {title: 'Kit −15 %', url: '/products/kit-tres-origenes', img: '/images/nav-kit.webp'},
     ],
   },
   {title: 'Encuentra tu café', url: '/quiz'},
-  {title: 'Notas de café', url: '/blog'},
-  {
-    title: 'Conócenos',
-    url: '/conocenos',
-  },
+  {title: 'Club de la Memoria', url: '/suscripcion', destacado: true},
+  {title: 'Merch', url: '/collections/merch'},
+  {title: 'Blog', url: '/blog'},
+  {title: 'Conócenos', url: '/conocenos'},
 ];
 
 /**
@@ -105,7 +95,7 @@ function TropicaliaNav() {
           </div>
         ) : (
           <NavLink
-            className="header-menu-item"
+            className={`header-menu-item${item.destacado ? ' header-menu-item--destacado' : ''}`}
             key={item.title}
             to={item.url}
             prefetch="intent"
@@ -161,64 +151,49 @@ export function HeaderMenu({viewport}) {
   const {close} = useAside();
   if (viewport !== 'mobile') return null;
 
-  const groups = TX_NAV.filter((item) => item.items);
-  const flat = TX_NAV.filter((item) => !item.items);
-
   return (
     <nav className="header-menu-mobile" aria-label="Principal">
       <NavLink end onClick={close} prefetch="intent" className="header-menu-item" to="/">
         Inicio
       </NavLink>
 
-      {groups.map((group) => (
-        <details className="header-menu-group" key={group.title}>
-          <summary className="header-menu-item header-menu-group__summary">
-            {group.title}
-            <IconChevronDown className="header-menu-group__chevron" aria-hidden="true" />
-          </summary>
-          <div className="header-menu-group__items">
-            <NavLink
-              end
-              onClick={close}
-              prefetch="intent"
-              className="header-menu-item header-menu-item--sub"
-              to={group.url}
-            >
-              {group.allLabel ?? `Ver todo ${group.title.toLowerCase()}`}
-            </NavLink>
-            {group.items.map((sub) => (
-              <NavLink
-                end
-                key={sub.url}
-                onClick={close}
-                prefetch="intent"
-                className="header-menu-item header-menu-item--sub"
-                to={sub.url}
-              >
-                {sub.title}
-              </NavLink>
-            ))}
-          </div>
-        </details>
-      ))}
-
-      {flat.map((item) => (
-        <NavLink
-          className="header-menu-item"
-          end
-          key={item.url}
-          onClick={close}
-          prefetch="intent"
-          to={item.url}
-        >
-          {item.title}
-        </NavLink>
-      ))}
+      {TX_NAV.map((item) =>
+        item.items ? (
+          <details className="header-menu-group" key={item.title}>
+            <summary className="header-menu-item header-menu-group__summary">
+              {item.title}
+              <IconChevronDown className="header-menu-group__chevron" aria-hidden="true" />
+            </summary>
+            <div className="header-menu-group__items">
+              {item.items.map((sub) => (
+                <NavLink
+                  end
+                  key={sub.url}
+                  onClick={close}
+                  prefetch="intent"
+                  className="header-menu-item header-menu-item--sub"
+                  to={sub.url}
+                >
+                  {sub.title}
+                </NavLink>
+              ))}
+            </div>
+          </details>
+        ) : (
+          <NavLink
+            className={`header-menu-item${item.destacado ? ' header-menu-item--destacado' : ''}`}
+            end
+            key={item.url}
+            onClick={close}
+            prefetch="intent"
+            to={item.url}
+          >
+            {item.title}
+          </NavLink>
+        ),
+      )}
 
       <div className="header-menu-mobile__foot">
-        <Link className="btn btn--block" to="/suscripcion" onClick={close}>
-          Club de la Memoria · −15%
-        </Link>
         <Link
           className="header-menu-mobile__link"
           to="/suscripcion/gestionar"
