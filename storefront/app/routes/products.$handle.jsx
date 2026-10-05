@@ -4,6 +4,8 @@ import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {PurchaseOptions} from '~/components/PurchaseOptions';
 import {RoastMeter} from '~/components/RoastMeter';
+import {PerfilCafe} from '~/components/PerfilCafe';
+import {OtrosCafes} from '~/components/OtrosCafes';
 import {StickyAtc} from '~/components/StickyAtc';
 import {Testimonials} from '~/components/Testimonials';
 import {IconBag, IconCheck, IconLeaf, IconPlus, IconUser} from '~/components/Icons';
@@ -138,11 +140,15 @@ function MetaIconsRow({variety, heroe, territory, farm, proceso, altitude}) {
 /** PDP de un café: medidor de tueste, origen, notas, compra/suscripción, productor e historia. */
 function CafeProductPage({cafe}) {
   return (
-    <div className="product-page">
+    <div
+      className={`product-page${cafe.tono ? ' product-page--tono' : ''}`}
+      style={cafe.tono ? {'--tono': cafe.tono} : undefined}
+    >
       <div className="container pdp">
         <PdpHead
           breadcrumb={{url: '/collections/cafes', label: 'Cafés'}}
-          roast={cafe.roast}
+          // El tueste ya va en las barras del perfil; solo se repite arriba si no hay perfil.
+          roast={cafe.perfil ? undefined : cafe.roast}
           roastLevel={cafe.roastLevel}
           title={cafe.title}
           subtitle={cafe.origin}
@@ -151,9 +157,11 @@ function CafeProductPage({cafe}) {
         />
 
         <div className="pdp-gallery">
-          <div className="pdp-gallery__main">
+          <div
+            className={`pdp-gallery__main${cafe.tono && cafe.heroImage ? ' pdp-gallery__main--arco' : ''}`}
+          >
             <img
-              src={cafe.image}
+              src={cafe.tono && cafe.heroImage ? cafe.heroImage : cafe.image}
               alt={`Bolsa de café ${cafe.title} de MORIAH`}
               width={1200}
               height={1291}
@@ -164,14 +172,7 @@ function CafeProductPage({cafe}) {
         </div>
 
         <div className="pdp-info">
-          {cafe.notes && (
-            <div className="flavor-notes">
-              <div className="flavor-notes__label">
-                <IconLeaf width={16} height={16} aria-hidden="true" /> Notas de sabor
-              </div>
-              <p className="flavor-notes__list">{cafe.notes}</p>
-            </div>
-          )}
+          <PerfilCafe cafe={cafe} />
 
           <PurchaseOptions cafe={cafe} />
 
@@ -225,23 +226,24 @@ function CafeProductPage({cafe}) {
                 Preparación recomendada <IconPlus className="accordion__icon" />
               </summary>
               <div className="accordion__panel">
-                Usa agua a 92–96 °C y proporción 1:16 (café:agua). Disfruta dentro de los 30
-                días tras abrir la bolsa.
-              </div>
-            </details>
-            <details className="accordion__item">
-              <summary className="accordion__trigger">
-                Envíos y devoluciones <IconPlus className="accordion__icon" />
-              </summary>
-              <div className="accordion__panel">
-                Enviamos a todo Colombia: Bogotá en 2–3 días hábiles y el resto del país en
-                3–5 días hábiles. Envío gratis desde $100.000.
+                <p>
+                  Usa agua a 92–96 °C y proporción 1:16 (café:agua). Disfruta dentro de los 30
+                  días tras abrir la bolsa.
+                </p>
+                <p>
+                  Recetas paso a paso:{' '}
+                  <Link to="/blog/como-preparar-cafe-en-v60">V60</Link> ·{' '}
+                  <Link to="/blog/como-preparar-cafe-en-aeropress">Aeropress</Link> ·{' '}
+                  <Link to="/blog/como-preparar-cafe-en-prensa-francesa">Prensa francesa</Link> ·{' '}
+                  <Link to="/blog/como-preparar-cafe-en-chemex">Chemex</Link>
+                </p>
               </div>
             </details>
           </div>
         </div>
       </div>
 
+      <OtrosCafes actual={cafe.handle} />
       <Testimonials />
       <FinalCta />
     </div>

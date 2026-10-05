@@ -75,6 +75,8 @@ export const CAFES = [
     // cata reales cuando las tengas (aparece como "Notas de sabor").
     roast: 'Tueste medio',
     flavor: 'Flores blancas, durazno, frutos amarillos y azúcar de caña',
+    // Escala 1–5 estimada a partir de la etiqueta (ajústala si quieres afinarla).
+    perfil: {tueste: 3, cuerpo: 2, acidez: 4},
     notes: 'Ligero y sedoso, tipo té · Acidez brillante',
     tags: ['Café de especialidad', '100% colombiano'],
     price: 45000,
@@ -101,6 +103,8 @@ export const CAFES = [
     acidity: 'Balanceada',
     roast: 'Tueste medio',
     flavor: 'Frutas tropicales, cítricos dulces, flor de azahar y panela',
+    // Escala 1–5 estimada a partir de la etiqueta (ajústala si quieres afinarla).
+    perfil: {tueste: 3, cuerpo: 4, acidez: 3},
     notes: 'Cuerpo medio-alto · Acidez balanceada',
     tags: ['Café de especialidad', '100% colombiano'],
     // ⚠️ PRECIO PROVISIONAL: confirmar con el negocio antes de publicar.
@@ -130,6 +134,8 @@ export const CAFES = [
     // la tarjeta solo muestra lo que exista. Faltan en Pacamara y Bourbon Rosado.
     roast: 'Tueste medio',
     flavor: 'Frutos amarillos, chocolate blanco, vainilla y té',
+    // Escala 1–5 estimada a partir de la etiqueta (ajústala si quieres afinarla).
+    perfil: {tueste: 3, cuerpo: 3, acidez: 3},
     notes: 'Cuerpo medio · Acidez media y sedosa',
     tags: ['Café de especialidad', '100% colombiano'],
     // ⚠️ PRECIO PROVISIONAL: confirmar con el negocio antes de publicar.
@@ -157,6 +163,8 @@ export const CAFES = [
     acidity: 'Balanceada',
     roast: 'Tueste medio',
     flavor: 'Ciruela, té de jazmín y limoncillo',
+    // Escala 1–5 estimada a partir de la etiqueta (ajústala si quieres afinarla).
+    perfil: {tueste: 3, cuerpo: 3, acidez: 3},
     notes: 'Cuerpo medio · Acidez balanceada',
     tags: ['Café de especialidad', '100% colombiano'],
     // ⚠️ PRECIO PROVISIONAL: confirmar con el negocio antes de publicar.
@@ -184,6 +192,8 @@ export const CAFES = [
     acidity: 'Súper ligera y sedosa',
     roast: 'Tueste medio',
     flavor: 'Jazmín, té verde, mandarina y miel ligera',
+    // Escala 1–5 estimada a partir de la etiqueta (ajústala si quieres afinarla).
+    perfil: {tueste: 3, cuerpo: 3, acidez: 2},
     notes: 'Cuerpo medio · Acidez súper ligera y sedosa',
     tags: ['Café de especialidad', '100% colombiano'],
     // ⚠️ PRECIO PROVISIONAL: confirmar con el negocio antes de publicar.
@@ -211,6 +221,8 @@ export const CAFES = [
     acidity: 'Cítrica y jugosa',
     roast: 'Tueste medio',
     flavor: 'Mandarina, panela y chocolate',
+    // Escala 1–5 estimada a partir de la etiqueta (ajústala si quieres afinarla).
+    perfil: {tueste: 3, cuerpo: 3, acidez: 4},
     notes: 'Cuerpo medio · Acidez cítrica y jugosa',
     tags: ['Café de especialidad', '100% colombiano'],
     // ⚠️ PRECIO PROVISIONAL: confirmar con el negocio antes de publicar.
@@ -238,6 +250,8 @@ export const CAFES = [
     acidity: 'Cítrica brillante',
     roast: 'Tueste medio-alto',
     flavor: 'Frutos rojos, caramelo, naranja dulce y chocolate negro',
+    // Escala 1–5 estimada a partir de la etiqueta (ajústala si quieres afinarla).
+    perfil: {tueste: 4, cuerpo: 3, acidez: 4},
     notes: 'Cuerpo medio · Acidez cítrica y brillante',
     tags: ['Café de especialidad', '100% colombiano'],
     // ⚠️ PRECIO PROVISIONAL: confirmar con el negocio antes de publicar.

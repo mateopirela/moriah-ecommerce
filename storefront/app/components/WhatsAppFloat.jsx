@@ -1,3 +1,4 @@
+import {useEffect, useState} from 'react';
 import {useLocation} from 'react-router';
 import {CONTACT, whatsappUrl} from '~/data/contact';
 import {IconWhatsapp} from '~/components/Icons';
@@ -13,6 +14,19 @@ const OCULTAR = ['/checkout', '/suscripcion/gestionar'];
  */
 export function WhatsAppFloat() {
   const {pathname} = useLocation();
+  // El texto se muestra al cargar cada página y se recoge al hacer scroll o tras unos
+  // segundos, para no tapar contenido.
+  const [expandido, setExpandido] = useState(true);
+  useEffect(() => {
+    setExpandido(true);
+    const recoger = () => setExpandido(false);
+    const timer = setTimeout(recoger, 7000);
+    window.addEventListener('scroll', recoger, {passive: true, once: true});
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', recoger);
+    };
+  }, [pathname]);
   if (!CONTACT.hasWhatsapp || OCULTAR.some((r) => pathname.startsWith(r))) return null;
 
   const producto = pathname.startsWith('/products/') ? pathname.split('/')[2] : null;
@@ -22,7 +36,7 @@ export function WhatsAppFloat() {
 
   return (
     <a
-      className={`wa-float${producto ? ' wa-float--sube' : ''}`}
+      className={`wa-float${producto ? ' wa-float--sube' : ''}${expandido ? '' : ' wa-float--compacto'}`}
       href={whatsappUrl(mensaje)}
       target="_blank"
       rel="noopener noreferrer"

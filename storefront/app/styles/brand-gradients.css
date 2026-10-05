@@ -168,9 +168,8 @@
   .wa-float { right: 1.5rem; bottom: 1.5rem; }
   .wa-float__texto { display: inline; }
 }
-@media (max-width: 760px) {
-  .wa-float--sube { bottom: 5.2rem; }
-}
+/* En fichas de producto hay una barra de compra fija abajo (móvil y escritorio). */
+.wa-float--sube { bottom: 5.2rem; }
 @media (prefers-reduced-motion: reduce) {
   .wa-float { transition: none; }
 }
@@ -233,3 +232,133 @@
   border-radius: 999px;
 }
 .tx-cafe .tx-club-tag { align-self: flex-start; margin-bottom: 0.2rem; }
+
+/* ── Página de producto: fondo y arco con el color de la bolsa ── */
+.product-page--tono {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tono) 65%, var(--tx-bg, #fbf6ea)) 0,
+    var(--tx-bg, #fbf6ea) 760px
+  );
+}
+.pdp-gallery__main--arco {
+  border-radius: 999px 999px 22px 22px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tono) 55%, #fff) 0%,
+    var(--tono) 100%
+  );
+}
+.pdp-gallery__main--arco img {
+  position: absolute;
+  left: 50%;
+  bottom: 5%;
+  width: auto;
+  height: 76%;
+  max-width: 76%;
+  transform: translateX(-50%);
+  object-fit: contain;
+  filter: drop-shadow(0 18px 22px rgba(25, 51, 47, 0.3));
+}
+
+/* ── Perfil del café (sabor + barras de tueste, cuerpo y acidez) ── */
+.perfil {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+  padding: 1.1rem 1.2rem 1.2rem;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--tx-line, rgba(25, 51, 47, 0.15));
+  border-radius: 18px;
+}
+.perfil__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tx-gold-deep, #b36d18);
+}
+.perfil__sabor p {
+  margin: 0.3rem 0 0;
+  font-family: var(--tx-display, inherit);
+  font-size: 1.15rem;
+  line-height: 1.3;
+  color: var(--tx-ink, #19332f);
+}
+.perfil__barras {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--tx-line, rgba(25, 51, 47, 0.15));
+}
+.perfil__barra { display: grid; gap: 0.35rem; }
+.perfil__titulo { font-size: 0.85rem; font-weight: 700; color: var(--tx-ink, #19332f); }
+.perfil__escala { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+.perfil__escala span {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(25, 51, 47, 0.14);
+}
+.perfil__escala span[data-on='true'] { background: var(--tx-ink, #19332f); }
+.perfil__extremos {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--tx-text, #3d4a47);
+}
+@media (max-width: 420px) {
+  .perfil__barras { grid-template-columns: 1fr; }
+}
+
+/* WhatsApp: tras unos segundos o al hacer scroll queda solo el ícono. */
+.wa-float--compacto .wa-float__texto { display: none; }
+
+/* ── Otros cafés (página de producto) ── */
+.otros { padding-block: clamp(2.5rem, 2rem + 3vw, 4.5rem); }
+.otros__titulo { margin: 0 0 1.6rem; text-align: center; font-size: clamp(1.7rem, 1.2rem + 2vw, 2.4rem); }
+.otros__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 0.5rem + 2vw, 2rem);
+  max-width: 62rem;
+  margin: 0 auto;
+}
+.otros__card {
+  display: grid;
+  gap: 0.3rem;
+  text-align: center;
+  color: inherit;
+  text-decoration: none;
+}
+.otros__media {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: clamp(250px, 24vw, 330px);
+  margin-bottom: 0.6rem;
+  padding: 2.4rem 1rem 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tono) 55%, #fff), var(--tono));
+  border-radius: 999px 999px 22px 22px;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+.otros__card:hover .otros__media { box-shadow: 0 24px 40px -26px rgba(25, 51, 47, 0.45); }
+.otros__media img {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 12px 16px rgba(25, 51, 47, 0.28));
+}
+.otros__nombre { font-family: var(--tx-display, inherit); font-size: 1.35rem; color: var(--tx-ink, #19332f); }
+.otros__notas { font-size: 0.88rem; color: var(--tx-muted, #5b6b67); }
+.otros__precio { font-weight: 700; color: var(--tx-ink, #19332f); }
+@media (max-width: 760px) {
+  .otros__grid { grid-template-columns: 1fr; max-width: 22rem; }
+  .otros__media { height: 280px; }
+}

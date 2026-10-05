@@ -15,7 +15,9 @@ export function Testimonials({
   title = 'Un café que se comparte',
   eyebrow = 'Voces de nuestra comunidad',
 }) {
-  if (!TESTIMONIALS.length) return null;
+  // Los testimonios actuales son de ejemplo: no se muestran hasta que sean reseñas
+  // reales (poner `VERIFIED = true` en data/testimonials.js cuando lo sean).
+  if (!VERIFIED || !TESTIMONIALS.length) return null;
 
   return (
     <section className="tx-section tx-testimonios">
