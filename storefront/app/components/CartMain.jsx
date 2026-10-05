@@ -81,7 +81,7 @@ export function CartMain({layout, cart: originalCart}) {
 
   return (
     <section
-      className={`cart-main${cart?.discount ? ' with-discount' : ''}`}
+      className={`cart-main cart-main--${layout}${cart?.discount ? ' with-discount' : ''}`}
       aria-label={layout === 'page' ? 'Página del carrito' : 'Carrito'}
     >
       <CartEmpty hidden={hasItems} />
@@ -97,6 +97,11 @@ export function CartMain({layout, cart: originalCart}) {
             ))}
           </ul>
           {hasItems && layout === 'aside' && <CartUpsell cart={cart} />}
+          {hasItems && layout === 'page' && (
+            <Link className="cart-seguir" to="/collections/cafes">
+              <span aria-hidden="true">←</span> Seguir comprando
+            </Link>
+          )}
         </div>
         {hasItems && <CartSummary cart={cart} layout={layout} />}
       </div>

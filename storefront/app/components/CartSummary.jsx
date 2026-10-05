@@ -20,10 +20,13 @@ export function CartSummary({cart, layout}) {
       <p id={summaryId} className="sr-only">
         Resumen del pedido
       </p>
-      <dl role="group" className="cart-subtotal">
-        <dt>Subtotal</dt>
-        <dd>{formatCop(cart.subtotal)}</dd>
-      </dl>
+      {/* Subtotal solo cuando difiere del total: evita tres líneas con el mismo número. */}
+      {(cart.discount || cart.shipping > 0) && (
+        <dl role="group" className="cart-subtotal">
+          <dt>Subtotal</dt>
+          <dd>{formatCop(cart.subtotal)}</dd>
+        </dl>
+      )}
       {cart.discount && (
         <dl role="group" className="cart-subtotal">
           <dt>Descuento ({cart.discount.code})</dt>
@@ -59,6 +62,11 @@ export function CartSummary({cart, layout}) {
         </span>
       </p>
       <CartDiscount discount={cart.discount} inputId={discountInputId} />
+      {layout === 'aside' && (
+        <Link className="cart-seguir cart-seguir--aside" to="/collections/cafes" onClick={close}>
+          Seguir comprando
+        </Link>
+      )}
     </div>
   );
 }

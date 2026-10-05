@@ -1,7 +1,7 @@
 import {Link} from 'react-router';
 import {CART_ACTIONS, CartForm} from '~/components/CartForm';
 import {useAside} from '~/components/Aside';
-import {formatCop} from '~/lib/catalog';
+import {SIZES, formatCop} from '~/lib/catalog';
 
 /**
  * Una línea del carrito: imagen, título, opciones, precio y controles de cantidad.
@@ -9,6 +9,8 @@ import {formatCop} from '~/lib/catalog';
  */
 export function CartLineItem({layout, line}) {
   const {close} = useAside();
+  // Con una sola presentación (250 g) el gramaje no aporta: se oculta.
+  const opciones = line.options.filter((o) => !(o.name === 'Gramaje' && SIZES.length === 1));
 
   return (
     <li className="cart-line">
@@ -39,9 +41,9 @@ export function CartLineItem({layout, line}) {
           <div aria-label="Precio" className="product-price" role="group">
             <span>{formatCop(line.totalPrice)}</span>
           </div>
-          {line.options.length > 0 && (
+          {opciones.length > 0 && (
             <ul>
-              {line.options.map((option) => (
+              {opciones.map((option) => (
                 <li key={option.name}>
                   <small>
                     {option.name}: {option.value}
