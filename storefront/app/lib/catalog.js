@@ -36,9 +36,35 @@ export function toCents(cop) {
   return Math.round(cop * 100);
 }
 
-/** @param {number} subtotal */
-export function shippingFor(subtotal) {
-  return subtotal >= FREE_SHIP_THRESHOLD ? 0 : SHIPPING_FEE;
+/** Tarifa de envío para las ciudades con entrega local. */
+export const LOCAL_SHIPPING_FEE = 6000;
+
+/** Ciudades con tarifa local (en minúsculas y sin tildes). Edita aquí para sumar otras. */
+export const LOCAL_SHIPPING_CITIES = ['barranquilla'];
+
+/** Minúsculas, sin tildes ni espacios sobrantes: "  Bogotá " → "bogota". */
+export function normalizeCity(city) {
+  return String(city ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase();
+}
+
+/** @param {string} [city] */
+export function isLocalCity(city) {
+  return LOCAL_SHIPPING_CITIES.includes(normalizeCity(city));
+}
+
+/**
+ * Costo de envío: gratis desde el umbral; si no, $6.000 en ciudades con tarifa local
+ * y $12.000 en el resto. Sin ciudad se asume la tarifa general (ver `shippingPending`).
+ * @param {number} subtotal
+ * @param {string} [city]
+ */
+export function shippingFor(subtotal, city) {
+  if (subtotal >= FREE_SHIP_THRESHOLD) return 0;
+  return isLocalCity(city) ? LOCAL_SHIPPING_FEE : SHIPPING_FEE;
 }
 
 /** Días entre entregas para cada etiqueta de frecuencia del Club. */
@@ -164,11 +190,11 @@ export function unitPrice(handle, {size, subscription = false} = {}) {
  * Puro: se usa en el servidor para cobrar y en el navegador para previsualizar.
  * @param {{cafeHandle: string, sizeLabel: string, quantity: number}} input
  */
-export function subscriptionAmounts({cafeHandle, sizeLabel, quantity}) {
+export function subscriptionAmounts({cafeHandle, sizeLabel, quantity, city}) {
   const unit = unitPrice(cafeHandle, {size: sizeLabel, subscription: true});
   const qty = Math.max(1, Math.min(10, Math.floor(Number(quantity) || 1)));
   const subtotal = unit * qty;
-  const shipping = shippingFor(subtotal);
+  const shipping = shippingFor(subtotal, city);
   return {
     unitPrice: unit,
     subtotal,

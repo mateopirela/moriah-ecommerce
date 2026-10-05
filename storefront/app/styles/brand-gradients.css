@@ -405,3 +405,13 @@
     border-radius: 18px;
   }
 }
+
+/* Envío según ciudad (carrito y pago) */
+.cart-subtotal--envio dd { font-weight: 600; font-size: 0.9rem; color: var(--tx-text, #3d4a47); }
+.cart-envio-tarifas, .checkout__envio-nota {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--tx-muted, #5b6b67);
+}
+.checkout__envio-nota:empty { display: none; }

@@ -93,7 +93,7 @@ export function sanitizeLines(lines) {
  * @param {{discountCode?: string|null}} [options]
  * @returns {Cart}
  */
-export function buildCart(rawLines, {discountCode} = {}) {
+export function buildCart(rawLines, {discountCode, city} = {}) {
   const lines = sanitizeLines(rawLines).map((l) => {
     const product = getProduct(l.handle);
     const price = unitPrice(l.handle, {size: l.size});
@@ -113,7 +113,7 @@ export function buildCart(rawLines, {discountCode} = {}) {
     };
   });
   const subtotal = lines.reduce((acc, l) => acc + l.totalPrice, 0);
-  const shipping = lines.length ? shippingFor(subtotal) : 0;
+  const shipping = lines.length ? shippingFor(subtotal, city) : 0;
   const discountDef = lines.length ? getDiscount(discountCode) : null;
   const discount = discountDef
     ? {
@@ -128,6 +128,9 @@ export function buildCart(rawLines, {discountCode} = {}) {
     totalQuantity: lines.reduce((acc, l) => acc + l.quantity, 0),
     subtotal,
     shipping,
+    // true mientras no se conoce la ciudad y aún se cobraría envío: la UI no muestra un
+    // monto fijo hasta tenerla.
+    shippingPending: shipping > 0 && !String(city ?? '').trim(),
     discount,
     total,
     currency: CURRENCY,
@@ -149,4 +152,19 @@ export function toStorage(lines) {
 function clampQuantity(q) {
   const n = Math.floor(Number(q) || 0);
   return Math.max(0, Math.min(MAX_QUANTITY, n));
+}
+
+/**
+ * Recalcula envío y total para una ciudad (checkout). No toca el resto del carrito.
+ * @param {Cart} cart
+ * @param {string} [city]
+ */
+export function withShipping(cart, city) {
+  const shipping = cart.lines.length ? shippingFor(cart.subtotal, city) : 0;
+  return {
+    ...cart,
+    shipping,
+    shippingPending: shipping > 0 && !String(city ?? '').trim(),
+    total: Math.max(0, cart.subtotal - (cart.discount?.amount ?? 0) + shipping),
+  };
 }

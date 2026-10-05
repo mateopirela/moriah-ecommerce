@@ -74,7 +74,7 @@ export async function createSubscription(db, input) {
     })
     .returning();
 
-  const amounts = subscriptionAmounts(input);
+  const amounts = subscriptionAmounts({...input, city: input.shipping?.city});
   const [sub] = await db
     .insert(subscriptions)
     .values({
@@ -138,7 +138,7 @@ export async function chargeSubscription(db, sub, {now = new Date(), wait = fals
     throw new Error(`Subscription ${sub.id} is missing customer or payment source`);
   }
 
-  const amounts = subscriptionAmounts(sub);
+  const amounts = subscriptionAmounts({...sub, city: sub.shipping?.city});
   const order = await createOrder(db, {
     customerId: customer.id,
     subscriptionId: sub.id,

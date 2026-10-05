@@ -3,7 +3,7 @@ import {Link} from 'react-router';
 import {CART_ACTIONS, CartForm} from '~/components/CartForm';
 import {useAside} from '~/components/Aside';
 import {IconShield} from '~/components/Icons';
-import {formatCop} from '~/lib/catalog';
+import {LOCAL_SHIPPING_FEE, SHIPPING_FEE, FREE_SHIP_THRESHOLD, formatCop} from '~/lib/catalog';
 import {analytics} from '~/lib/analytics';
 
 /**
@@ -21,7 +21,7 @@ export function CartSummary({cart, layout}) {
         Resumen del pedido
       </p>
       {/* Subtotal solo cuando difiere del total: evita tres líneas con el mismo número. */}
-      {(cart.discount || cart.shipping > 0) && (
+      {(cart.discount || (cart.shipping > 0 && !cart.shippingPending)) && (
         <dl role="group" className="cart-subtotal">
           <dt>Subtotal</dt>
           <dd>{formatCop(cart.subtotal)}</dd>
@@ -33,13 +33,26 @@ export function CartSummary({cart, layout}) {
           <dd>−{formatCop(cart.discount.amount)}</dd>
         </dl>
       )}
-      <dl role="group" className="cart-subtotal">
-        <dt>Envío</dt>
-        <dd>{cart.shipping === 0 ? 'Gratis' : formatCop(cart.shipping)}</dd>
-      </dl>
+      {cart.shippingPending ? (
+        <>
+          <dl role="group" className="cart-subtotal cart-subtotal--envio">
+            <dt>Envío</dt>
+            <dd>Según tu ciudad</dd>
+          </dl>
+          <p className="cart-envio-tarifas">
+            Barranquilla {formatCop(LOCAL_SHIPPING_FEE)} · resto del país {formatCop(SHIPPING_FEE)} ·
+            gratis desde {formatCop(FREE_SHIP_THRESHOLD)}
+          </p>
+        </>
+      ) : (
+        <dl role="group" className="cart-subtotal">
+          <dt>Envío</dt>
+          <dd>{cart.shipping === 0 ? 'Gratis' : formatCop(cart.shipping)}</dd>
+        </dl>
+      )}
       <dl role="group" className="cart-subtotal cart-subtotal--total">
-        <dt>Total</dt>
-        <dd>{formatCop(cart.total)}</dd>
+        <dt>{cart.shippingPending ? 'Total sin envío' : 'Total'}</dt>
+        <dd>{formatCop(cart.shippingPending ? cart.total - cart.shipping : cart.total)}</dd>
       </dl>
       <p className="cart-subtotal__note">Impuestos incluidos.</p>
       <Link

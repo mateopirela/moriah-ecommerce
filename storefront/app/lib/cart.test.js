@@ -1,8 +1,11 @@
 import {describe, expect, it} from 'vitest';
-import {addLine, buildCart, removeLine, sanitizeLines, updateLine} from './cart';
+import {addLine, buildCart, removeLine, sanitizeLines, updateLine, withShipping} from './cart';
 import {
   FREE_SHIP_THRESHOLD,
+  LOCAL_SHIPPING_FEE,
   SHIPPING_FEE,
+  isLocalCity,
+  shippingFor,
   getCollection,
   searchProducts,
   subscriptionAmounts,
@@ -106,5 +109,35 @@ describe('catalog', () => {
       expect.arrayContaining(['bourbon-rosado']),
     );
     expect(searchProducts('')).toEqual([]);
+  });
+});
+
+describe('shipping by city', () => {
+  it('uses the local fee in Barranquilla (any case or accent) and the general fee elsewhere', () => {
+    expect(isLocalCity(' Barranquilla ')).toBe(true);
+    expect(isLocalCity('BARRANQUILLA')).toBe(true);
+    expect(isLocalCity('Bogotá')).toBe(false);
+    expect(shippingFor(45000, 'Barranquilla')).toBe(LOCAL_SHIPPING_FEE);
+    expect(shippingFor(45000, 'Medellín')).toBe(SHIPPING_FEE);
+    expect(shippingFor(FREE_SHIP_THRESHOLD, 'Medellín')).toBe(0);
+  });
+
+  it('marks shipping as pending until the city is known, then recalculates the total', () => {
+    const lines = addLine([], {handle: 'bourbon-rosado', quantity: 1});
+    const cart = buildCart(lines);
+    expect(cart.shippingPending).toBe(true);
+    const local = withShipping(cart, 'Barranquilla');
+    expect(local.shippingPending).toBe(false);
+    expect(local.shipping).toBe(LOCAL_SHIPPING_FEE);
+    expect(local.total).toBe(cart.subtotal + LOCAL_SHIPPING_FEE);
+    expect(withShipping(cart, 'Cali').total).toBe(cart.subtotal + SHIPPING_FEE);
+  });
+
+  it('is never pending when the order already ships free', () => {
+    const lines = addLine([], {handle: 'pacamara', quantity: 2});
+    const cart = buildCart(lines);
+    expect(cart.subtotal).toBeGreaterThanOrEqual(FREE_SHIP_THRESHOLD);
+    expect(cart.shippingPending).toBe(false);
+    expect(cart.shipping).toBe(0);
   });
 });
