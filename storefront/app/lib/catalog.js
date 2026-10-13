@@ -158,31 +158,9 @@ export function allProducts() {
   ];
 }
 
-/**
- * Producto oculto de $1.500 (el mínimo de Wompi) para probar pagos reales de punta a punta. Solo se llega
- * por enlace directo (/products/prueba-de-pago): no está en `allProducts`, así que
- * no sale en colecciones, búsqueda, sitemap ni sugerencias, y no paga envío.
- */
-export const TEST_PRODUCT = {
-  handle: 'prueba-de-pago',
-  title: 'Prueba de pago',
-  category: null,
-  badge: 'Interno',
-  price: 1500,
-  image: '/images/producto-bolsa.webp',
-  short: 'Producto interno para probar pagos.',
-  description: 'Producto interno de $1.500 para verificar el flujo de pago. No se envía nada.',
-};
-
-/** @param {string} handle */
-export function isTestProduct(handle) {
-  return handle === TEST_PRODUCT.handle;
-}
-
 /** @param {string} handle */
 export function getProduct(handle) {
   if (!handle) return null;
-  if (isTestProduct(handle)) return {...normalizeMerch(TEST_PRODUCT), hidden: true};
   const cafe = getCafe(handle);
   if (cafe) return normalizeCafe(cafe);
   if (handle === BUNDLE.handle) return normalizeBundle();

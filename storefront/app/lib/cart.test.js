@@ -2,7 +2,6 @@ import {describe, expect, it} from 'vitest';
 import {addLine, buildCart, removeLine, sanitizeLines, updateLine, withShipping} from './cart';
 import {
   FREE_SHIP_THRESHOLD,
-  allProducts,
   LOCAL_SHIPPING_FEE,
   SHIPPING_FEE,
   isLocalCity,
@@ -140,22 +139,5 @@ describe('shipping by city', () => {
     expect(cart.subtotal).toBeGreaterThanOrEqual(FREE_SHIP_THRESHOLD);
     expect(cart.shippingPending).toBe(false);
     expect(cart.shipping).toBe(0);
-  });
-});
-
-describe('producto de prueba de pago', () => {
-  it('cuesta $1.500 sin envío y no aparece en el catálogo', () => {
-    const cart = withShipping(buildCart([{handle: 'prueba-de-pago', quantity: 1}]), 'Medellín');
-    expect(cart.total).toBe(1500);
-    expect(cart.shipping).toBe(0);
-    expect(allProducts().some((p) => p.handle === 'prueba-de-pago')).toBe(false);
-  });
-
-  it('no regala el envío si va con otros productos', () => {
-    const cart = buildCart([
-      {handle: 'prueba-de-pago', quantity: 1},
-      {handle: 'bourbon-rosado', size: '250 g', grind: 'Grano entero', quantity: 1},
-    ]);
-    expect(cart.shipping).toBe(SHIPPING_FEE);
   });
 });
