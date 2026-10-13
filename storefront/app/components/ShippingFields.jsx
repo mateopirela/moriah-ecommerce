@@ -16,7 +16,15 @@ export function ShippingFields({
 }) {
   // El departamento se elige primero y la ciudad se sugiere a partir de él.
   const [region, setRegion] = useState(values.region ?? '');
+  const [city, setCity] = useState(values.city ?? '');
   const ciudades = MUNICIPIOS[region] ?? [];
+  const alCambiarDepartamento = (e) => {
+    const nuevo = e.target.value;
+    setRegion(nuevo);
+    // La ciudad es de otro departamento: se reinicia (o se fija sola si solo hay una, como Bogotá).
+    const lista = MUNICIPIOS[nuevo] ?? [];
+    setCity(lista.length === 1 ? lista[0] : '');
+  };
   const field = (name, label, props = {}) => (
     <div className={`field${flotante ? ' field--flotante' : ''}${errors[name] ? ' field--error' : ''}`}>
       <label htmlFor={`f-${name}`}>{label}</label>
@@ -70,7 +78,7 @@ export function ShippingFields({
               id="f-region"
               name="region"
               value={region}
-              onChange={(e) => setRegion(e.target.value)}
+              onChange={alCambiarDepartamento}
               required
             >
               <option value="" disabled>
@@ -88,12 +96,34 @@ export function ShippingFields({
               </p>
             )}
           </div>
-          {field('city', 'Ciudad o municipio', {autoComplete: 'address-level2', required: true, list: 'ciudades-sugeridas'})}
-          <datalist id="ciudades-sugeridas">
-            {ciudades.map((c) => (
-              <option key={c} value={c} />
-            ))}
-          </datalist>
+          <div
+            className={`field${flotante ? ' field--flotante field--select' : ''}${errors.city ? ' field--error' : ''}`}
+          >
+            <label htmlFor="f-city">Ciudad o municipio</label>
+            <select
+              id="f-city"
+              name="city"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              autoComplete="address-level2"
+              required
+              aria-invalid={errors.city ? 'true' : undefined}
+            >
+              <option value="" disabled>
+                {region ? 'Selecciona tu ciudad…' : 'Primero elige el departamento'}
+              </option>
+              {ciudades.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            {errors.city && (
+              <p className="field__error" role="alert">
+                {errors.city}
+              </p>
+            )}
+          </div>
         </div>
         {flotante ? (
           // Nota opcional recogida: así el formulario queda más corto.

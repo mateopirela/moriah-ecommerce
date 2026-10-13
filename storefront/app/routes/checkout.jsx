@@ -5,6 +5,7 @@ import {IconShield} from '~/components/Icons';
 import {loadCart} from '~/lib/cart.server';
 import {FREE_SHIP_THRESHOLD, formatCop, shippingRates, shippingZone, toCents} from '~/lib/catalog';
 import {withShipping} from '~/lib/cart';
+import {MUNICIPIOS} from '~/data/municipios';
 import {parseShipping, toShippingRecord} from '~/lib/checkout-form';
 import {useFocusFirstError} from '~/lib/useFocusFirstError';
 import {getDb} from '~/db/client.server';
@@ -211,7 +212,12 @@ export default function Checkout() {
           replace
           onInput={(e) => {
             if (e.target.name === 'city') setCity(e.target.value);
-            if (e.target.name === 'region') setRegion(e.target.value);
+            if (e.target.name === 'region') {
+              setRegion(e.target.value);
+              // Al cambiar de departamento la ciudad se reinicia (o queda fija si solo hay una).
+              const lista = MUNICIPIOS[e.target.value] ?? [];
+              setCity(lista.length === 1 ? lista[0] : '');
+            }
           }}
         >
           {errorCount > 0 && (
