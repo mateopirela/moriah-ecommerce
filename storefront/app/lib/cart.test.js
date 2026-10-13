@@ -144,9 +144,9 @@ describe('shipping by city', () => {
 });
 
 describe('producto de prueba de pago', () => {
-  it('cuesta $1 sin envío y no aparece en el catálogo', () => {
+  it('cuesta $1.500 sin envío y no aparece en el catálogo', () => {
     const cart = withShipping(buildCart([{handle: 'prueba-de-pago', quantity: 1}]), 'Medellín');
-    expect(cart.total).toBe(1);
+    expect(cart.total).toBe(1500);
     expect(cart.shipping).toBe(0);
     expect(allProducts().some((p) => p.handle === 'prueba-de-pago')).toBe(false);
   });
