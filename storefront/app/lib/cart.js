@@ -19,6 +19,7 @@ import {
   CURRENCY,
   FREE_SHIP_THRESHOLD,
   getProduct,
+  isTestProduct,
   lineOptions,
   normalizeOptions,
   round100,
@@ -28,6 +29,12 @@ import {
 import {getDiscount} from '~/data/discounts';
 
 export const MAX_QUANTITY = 99;
+
+/** Envío del carrito: gratis si solo lleva el producto de prueba de pago. */
+function cartShipping(lines, subtotal, city) {
+  if (!lines.length || lines.every((l) => isTestProduct(l.handle))) return 0;
+  return shippingFor(subtotal, city);
+}
 
 /** Identificador estable de una línea a partir de su producto + opciones. */
 export function lineId({handle, size, grind}) {
@@ -113,7 +120,7 @@ export function buildCart(rawLines, {discountCode, city} = {}) {
     };
   });
   const subtotal = lines.reduce((acc, l) => acc + l.totalPrice, 0);
-  const shipping = lines.length ? shippingFor(subtotal, city) : 0;
+  const shipping = cartShipping(lines, subtotal, city);
   const discountDef = lines.length ? getDiscount(discountCode) : null;
   const discount = discountDef
     ? {
@@ -160,7 +167,7 @@ function clampQuantity(q) {
  * @param {string} [city]
  */
 export function withShipping(cart, city) {
-  const shipping = cart.lines.length ? shippingFor(cart.subtotal, city) : 0;
+  const shipping = cartShipping(cart.lines, cart.subtotal, city);
   return {
     ...cart,
     shipping,

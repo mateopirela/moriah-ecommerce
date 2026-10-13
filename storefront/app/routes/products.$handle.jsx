@@ -23,6 +23,7 @@ export const meta = ({data}) => {
   const url = `${origin}/products/${p.handle}`;
   return [
     {title: `${p.title} · MORIAH Café`},
+    ...(p.hidden ? [{name: 'robots', content: 'noindex'}] : []),
     {name: 'description', content: p.description?.slice(0, 160)},
     {tagName: 'link', rel: 'canonical', href: url},
     {property: 'og:title', content: `${p.title} · MORIAH Café`},
