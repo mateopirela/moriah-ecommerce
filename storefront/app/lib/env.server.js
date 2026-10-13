@@ -7,7 +7,9 @@ import 'dotenv/config';
  * @param {string} [fallback]
  */
 export function env(name, fallback = '') {
-  const value = process.env[name];
+  // Sin espacios ni saltos de línea: al pegar una llave en el panel de Vercel es fácil
+  // arrastrar uno, y en un secreto de firma basta para que Wompi la rechace.
+  const value = process.env[name]?.trim();
   return value == null || value === '' ? fallback : value;
 }
 

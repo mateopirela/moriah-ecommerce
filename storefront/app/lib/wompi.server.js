@@ -13,10 +13,27 @@ import {env} from '~/lib/env.server';
 
 export const WOMPI_CHECKOUT_URL = 'https://checkout.wompi.co/p/';
 
+/**
+ * Avisa en los logs si las llaves no son del mismo entorno o el secreto de integridad
+ * no es uno de integridad: Wompi solo responde «La firma es inválida» al pagar.
+ */
+let keysChecked = false;
+function checkKeyPrefixes(publicKey, integritySecret) {
+  if (keysChecked || !publicKey || !integritySecret) return;
+  keysChecked = true;
+  const mode = isSandboxKey(publicKey) ? 'test' : 'prod';
+  if (!integritySecret.startsWith(`${mode}_integrity_`)) {
+    console.error(
+      `[wompi] WOMPI_INTEGRITY_SECRET debería empezar por "${mode}_integrity_" para una llave pública ${mode}; empieza por "${integritySecret.split("_").slice(0, 2).join("_")}_…". Los pagos fallarán con «La firma es inválida».`,
+    );
+  }
+}
+
 /** Configuración derivada de las variables de entorno. */
 export function wompiConfig() {
   const publicKey = env('WOMPI_PUBLIC_KEY');
   const sandbox = isSandboxKey(publicKey);
+  checkKeyPrefixes(publicKey, env('WOMPI_INTEGRITY_SECRET'));
   return {
     publicKey,
     privateKey: env('WOMPI_PRIVATE_KEY'),
