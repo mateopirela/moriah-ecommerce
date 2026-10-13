@@ -38,6 +38,8 @@ export const orders = pgTable('orders', {
   notes: text('notes'),
   wompiTransactionId: text('wompi_transaction_id'),
   wompiPaymentMethod: text('wompi_payment_method'),
+  /** Cuándo se despachó el pedido (lo marca el admin en /admin/pedidos). */
+  fulfilledAt: timestamp('fulfilled_at', {withTimezone: true}),
   createdAt: timestamp('created_at', {withTimezone: true})
     .notNull()
     .defaultNow(),

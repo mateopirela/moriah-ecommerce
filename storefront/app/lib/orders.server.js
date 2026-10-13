@@ -1,7 +1,8 @@
-import {eq} from 'drizzle-orm';
+import {and, eq} from 'drizzle-orm';
 import {customers, orders} from '~/db/schema';
 import {getProduct, toCents} from '~/lib/catalog';
 import {notifyOrderPaid} from '~/lib/klaviyo.server';
+import {notifyMerchantOrderPaid} from '~/lib/notify.server';
 import {
   getTransaction,
   isFinalStatus,
@@ -116,7 +117,7 @@ export function transactionMatchesOrder(order, tx) {
 /**
  * Aplica el estado de una transacción al pedido. Idempotente: si el pedido ya
  * está en un estado final igual, no hace nada. Notifica al cliente cuando el
- * pedido pasa a aprobado.
+ * pedido pasa a aprobado, y avisa a la tienda por correo.
  * @param {any} db
  * @param {any} order
  * @param {any} tx
@@ -136,8 +137,14 @@ export async function applyTransactionToOrder(db, order, tx) {
       wompiPaymentMethod: tx.payment_method_type ?? tx.payment_method?.type ?? null,
       updatedAt: new Date(),
     })
-    .where(eq(orders.id, order.id))
+    // Solo si nadie lo cambió entretanto: el webhook y la página de gracias pueden
+    // llegar a la vez, y los avisos de pago deben salir una sola vez.
+    .where(and(eq(orders.id, order.id), eq(orders.status, previousStatus)))
     .returning();
+  if (!updated) {
+    const current = await findOrderByReference(db, order.reference);
+    return {order: current ?? order, changed: false, previousStatus};
+  }
 
   if (status === 'approved' && previousStatus !== 'approved') {
     const customer = await findCustomer(db, updated.customerId);
@@ -146,6 +153,9 @@ export async function applyTransactionToOrder(db, order, tx) {
         console.error('notifyOrderPaid failed', err),
       );
     }
+    await notifyMerchantOrderPaid(updated, customer).catch((err) =>
+      console.error('notifyMerchantOrderPaid failed', err),
+    );
   }
   return {order: updated, changed: previousStatus !== status, previousStatus};
 }

@@ -8,6 +8,7 @@ Disallow: /cart
 Disallow: /checkout
 Disallow: /suscripcion/gestionar
 Disallow: /api/
+Disallow: /admin
 Disallow: /search
 Sitemap: ${sitemapUrl}
 `;

@@ -1,0 +1,152 @@
+/* ============================================================
+   Panel interno (/admin) — MORIAH
+   ============================================================ */
+
+.admin {
+  padding-block: clamp(2rem, 5vw, 4rem) 5rem;
+  max-width: 860px;
+}
+
+.admin-login {
+  max-width: 380px;
+  margin-inline: auto;
+}
+.admin-login__form {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.admin__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.admin__tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-block: var(--space-4);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.admin__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-muted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  white-space: nowrap;
+}
+.admin__tab.is-active {
+  color: var(--text);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+.admin__count {
+  min-width: 1.5em;
+  padding: 0 0.4em;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 0.8em;
+  text-align: center;
+}
+
+.admin__empty {
+  padding-block: var(--space-6);
+  text-align: center;
+}
+
+.admin__list {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.admin-order {
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.admin-order--pending,
+.admin-order--declined,
+.admin-order--voided,
+.admin-order--error {
+  opacity: 0.7;
+}
+
+.admin-order__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.admin-order__ref {
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-badge,
+.admin-status {
+  display: inline-block;
+  padding: 0.15em 0.6em;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+}
+.admin-badge {
+  margin-left: var(--space-2);
+}
+.admin-status--approved {
+  background: var(--success);
+  border-color: var(--success);
+  color: var(--white);
+}
+
+.admin-order__items {
+  display: grid;
+  gap: var(--space-1);
+  margin-block: var(--space-3);
+  padding: 0;
+  list-style: none;
+}
+.admin-order__items li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.admin-order__total {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border);
+}
+
+.admin-order__ship p {
+  margin: 0 0 var(--space-2);
+  line-height: 1.5;
+}
+.admin-order__contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.admin-order__notes {
+  font-style: italic;
+}
+
+.admin-order__actions {
+  /* reset.css limita todos los forms a 400px en escritorio. */
+  max-width: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
