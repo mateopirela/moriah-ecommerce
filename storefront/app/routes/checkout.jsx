@@ -3,7 +3,7 @@ import {Form, Link, data, redirect, useActionData, useLoaderData, useNavigation}
 import {ShippingFields} from '~/components/ShippingFields';
 import {IconShield} from '~/components/Icons';
 import {loadCart} from '~/lib/cart.server';
-import {LOCAL_SHIPPING_FEE, SHIPPING_FEE, formatCop, isLocalCity, toCents} from '~/lib/catalog';
+import {FREE_SHIP_THRESHOLD, formatCop, shippingRates, shippingZone, toCents} from '~/lib/catalog';
 import {withShipping} from '~/lib/cart';
 import {parseShipping, toShippingRecord} from '~/lib/checkout-form';
 import {useFocusFirstError} from '~/lib/useFocusFirstError';
@@ -35,7 +35,7 @@ export async function action({request}) {
   }
   const form = parsed.data;
   // El envío depende de la ciudad: se recalcula aquí, en el servidor, con la ciudad enviada.
-  const priced = withShipping(cart, form.city);
+  const priced = withShipping(cart, {city: form.city, region: form.region});
 
   const db = await getDb();
   const customer = await upsertCustomer(db, {
@@ -76,7 +76,7 @@ export async function action({request}) {
 }
 
 /** Resumen del pedido (se usa en el panel de escritorio y en el desplegable de móvil). */
-function ResumenPedido({cart, city}) {
+function ResumenPedido({cart, place}) {
   return (
     <>
       <h2 className="co__resumen-titulo">Tu pedido</h2>
@@ -119,7 +119,9 @@ function ResumenPedido({cart, city}) {
           <dt>Envío</dt>
           <dd>
             {cart.shippingPending
-              ? 'Escribe tu ciudad'
+              ? place?.region
+                ? 'Escribe tu ciudad'
+                : 'Elige tu departamento'
               : cart.shipping === 0
                 ? 'Gratis'
                 : formatCop(cart.shipping)}
@@ -130,13 +132,22 @@ function ResumenPedido({cart, city}) {
           <dd>{formatCop(cart.shippingPending ? cart.total - cart.shipping : cart.total)}</dd>
         </div>
       </dl>
-      <p className="checkout__envio-nota">
-        {cart.shippingPending
-          ? `Envío: Barranquilla ${formatCop(LOCAL_SHIPPING_FEE)} · resto del país ${formatCop(SHIPPING_FEE)}.`
-          : cart.shipping > 0 && isLocalCity(city)
-            ? 'Tarifa local de Barranquilla.'
-            : null}
-      </p>
+      <div className="checkout__envio-nota">
+        {cart.shippingPending ? (
+          <ul className="cart-envio-tarifas">
+            {shippingRates().map((r) => (
+              <li key={r.label}>
+                {r.label} <strong>{formatCop(r.fee)}</strong>
+              </li>
+            ))}
+            <li>
+              Gratis desde <strong>{formatCop(FREE_SHIP_THRESHOLD)}</strong>
+            </li>
+          </ul>
+        ) : cart.shipping > 0 && shippingZone(place) ? (
+          <p>Tarifa: {shippingZone(place).label}.</p>
+        ) : null}
+      </div>
       <Link to="/cart" className="checkout__edit">
         Editar carrito
       </Link>
@@ -154,7 +165,9 @@ export default function Checkout() {
   useFocusFirstError(actionData?.errors);
   // La ciudad define el envío: el resumen se actualiza mientras se escribe.
   const [city, setCity] = useState(actionData?.values?.city ?? '');
-  const cart = withShipping(baseCart, city);
+  const [region, setRegion] = useState(actionData?.values?.region ?? '');
+  const place = {city, region};
+  const cart = withShipping(baseCart, place);
   const totalVisible = formatCop(cart.shippingPending ? cart.total - cart.shipping : cart.total);
 
   return (
@@ -188,7 +201,7 @@ export default function Checkout() {
             <strong>{totalVisible}</strong>
           </summary>
           <div className="co__movil-cuerpo">
-            <ResumenPedido cart={cart} city={city} />
+            <ResumenPedido cart={cart} place={place} />
           </div>
         </details>
 
@@ -198,6 +211,7 @@ export default function Checkout() {
           replace
           onInput={(e) => {
             if (e.target.name === 'city') setCity(e.target.value);
+            if (e.target.name === 'region') setRegion(e.target.value);
           }}
         >
           {errorCount > 0 && (
@@ -270,7 +284,7 @@ export default function Checkout() {
 
       <aside className="co__panel" aria-label="Resumen del pedido">
         <div className="co__panel-fijo">
-          <ResumenPedido cart={cart} city={city} />
+          <ResumenPedido cart={cart} place={place} />
         </div>
       </aside>
     </div>

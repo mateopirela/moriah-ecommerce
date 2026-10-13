@@ -1,4 +1,6 @@
+import {useState} from 'react';
 import {DEPARTAMENTOS} from '~/data/colombia';
+import {MUNICIPIOS} from '~/data/municipios';
 
 /**
  * Campos de contacto y dirección (checkout y suscripción).
@@ -12,6 +14,9 @@ export function ShippingFields({
   addressLegend = 'Dirección de entrega',
   flotante = false,
 }) {
+  // El departamento se elige primero y la ciudad se sugiere a partir de él.
+  const [region, setRegion] = useState(values.region ?? '');
+  const ciudades = MUNICIPIOS[region] ?? [];
   const field = (name, label, props = {}) => (
     <div className={`field${flotante ? ' field--flotante' : ''}${errors[name] ? ' field--error' : ''}`}>
       <label htmlFor={`f-${name}`}>{label}</label>
@@ -57,12 +62,17 @@ export function ShippingFields({
           </>
         )}
         <div className="field-row">
-          {field('city', 'Ciudad', {autoComplete: 'address-level2', required: true})}
           <div
             className={`field${flotante ? ' field--flotante field--select' : ''}${errors.region ? ' field--error' : ''}`}
           >
             <label htmlFor="f-region">Departamento</label>
-            <select id="f-region" name="region" defaultValue={values.region ?? ''} required>
+            <select
+              id="f-region"
+              name="region"
+              value={region}
+              onChange={(e) => setRegion(e.target.value)}
+              required
+            >
               <option value="" disabled>
                 Selecciona…
               </option>
@@ -78,6 +88,12 @@ export function ShippingFields({
               </p>
             )}
           </div>
+          {field('city', 'Ciudad o municipio', {autoComplete: 'address-level2', required: true, list: 'ciudades-sugeridas'})}
+          <datalist id="ciudades-sugeridas">
+            {ciudades.map((c) => (
+              <option key={c} value={c} />
+            ))}
+          </datalist>
         </div>
         {flotante ? (
           // Nota opcional recogida: así el formulario queda más corto.

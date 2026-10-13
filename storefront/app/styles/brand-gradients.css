@@ -415,3 +415,9 @@
   color: var(--tx-muted, #5b6b67);
 }
 .checkout__envio-nota:empty { display: none; }
+
+/* Lista de tarifas de envío (carrito y pago) */
+ul.cart-envio-tarifas { margin: 0 0 0.5rem; padding: 0; list-style: none; display: grid; gap: 0.1rem; }
+ul.cart-envio-tarifas li { font-size: 0.8rem; line-height: 1.35; color: var(--tx-muted, #5b6b67); }
+ul.cart-envio-tarifas strong { color: var(--tx-ink, #19332f); }
+.checkout__envio-nota p { margin: 0 0 0.5rem; }

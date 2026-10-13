@@ -46,6 +46,8 @@ export default function AdminLogin() {
                 type="password"
                 autoComplete="current-password"
                 required
+                // Es el único campo de la página: el foco directo ahorra un clic.
+                // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
               />
               {actionData?.error ? <p className="field__error">{actionData.error}</p> : null}

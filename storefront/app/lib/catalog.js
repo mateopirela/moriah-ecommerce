@@ -36,35 +36,82 @@ export function toCents(cop) {
   return Math.round(cop * 100);
 }
 
-/** Tarifa de envío para las ciudades con entrega local. */
-export const LOCAL_SHIPPING_FEE = 6000;
-
-/** Ciudades con tarifa local (en minúsculas y sin tildes). Edita aquí para sumar otras. */
-export const LOCAL_SHIPPING_CITIES = ['barranquilla'];
+/**
+ * Zonas con tarifa propia. Todo lo que no esté aquí paga `SHIPPING_FEE`.
+ * Para sumar una ciudad, agrégala a `cities` (minúsculas y sin tildes) con su
+ * departamento; para otra tarifa, crea otra zona.
+ */
+export const SHIPPING_ZONES = [
+  {
+    id: 'baq',
+    label: 'Barranquilla y área metropolitana',
+    fee: 6000,
+    region: 'Atlántico',
+    cities: ['barranquilla', 'soledad', 'malambo', 'galapa', 'puerto colombia'],
+  },
+  {id: 'cartagena', label: 'Cartagena', fee: 10000, region: 'Bolívar', cities: ['cartagena', 'cartagena de indias']},
+  {id: 'santa-marta', label: 'Santa Marta', fee: 10000, region: 'Magdalena', cities: ['santa marta']},
+];
 
 /** Minúsculas, sin tildes ni espacios sobrantes: "  Bogotá " → "bogota". */
-export function normalizeCity(city) {
-  return String(city ?? '')
+export function normalizeText(value) {
+  return String(value ?? '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .trim()
     .toLowerCase();
 }
 
-/** @param {string} [city] */
-export function isLocalCity(city) {
-  return LOCAL_SHIPPING_CITIES.includes(normalizeCity(city));
+/** Acepta {city, region} o, por compatibilidad, solo el nombre de la ciudad. */
+function asPlace(place) {
+  if (typeof place === 'string') return {city: place, region: ''};
+  return {city: place?.city ?? '', region: place?.region ?? ''};
 }
 
 /**
- * Costo de envío: gratis desde el umbral; si no, $6.000 en ciudades con tarifa local
- * y $12.000 en el resto. Sin ciudad se asume la tarifa general (ver `shippingPending`).
- * @param {number} subtotal
- * @param {string} [city]
+ * Zona de envío con tarifa propia para un destino, o null si paga la tarifa general.
+ * @param {{city?: string, region?: string}|string} [place]
  */
-export function shippingFor(subtotal, city) {
+export function shippingZone(place) {
+  const {city, region} = asPlace(place);
+  const c = normalizeText(city);
+  if (!c) return null;
+  const r = normalizeText(region);
+  return SHIPPING_ZONES.find((z) => z.cities.includes(c) && (!r || normalizeText(z.region) === r)) ?? null;
+}
+
+/**
+ * ¿Ya se sabe lo suficiente del destino para fijar el precio? Con el departamento basta,
+ * salvo en los que tienen zonas con tarifa propia (Atlántico, Bolívar, Magdalena): ahí
+ * también hace falta la ciudad.
+ * @param {{city?: string, region?: string}|string} [place]
+ */
+export function shippingKnown(place) {
+  if (shippingZone(place)) return true;
+  const {city, region} = asPlace(place);
+  const r = normalizeText(region);
+  if (!r) return false;
+  const hasZones = SHIPPING_ZONES.some((z) => normalizeText(z.region) === r);
+  return !hasZones || Boolean(normalizeText(city));
+}
+
+/**
+ * Costo de envío: gratis desde el umbral; si no, la tarifa de la zona del destino o la
+ * general. Sin destino se asume la general (ver `shippingKnown`).
+ * @param {number} subtotal
+ * @param {{city?: string, region?: string}|string} [place]
+ */
+export function shippingFor(subtotal, place) {
   if (subtotal >= FREE_SHIP_THRESHOLD) return 0;
-  return isLocalCity(city) ? LOCAL_SHIPPING_FEE : SHIPPING_FEE;
+  return shippingZone(place)?.fee ?? SHIPPING_FEE;
+}
+
+/** Tarifas para mostrar: [{label, fee}], agrupando zonas con el mismo precio, y el resto del país. */
+export function shippingRates() {
+  const byFee = new Map();
+  for (const z of SHIPPING_ZONES) byFee.set(z.fee, [...(byFee.get(z.fee) ?? []), z.label]);
+  const rates = [...byFee].map(([fee, labels]) => ({fee, label: labels.join(' y ')}));
+  return [...rates.sort((a, b) => a.fee - b.fee), {fee: SHIPPING_FEE, label: 'Resto del país'}];
 }
 
 /** Días entre entregas para cada etiqueta de frecuencia del Club. */
@@ -190,11 +237,11 @@ export function unitPrice(handle, {size, subscription = false} = {}) {
  * Puro: se usa en el servidor para cobrar y en el navegador para previsualizar.
  * @param {{cafeHandle: string, sizeLabel: string, quantity: number}} input
  */
-export function subscriptionAmounts({cafeHandle, sizeLabel, quantity, city}) {
+export function subscriptionAmounts({cafeHandle, sizeLabel, quantity, place}) {
   const unit = unitPrice(cafeHandle, {size: sizeLabel, subscription: true});
   const qty = Math.max(1, Math.min(10, Math.floor(Number(quantity) || 1)));
   const subtotal = unit * qty;
-  const shipping = shippingFor(subtotal, city);
+  const shipping = shippingFor(subtotal, place);
   return {
     unitPrice: unit,
     subtotal,

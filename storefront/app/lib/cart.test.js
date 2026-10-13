@@ -2,10 +2,10 @@ import {describe, expect, it} from 'vitest';
 import {addLine, buildCart, removeLine, sanitizeLines, updateLine, withShipping} from './cart';
 import {
   FREE_SHIP_THRESHOLD,
-  LOCAL_SHIPPING_FEE,
   SHIPPING_FEE,
-  isLocalCity,
   shippingFor,
+  shippingKnown,
+  shippingZone,
   getCollection,
   searchProducts,
   subscriptionAmounts,
@@ -112,25 +112,51 @@ describe('catalog', () => {
   });
 });
 
-describe('shipping by city', () => {
-  it('uses the local fee in Barranquilla (any case or accent) and the general fee elsewhere', () => {
-    expect(isLocalCity(' Barranquilla ')).toBe(true);
-    expect(isLocalCity('BARRANQUILLA')).toBe(true);
-    expect(isLocalCity('Bogotá')).toBe(false);
-    expect(shippingFor(45000, 'Barranquilla')).toBe(LOCAL_SHIPPING_FEE);
-    expect(shippingFor(45000, 'Medellín')).toBe(SHIPPING_FEE);
-    expect(shippingFor(FREE_SHIP_THRESHOLD, 'Medellín')).toBe(0);
+describe('shipping by destination', () => {
+  const BAQ = 6000;
+  const CARIBE = 10000;
+
+  it('charges $6.000 in Barranquilla and its metro area (any case or accent)', () => {
+    for (const city of ['Barranquilla', ' BARRANQUILLA ', 'Soledad', 'Malambo', 'Galapa', 'Puerto Colombia']) {
+      expect(shippingFor(45000, {city, region: 'Atlántico'})).toBe(BAQ);
+    }
   });
 
-  it('marks shipping as pending until the city is known, then recalculates the total', () => {
+  it('charges $10.000 in Cartagena and Santa Marta', () => {
+    expect(shippingFor(45000, {city: 'Cartagena', region: 'Bolívar'})).toBe(CARIBE);
+    expect(shippingFor(45000, {city: 'cartagena de indias', region: 'Bolívar'})).toBe(CARIBE);
+    expect(shippingFor(45000, {city: 'Santa Marta', region: 'Magdalena'})).toBe(CARIBE);
+  });
+
+  it('charges the general fee elsewhere, and when the city does not belong to the department', () => {
+    expect(shippingFor(45000, {city: 'Medellín', region: 'Antioquia'})).toBe(SHIPPING_FEE);
+    expect(shippingFor(45000, {city: 'Sabanalarga', region: 'Atlántico'})).toBe(SHIPPING_FEE);
+    expect(shippingFor(45000, {city: 'Barranquilla', region: 'Antioquia'})).toBe(SHIPPING_FEE);
+    expect(shippingZone({city: 'Cali', region: 'Valle del Cauca'})).toBeNull();
+  });
+
+  it('is free from the threshold, wherever it goes', () => {
+    expect(shippingFor(FREE_SHIP_THRESHOLD, {city: 'Cali', region: 'Valle del Cauca'})).toBe(0);
+  });
+
+  it('needs the department, and the city only where there are special zones', () => {
+    expect(shippingKnown({})).toBe(false);
+    expect(shippingKnown({region: 'Antioquia'})).toBe(true);
+    expect(shippingKnown({region: 'Atlántico'})).toBe(false);
+    expect(shippingKnown({region: 'Atlántico', city: 'Sabanalarga'})).toBe(true);
+    expect(shippingKnown({region: 'Magdalena'})).toBe(false);
+  });
+
+  it('marks shipping as pending until the destination is known, then recalculates the total', () => {
     const lines = addLine([], {handle: 'bourbon-rosado', quantity: 1});
     const cart = buildCart(lines);
     expect(cart.shippingPending).toBe(true);
-    const local = withShipping(cart, 'Barranquilla');
+    const local = withShipping(cart, {city: 'Barranquilla', region: 'Atlántico'});
     expect(local.shippingPending).toBe(false);
-    expect(local.shipping).toBe(LOCAL_SHIPPING_FEE);
-    expect(local.total).toBe(cart.subtotal + LOCAL_SHIPPING_FEE);
-    expect(withShipping(cart, 'Cali').total).toBe(cart.subtotal + SHIPPING_FEE);
+    expect(local.shipping).toBe(BAQ);
+    expect(local.total).toBe(cart.subtotal + BAQ);
+    expect(withShipping(cart, {city: 'Cartagena', region: 'Bolívar'}).total).toBe(cart.subtotal + CARIBE);
+    expect(withShipping(cart, {region: 'Valle del Cauca'}).total).toBe(cart.subtotal + SHIPPING_FEE);
   });
 
   it('is never pending when the order already ships free', () => {
