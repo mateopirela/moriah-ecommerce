@@ -79,6 +79,7 @@ export function ShippingFields({
               name="region"
               value={region}
               onChange={alCambiarDepartamento}
+              autoComplete="address-level1"
               required
             >
               <option value="" disabled>
