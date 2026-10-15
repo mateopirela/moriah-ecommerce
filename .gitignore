@@ -41,3 +41,4 @@ Thumbs.db
 
 # Vercel (local project link + Build Output API artifacts)
 .vercel/
+.env*.local
