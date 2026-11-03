@@ -26,9 +26,16 @@ export async function action({request}) {
 
   const verified = verifyEvent(event);
   const tx = event.data?.transaction;
-  const db = await getDb();
-
   const id = [event.event, tx?.id ?? 'none', tx?.status ?? '', event.timestamp ?? ''].join(':');
+
+  // La firma se comprueba ANTES de tocar la base de datos: una petición sin firma válida
+  // no se guarda (así nadie puede llenar la tabla de eventos con basura).
+  if (!verified) {
+    console.warn('[wompi] event with invalid checksum', id);
+    return Response.json({error: 'invalid signature'}, {status: 401});
+  }
+
+  const db = await getDb();
   try {
     await db.insert(wompiEvents).values({
       id,
@@ -41,10 +48,6 @@ export async function action({request}) {
     return Response.json({ok: true, duplicate: true});
   }
 
-  if (!verified) {
-    console.warn('[wompi] event with invalid checksum', id);
-    return Response.json({error: 'invalid signature'}, {status: 401});
-  }
   if (event.event !== 'transaction.updated' || !tx) {
     return Response.json({ok: true, ignored: event.event});
   }

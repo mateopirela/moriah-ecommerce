@@ -1,4 +1,5 @@
 import {useEffect} from 'react';
+import {NOINDEX} from '~/lib/seo';
 import {Form, Link, useLoaderData} from 'react-router';
 import {formatCop, searchProducts} from '~/lib/catalog';
 import {analytics} from '~/lib/analytics';
@@ -6,6 +7,7 @@ import {analytics} from '~/lib/analytics';
 /** @type {import('react-router').MetaFunction} */
 export const meta = ({data}) => [
   {title: data?.term ? `“${data.term}” · Búsqueda · MORIAH Café` : 'Búsqueda · MORIAH Café'},
+  NOINDEX,
 ];
 
 /** @param {import('react-router').LoaderFunctionArgs} args */

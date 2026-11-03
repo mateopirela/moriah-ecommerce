@@ -1,4 +1,6 @@
 import {Link, useLoaderData} from 'react-router';
+import {breadcrumbLd, seoMeta} from '~/lib/seo';
+import {siteUrl} from '~/lib/env.server';
 import {IconArrowRight} from '~/components/Icons';
 import {SUBSCRIPTION, formatCop, getCollection} from '~/lib/catalog';
 import {useReveal} from '~/lib/useReveal';
@@ -37,23 +39,29 @@ const BANNER_IMAGES = {
 /** @type {import('react-router').MetaFunction} */
 export const meta = ({data}) => {
   const c = data?.collection;
+  if (!c) return [{title: 'Tienda · MORIAH Café'}];
   return [
-    {title: `${c?.title ?? 'Tienda'} · MORIAH Café`},
-    {
-      name: 'description',
-      content:
-        c?.description ?? 'Cafés colombianos de especialidad, tostados de forma artesanal.',
-    },
+    ...seoMeta({
+      origin: data.origin,
+      path: `/collections/${c.handle}`,
+      title: `${c.title} · MORIAH Café`,
+      description:
+        c.description ?? 'Cafés colombianos de especialidad, tostados de forma artesanal.',
+    }),
+    breadcrumbLd(data.origin, [
+      {name: 'Inicio', path: '/'},
+      {name: c.title, path: `/collections/${c.handle}`},
+    ]),
   ];
 };
 
 /** @param {import('react-router').LoaderFunctionArgs} args */
-export async function loader({params}) {
+export async function loader({params, request}) {
   const collection = getCollection(params.handle);
   if (!collection) {
     throw new Response(`Colección ${params.handle} no encontrada`, {status: 404});
   }
-  return {collection};
+  return {collection, origin: siteUrl(request)};
 }
 
 export default function Collection() {

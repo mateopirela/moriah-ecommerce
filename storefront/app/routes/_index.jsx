@@ -8,18 +8,20 @@ import {Testimonials} from '~/components/Testimonials';
 import {BlogSection} from '~/components/BlogSection';
 import {OrigenSection} from '~/components/OrigenSection';
 import {PrimeraVez} from '~/components/PrimeraVez';
-import {seoMeta} from '~/lib/seo';
+import {seoMeta, siteLd} from '~/lib/seo';
 import {siteUrl} from '~/lib/env.server';
 
 /** @type {Route.MetaFunction} */
-export const meta = ({data}) =>
-  seoMeta({
+export const meta = ({data}) => [
+  ...seoMeta({
     origin: data?.origin ?? '',
     path: '/',
     title: 'MORIAH Café · Un café para el alma',
     description:
       'Café de especialidad de las montañas de Colombia, para volver a la pausa de cada mañana. Microlotes de Pitalito, Huila, en grano o molido. Entrega en 2–5 días.',
-  });
+  }),
+  ...siteLd(data?.origin ?? ''),
+];
 
 /** Precarga el póster del hero: es lo primero que se ve mientras llega el video. */
 export function links() {

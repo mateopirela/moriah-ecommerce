@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {DEPARTAMENTOS} from '~/data/colombia';
 import {MUNICIPIOS} from '~/data/municipios';
 
@@ -13,11 +13,17 @@ export function ShippingFields({
   contactLegend = 'Datos de contacto',
   addressLegend = 'Dirección de entrega',
   flotante = false,
+  onPlaceChange,
 }) {
   // El departamento se elige primero y la ciudad se sugiere a partir de él.
   const [region, setRegion] = useState(values.region ?? '');
   const [city, setCity] = useState(values.city ?? '');
   const ciudades = MUNICIPIOS[region] ?? [];
+  // Avisa al padre (el resumen del pedido) del destino elegido. Se lee del estado de este
+  // componente y no de eventos del DOM: así también cuenta lo que rellena el autocompletado.
+  useEffect(() => {
+    onPlaceChange?.({city, region});
+  }, [city, region, onPlaceChange]);
   const alCambiarDepartamento = (e) => {
     const nuevo = e.target.value;
     setRegion(nuevo);

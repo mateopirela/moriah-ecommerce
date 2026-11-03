@@ -1,11 +1,11 @@
 import {useState} from 'react';
+import {NOINDEX} from '~/lib/seo';
 import {Form, Link, data, redirect, useActionData, useLoaderData, useNavigation} from 'react-router';
 import {ShippingFields} from '~/components/ShippingFields';
 import {IconShield} from '~/components/Icons';
 import {loadCart} from '~/lib/cart.server';
 import {FREE_SHIP_THRESHOLD, formatCop, shippingRates, shippingZone, toCents} from '~/lib/catalog';
 import {withShipping} from '~/lib/cart';
-import {MUNICIPIOS} from '~/data/municipios';
 import {parseShipping, toShippingRecord} from '~/lib/checkout-form';
 import {useFocusFirstError} from '~/lib/useFocusFirstError';
 import {getDb} from '~/db/client.server';
@@ -13,7 +13,7 @@ import {databaseConfigured, siteUrl} from '~/lib/env.server';
 import {createOrder, orderItemsFromCart, upsertCustomer} from '~/lib/orders.server';
 import {buildCheckoutUrl, wompiConfig} from '~/lib/wompi.server';
 
-export const meta = () => [{title: 'Finalizar compra · MORIAH Café'}];
+export const meta = () => [{title: 'Finalizar compra · MORIAH Café'}, NOINDEX];
 
 /** @param {import('react-router').LoaderFunctionArgs} args */
 export async function loader({request}) {
@@ -165,9 +165,10 @@ export default function Checkout() {
   const errorCount = Object.keys(errors).length;
   useFocusFirstError(actionData?.errors);
   // La ciudad define el envío: el resumen se actualiza mientras se escribe.
-  const [city, setCity] = useState(actionData?.values?.city ?? '');
-  const [region, setRegion] = useState(actionData?.values?.region ?? '');
-  const place = {city, region};
+  const [place, setPlace] = useState({
+    city: actionData?.values?.city ?? '',
+    region: actionData?.values?.region ?? '',
+  });
   const cart = withShipping(baseCart, place);
   const totalVisible = formatCop(cart.shippingPending ? cart.total - cart.shipping : cart.total);
 
@@ -210,15 +211,6 @@ export default function Checkout() {
           method="post"
           className="checkout__form co__form"
           replace
-          onInput={(e) => {
-            if (e.target.name === 'city') setCity(e.target.value);
-            if (e.target.name === 'region') {
-              setRegion(e.target.value);
-              // Al cambiar de departamento la ciudad se reinicia (o queda fija si solo hay una).
-              const lista = MUNICIPIOS[e.target.value] ?? [];
-              setCity(lista.length === 1 ? lista[0] : '');
-            }
-          }}
         >
           {errorCount > 0 && (
             <div className="form-errors" role="alert">
@@ -240,6 +232,7 @@ export default function Checkout() {
           )}
           <ShippingFields
             flotante
+            onPlaceChange={setPlace}
             errors={errors}
             values={actionData?.values}
             contactLegend="Contacto"

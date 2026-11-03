@@ -1,22 +1,30 @@
 import {Link, useLoaderData} from 'react-router';
 import {articulosOrdenados, formatFecha, getArticulo} from '~/data/articulos';
 import {BlogCard} from '~/components/BlogCard';
-import {seoMeta} from '~/lib/seo';
+import {articleLd, breadcrumbLd, seoMeta} from '~/lib/seo';
 import {siteUrl} from '~/lib/env.server';
 
 /** @type {import('react-router').MetaFunction} */
 export const meta = ({data}) => {
   const a = data?.articulo;
   if (!a) return [{title: 'Artículo no encontrado · MORIAH Café'}];
-  return seoMeta({
-    origin: data.origin,
-    path: `/blog/${a.handle}`,
-    title: `${a.title} · Notas de café MORIAH`,
-    description: a.excerpt,
-    image: a.img,
-    imageAlt: a.title,
-    type: 'article',
-  });
+  return [
+    ...seoMeta({
+      origin: data.origin,
+      path: `/blog/${a.handle}`,
+      title: `${a.title} · Notas de café MORIAH`,
+      description: a.excerpt,
+      image: a.img,
+      imageAlt: a.title,
+      type: 'article',
+    }),
+    articleLd(data.origin, a),
+    breadcrumbLd(data.origin, [
+      {name: 'Inicio', path: '/'},
+      {name: 'Notas de café', path: '/blog'},
+      {name: a.title, path: `/blog/${a.handle}`},
+    ]),
+  ];
 };
 
 /** @param {import('react-router').LoaderFunctionArgs} args */

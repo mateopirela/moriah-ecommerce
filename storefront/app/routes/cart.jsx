@@ -1,11 +1,12 @@
 import {data, redirect, useLoaderData} from 'react-router';
+import {NOINDEX} from '~/lib/seo';
 import {CartMain} from '~/components/CartMain';
 import {CART_ACTIONS} from '~/components/CartForm';
 import {addLine, buildCart, removeLine, updateLine} from '~/lib/cart';
 import {commitCart, readCartSession} from '~/lib/cart.server';
 import {getDiscount} from '~/data/discounts';
 
-export const meta = () => [{title: 'Tu carrito · MORIAH Café'}];
+export const meta = () => [{title: 'Tu carrito · MORIAH Café'}, NOINDEX];
 
 /** @type {import('react-router').HeadersFunction} */
 export const headers = ({actionHeaders}) => actionHeaders;

@@ -1,10 +1,12 @@
 import {useSearchParams} from 'react-router';
+import {NOINDEX} from '~/lib/seo';
 import {Link} from 'react-router';
 import {IconArrowRight, IconCheck} from '~/components/Icons';
 
 export const meta = () => [
   {title: '¡Gracias! Tu historia es valiosa'},
   {name: 'description', content: 'Tu memoria ha sido recibida. Aquí está tu código de descuento.'},
+  NOINDEX,
 ];
 
 /**

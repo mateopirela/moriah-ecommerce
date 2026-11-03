@@ -47,3 +47,54 @@ export function seoMeta({
     {name: 'twitter:image', content: img},
   ];
 }
+
+/** Entrada de datos estructurados (JSON-LD) para el arreglo `meta`. */
+export const jsonLd = (data) => ({'script:ld+json': {'@context': 'https://schema.org', ...data}});
+
+/** Marca y sitio: va en el home. */
+export function siteLd(origin) {
+  return [
+    jsonLd({
+      '@type': 'Organization',
+      name: 'MORIAH Café',
+      url: absoluteUrl(origin, '/'),
+      logo: absoluteUrl(origin, '/images/logo-moriah.png'),
+    }),
+    jsonLd({
+      '@type': 'WebSite',
+      name: 'MORIAH Café',
+      url: absoluteUrl(origin, '/'),
+      inLanguage: 'es-CO',
+    }),
+  ];
+}
+
+/** Migas de pan. `items`: [{name, path}] de lo general a lo particular. */
+export function breadcrumbLd(origin, items) {
+  return jsonLd({
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: item.name,
+      item: absoluteUrl(origin, item.path),
+    })),
+  });
+}
+
+/** Artículo del blog. `date` es ISO 'YYYY-MM-DD'. */
+export function articleLd(origin, {title, excerpt, date, img, handle}) {
+  return jsonLd({
+    '@type': 'Article',
+    headline: title,
+    description: excerpt,
+    datePublished: date,
+    image: absoluteUrl(origin, img),
+    mainEntityOfPage: absoluteUrl(origin, `/blog/${handle}`),
+    author: {'@type': 'Organization', name: 'MORIAH Café'},
+    publisher: {'@type': 'Organization', name: 'MORIAH Café'},
+  });
+}
+
+/** Páginas que no deben aparecer en Google (robots.txt solo evita el rastreo). */
+export const NOINDEX = {name: 'robots', content: 'noindex'};

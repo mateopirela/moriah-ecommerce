@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {breadcrumbLd} from '~/lib/seo';
 import {Link, redirect, useLoaderData} from 'react-router';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
@@ -49,6 +50,11 @@ export const meta = ({data}) => {
         },
       },
     },
+    breadcrumbLd(origin, [
+      {name: 'Inicio', path: '/'},
+      {name: 'Cafés', path: '/collections/cafes'},
+      {name: p.title, path: `/products/${p.handle}`},
+    ]),
   ];
 };
 
