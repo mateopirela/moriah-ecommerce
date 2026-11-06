@@ -60,7 +60,7 @@
 /* --- PDP layout --- */
 .pdp {
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
   grid-template-areas:
     'gallery head'
     'gallery info';
@@ -87,7 +87,7 @@
      Antes la imagen ocupaba toda la primera pantalla y el nombre del café
      aparecía ~1.200px más abajo. */
   .pdp {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
       'head'
       'gallery'
@@ -100,7 +100,7 @@
 /* Gallery */
 .pdp-gallery {
   position: sticky;
-  top: calc(var(--header-h) + var(--space-3));
+  top: calc(var(--header-total) + var(--space-3));
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -120,6 +120,14 @@
 .pdp-gallery__thumbs {
   display: flex;
   gap: var(--space-2);
+}
+/* La galería va pegada bajo la cabecera: si es más alta que lo que queda de
+   pantalla, el pie de la foto nunca se ve. */
+@media (min-width: 901px) {
+  .pdp-gallery__main {
+    width: 100%;
+    max-height: calc(100svh - var(--header-total) - var(--space-5));
+  }
 }
 .pdp-thumb {
   width: 76px;
@@ -260,6 +268,7 @@
 /* Quantity stepper */
 .qty-stepper {
   display: inline-flex;
+  flex: none;
   align-items: center;
   border: 1px solid var(--border);
   border-radius: var(--r-pill);
@@ -292,6 +301,7 @@
 }
 .pdp-buy__row {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-3);
   align-items: stretch;
 }
@@ -423,9 +433,11 @@
 .sticky-atc .btn {
   flex: none;
 }
+.sticky-atc__meta-extra {
+  min-width: 0;
+}
 @media (max-width: 560px) {
-  .sticky-atc__info img,
-  .sticky-atc__meta-extra {
+  .sticky-atc__info img {
     display: none;
   }
 }
@@ -511,8 +523,13 @@
 }
 .buy-type {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2);
+}
+@media (max-width: 380px) {
+  .buy-type {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .buy-type__opt {
   display: flex;
@@ -536,6 +553,7 @@
 }
 .buy-type__head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
@@ -607,7 +625,7 @@
   width: 100%;
   min-height: 48px;
   padding: 0 1rem;
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-family: inherit;
   color: var(--text);
   background: var(--white);
@@ -735,7 +753,6 @@
   /* Cantidad arriba (a lo ancho) y botón de compra debajo: en 390px el
      botón quedaba estrujado y su texto caía en tres líneas. */
   .pdp-buy__row {
-    flex-wrap: wrap;
     gap: var(--space-2);
   }
   .pdp-buy__row .qty-stepper {
@@ -779,10 +796,11 @@
   color: var(--ink-500);
   font-size: 0.78rem;
 }
-/* Migas: alto cómodo para el dedo */
+/* Migas: área cómoda para el dedo */
 .breadcrumb a {
   display: inline-flex;
   align-items: center;
+  min-width: 44px;
   min-height: 44px;
 }
 .roast-meter__label {

@@ -152,8 +152,11 @@
 }
 .tx-primera__consejo strong { color: var(--tx-gold-deep, #b36d18); }
 .tx-primera__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  min-height: 44px;
   margin-top: auto;
-  padding-top: 0.6rem;
   font-weight: 700;
   color: var(--tx-gold-deep, #b36d18);
   text-decoration: none;

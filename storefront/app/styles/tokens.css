@@ -87,8 +87,9 @@
   --maxw: 1280px;
   --maxw-prose: 64ch;
   --gutter: clamp(1.25rem, 0.5rem + 3vw, 3rem);
-  --header-h: 76px;
+  --header-h: 72px;
   --announce-h: 40px;
+  --header-total: calc(var(--header-h) + var(--announce-h)); /* lo que tapa la cabecera fija */
 
   /* --- Radius --- */
   --r-sm: 6px;
@@ -123,4 +124,12 @@
   --z-header: 100;
   --z-aside: 200;
   --z-toast: 300;
+}
+
+/* Celular horizontal: 112 px de cabecera son casi un tercio de la pantalla. */
+@media (max-height: 500px) and (orientation: landscape) {
+  :root {
+    --header-h: 56px;
+    --announce-h: 0px;
+  }
 }

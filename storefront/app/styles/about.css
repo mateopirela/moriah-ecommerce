@@ -99,8 +99,10 @@
   border-left: 2px solid var(--tx-line);
 }
 .tx-about__indice a {
-  display: block;
-  padding: 0.45rem 0 0.45rem 1rem;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0 0 1rem;
   margin-left: -2px;
   font-size: 0.9rem;
   color: var(--tx-muted);
@@ -418,7 +420,7 @@
   /* El índice pasa a ser una tira horizontal que se queda pegada arriba. */
   .tx-about__indice {
     position: sticky;
-    top: 112px;
+    top: var(--header-total);
     z-index: 20;
     min-width: 0;
     margin-inline: calc(var(--tx-gutter) * -1);
@@ -437,7 +439,10 @@
   .tx-about__indice ol::-webkit-scrollbar { display: none; }
   .tx-about__indice a {
     flex: 0 0 auto;
-    padding: 0.5rem 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 0.9rem;
     margin: 0;
     white-space: nowrap;
     font-size: 0.82rem;

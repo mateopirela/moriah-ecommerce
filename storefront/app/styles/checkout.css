@@ -4,7 +4,8 @@
 
 .checkout,
 .status-page,
-.subscribe {
+.subscribe,
+.search {
   /* Solo arriba y abajo: el margen lateral lo pone `.container`. */
   padding-block: clamp(2rem, 5vw, 4rem) 5rem;
 }
@@ -63,6 +64,15 @@
   width: 100%;
   min-height: 48px;
 }
+/* Safari ignora alto y relleno del <select> nativo (se quedaba en 27px). */
+.field select {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 2.4rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2319332f' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+}
 .field input:focus,
 .field select:focus,
 .field textarea:focus {
@@ -87,7 +97,7 @@
 }
 @media (min-width: 600px) {
   .field-row {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -122,7 +132,7 @@
 }
 .checkout__line {
   display: grid;
-  grid-template-columns: 56px 1fr auto;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
   gap: 0.75rem;
   align-items: center;
 }
@@ -160,8 +170,10 @@
   margin-top: 0.75rem !important;
 }
 .checkout__edit {
-  display: inline-block;
-  margin-top: 1rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 0.5rem;
   font-size: 0.9rem;
   text-decoration: underline;
 }
@@ -241,7 +253,7 @@
 .card-fields {
   display: grid;
   gap: 0 1rem;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .card-fields .field--full {
   grid-column: 1 / -1;
@@ -330,15 +342,6 @@
 }
 
 @media (max-width: 560px) {
-  /* Número de tarjeta, vencimiento y CVC a lo ancho: en 390px la fila
-     de dos columnas dejaba campos de ~150px. */
-  .card-fields {
-    grid-template-columns: 1fr 1fr;
-  }
-  .card-fields .field {
-    min-width: 0;
-  }
-
   /* Ficha de la suscripción: etiqueta encima del valor. */
   .manage-card {
     padding: 1.25rem;
@@ -450,6 +453,8 @@
 }
 .co__volver {
   justify-self: start;
+  display: inline-block;
+  padding-block: 0.8rem; /* 44px de área táctil */
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--tx-ink, #19332f);
@@ -459,6 +464,7 @@
 .co__logo {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   gap: 0.5rem;
   font-family: var(--tx-display, inherit);
   font-size: 1.25rem;
@@ -477,7 +483,14 @@
   color: var(--tx-muted, #5b6b67);
 }
 .co__pasos li + li::before { content: '›'; margin-right: 0.4rem; }
-.co__pasos a { color: inherit; }
+.co__pasos a {
+  display: inline-flex;
+  align-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  margin-block: -0.9rem; /* área táctil de 44px sin agrandar la fila */
+  color: inherit;
+}
 .co__pasos [aria-current='step'] { font-weight: 700; color: var(--tx-ink, #19332f); }
 .co__titulo {
   margin: 0 0 1.2rem;
@@ -535,7 +548,7 @@
   padding: 1.35rem 0.95rem 0.4rem;
   border: 1px solid rgba(25, 51, 47, 0.25);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.85);
 }
 .co .field--flotante textarea { padding-top: 1.6rem; min-height: 4.5rem; }
 .co .field--flotante:focus-within label,
@@ -700,18 +713,26 @@ main:has(> .co) { padding-top: 0; min-height: 100vh; }
   font-size: 1.02rem;
   padding: 1.45rem 1rem 0.4rem;
 }
+.co .field--flotante select {
+  padding-right: 2.4rem;
+  text-overflow: ellipsis;
+}
 .co .field--flotante:focus-within label,
 .co .field--flotante:has(input:not(:placeholder-shown)) label,
 .co .field--flotante:has(textarea:not(:placeholder-shown)) label,
 .co .field--select label { top: 0.42rem; font-size: 0.74rem; }
 .co .field-row { gap: 0 0.7rem; }
 @media (min-width: 600px) {
-  .co .field-row--direccion { grid-template-columns: 2fr 1fr; }
+  .co .field-row--direccion { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
 }
 
 /* Nota opcional recogida */
 .co__nota { margin: 0.2rem 0 0; }
 .co__nota summary {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 44px;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 600;
@@ -719,8 +740,8 @@ main:has(> .co) { padding-top: 0; min-height: 100vh; }
   list-style: none;
 }
 .co__nota summary::-webkit-details-marker { display: none; }
-.co__nota summary::before { content: '+ '; }
-.co__nota[open] summary::before { content: '− '; }
+.co__nota summary::before { content: '+'; }
+.co__nota[open] summary::before { content: '−'; }
 .co__nota[open] summary { margin-bottom: 0.7rem; }
 
 /* Bloque de pago más compacto */
@@ -737,15 +758,19 @@ main:has(> .co) { padding-top: 0; min-height: 100vh; }
 }
 
 /* ============================================================
-   /checkout — tamaño: el formulario usa todo su ancho y el resumen se lee bien
-   (una regla global de reset.css limitaba cualquier <form> a 400 px)
+   /checkout — tamaño: el resumen se lee bien
    ============================================================ */
-.co .co__form { max-width: none; width: 100%; }
-
 /* Resumen del pedido: producto más grande y cifras más legibles */
 .co__resumen-titulo { margin-bottom: 1.2rem; font-size: 1.2rem; }
 .co__panel .checkout__line,
-.co__movil .checkout__line { grid-template-columns: 84px 1fr auto; gap: 1rem; }
+.co__movil .checkout__line { grid-template-columns: 84px minmax(0, 1fr) auto; gap: 1rem; }
+@media (max-width: 400px) {
+  .co__movil .checkout__line { grid-template-columns: 64px minmax(0, 1fr) auto; gap: 0.75rem; }
+  .co__movil .co__thumb,
+  .co__movil .co__thumb img { width: 64px; height: 64px; }
+  .co__movil .checkout__line-title { font-size: 1rem; }
+  .co__movil .checkout__line > span:last-child { font-size: 0.95rem; }
+}
 .co__thumb, .co__thumb img { width: 84px; height: 84px; }
 .co__thumb img { border-radius: 14px; }
 .co__cant { top: -8px; right: -8px; min-width: 1.5rem; height: 1.5rem; font-size: 0.8rem; }

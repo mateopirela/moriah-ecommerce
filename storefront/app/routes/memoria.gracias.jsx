@@ -48,7 +48,7 @@ export default function GraciasPage() {
             backgroundColor: 'rgba(19, 54, 43, 0.15)',
             border: '2px solid var(--primary)',
             borderRadius: '8px',
-            padding: '2.5rem',
+            padding: 'clamp(1.25rem, 5vw, 2.5rem)',
             textAlign: 'center',
             marginBottom: '2rem',
           }}>
@@ -63,12 +63,13 @@ export default function GraciasPage() {
             <div style={{
               backgroundColor: 'var(--primary)',
               color: 'var(--cream-50)',
-              padding: '1.5rem',
+              padding: 'clamp(1rem, 4vw, 1.5rem)',
               borderRadius: '4px',
               marginBottom: '1rem',
               fontFamily: 'monospace',
-              fontSize: '2rem',
-              letterSpacing: '2px',
+              fontSize: 'clamp(1.05rem, 5.2vw, 2rem)',
+              letterSpacing: '0.04em',
+              overflowWrap: 'anywhere',
               fontWeight: 700,
               userSelect: 'all',
             }}>

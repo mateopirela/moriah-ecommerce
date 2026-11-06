@@ -215,7 +215,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 1rem;
   font-size: 0.85rem;
   font-weight: 700;
@@ -339,7 +339,10 @@
 }
 .tx-blog-card__more {
   margin-top: auto;
-  padding-top: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  min-height: 44px;
   align-self: flex-start;
   font-size: 0.85rem;
   font-weight: 700;
@@ -464,20 +467,20 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .tx-blog-shop__inner {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 @media (max-width: 600px) {
   .tx-blog-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-auto-rows: auto;
   }
   .tx-blog-shop__list {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .tx-blog-shop__cafe {
     display: grid;
-    grid-template-columns: 76px 1fr auto;
+    grid-template-columns: 76px minmax(0, 1fr) auto;
     align-items: center;
     column-gap: 0.8rem;
     padding: 0.6rem 0.9rem 0.6rem 0.6rem;
@@ -501,8 +504,10 @@
   padding: clamp(1.25rem, 0.8rem + 1.5vw, 2.25rem) var(--tx-gutter) 0;
 }
 .tx-blog-back {
-  display: inline-block;
-  margin-bottom: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-bottom: 0.9rem;
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--tx-gold-deep);

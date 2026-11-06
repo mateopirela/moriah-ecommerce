@@ -176,7 +176,7 @@
   .tx-banner__inner {
     grid-template-columns: 1fr;
     gap: 0.25rem;
-    padding-top: 6.9rem;
+    padding-top: var(--header-total);
     padding-bottom: 0.25rem;
   }
   .tx-banner--split .tx-banner__h1 {
@@ -229,6 +229,49 @@
   .tx-banner__cafe {
     flex: 0 0 62%;
     scroll-snap-align: start;
+  }
+}
+
+/* A 320px los dos botones no caben en una fila. */
+@media (max-width: 359px) {
+  .tx-banner--split .tx-banner__acciones {
+    flex-wrap: wrap;
+  }
+}
+
+/* Tablet vertical: los botones conservan su tamaño en vez de estirarse. */
+@media (min-width: 600px) and (max-width: 899px) {
+  .tx-banner--split .tx-banner__acciones .tx-btn {
+    flex: 0 1 auto;
+    padding-inline: 1.5rem;
+    font-size: 0.82rem;
+  }
+}
+
+/* Celular horizontal: sobra ancho y falta alto. Dos columnas, como en escritorio,
+   para que el titular y los botones entren en la primera pantalla. */
+@media (max-width: 899px) and (max-height: 500px) and (orientation: landscape) {
+  .tx-banner__inner {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.5fr);
+    align-items: end;
+    padding-top: calc(var(--header-total) + 0.5rem);
+    padding-bottom: 0.75rem;
+  }
+  .tx-banner--split .tx-banner__h1 {
+    max-width: none;
+    font-size: clamp(1.7rem, 5vw, 2.2rem);
+  }
+  .tx-banner--split .tx-banner__acciones .tx-btn {
+    flex: 0 1 auto;
+  }
+  .tx-banner__producto img {
+    height: min(58svh, 200px);
+    transform: none;
+  }
+  .tx-banner__cafe {
+    flex: 0 0 auto;
+    min-width: 11rem;
+    padding: 0.5rem 0.9rem;
   }
 }
 
