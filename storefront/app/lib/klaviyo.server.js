@@ -1,7 +1,7 @@
 /**
  * Klaviyo — perfiles, eventos y listas (solo servidor).
  * Si KLAVIYO_PRIVATE_KEY no está configurada, todas las llamadas son no-ops:
- * el sitio funciona igual, solo sin emails automáticos.
+ * el sitio funciona igual. Los correos al cliente salen por Resend (notify.server).
  */
 import {env} from '~/lib/env.server';
 import {formatCop} from '~/lib/catalog';
@@ -101,7 +101,7 @@ export function createKlaviyoClient(privateKey, communityListId = null) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Notificaciones transaccionales (flows en Klaviyo por nombre de métrica) */
+/* Eventos para flows de marketing: no crear flows que repitan los correos de Resend */
 /* ------------------------------------------------------------------ */
 
 /**

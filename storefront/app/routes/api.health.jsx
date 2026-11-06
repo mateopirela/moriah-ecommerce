@@ -3,7 +3,7 @@ import {getDb} from '~/db/client.server';
 import {databaseConfigured, env} from '~/lib/env.server';
 import {isSandboxKey, wompiConfig} from '~/lib/wompi.server';
 import {adminConfigured} from '~/lib/admin.server';
-import {orderEmailConfigured} from '~/lib/notify.server';
+import {customerEmailConfigured, orderEmailConfigured} from '~/lib/notify.server';
 
 /**
  * Estado de la configuración de producción: solo responde sí/no, nunca valores.
@@ -60,6 +60,7 @@ export async function loader() {
         cronSecret: Boolean(env('CRON_SECRET')),
         // Avisos y panel: no bloquean los pagos, por eso no cuentan para `ok`.
         orderEmail: orderEmailConfigured(),
+        customerEmail: customerEmailConfigured(),
         adminPanel: adminConfigured(),
         siteUrl: Boolean(env('PUBLIC_SITE_URL')),
       },

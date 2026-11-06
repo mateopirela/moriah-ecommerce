@@ -17,6 +17,12 @@ import {
   notifySubscriptionStarted,
   notifySubscriptionStatus,
 } from '~/lib/klaviyo.server';
+import {siteUrl} from '~/lib/env.server';
+import {
+  emailSubscriptionPaymentFailed,
+  emailSubscriptionStarted,
+  emailSubscriptionStatus,
+} from '~/lib/notify.server';
 import {
   applyTransactionToOrder,
   createOrder,
@@ -39,6 +45,11 @@ export function addDays(date, days) {
 }
 
 /** @param {number} days */
+/** @param {{manageToken: string}} sub */
+export function subscriptionManageUrl(sub) {
+  return `${siteUrl()}/suscripcion/gestionar?token=${sub.manageToken}`;
+}
+
 export function frequencyLabel(days) {
   return (
     Object.entries(FREQUENCY_DAYS).find(([, d]) => d === days)?.[0] ??
@@ -228,7 +239,11 @@ async function registerFailure(db, sub, customer, now) {
     .where(eq(subscriptions.id, sub.id))
     .returning();
   if (customer) {
-    await notifySubscriptionPaymentFailed(updated, customer, '').catch(() => {});
+    const manageUrl = subscriptionManageUrl(updated);
+    await notifySubscriptionPaymentFailed(updated, customer, manageUrl).catch(() => {});
+    await emailSubscriptionPaymentFailed(updated, customer, manageUrl).catch((err) =>
+      console.error('emailSubscriptionPaymentFailed failed', err),
+    );
   }
   return updated;
 }
@@ -333,7 +348,12 @@ export async function manageSubscription(db, sub, action, {frequencyDays, now = 
     .where(eq(subscriptions.id, sub.id))
     .returning();
   const customer = await findCustomer(db, sub.customerId);
-  if (customer) await notifySubscriptionStatus(updated, customer).catch(() => {});
+  if (customer) {
+    await notifySubscriptionStatus(updated, customer).catch(() => {});
+    await emailSubscriptionStatus(updated, customer, subscriptionManageUrl(updated)).catch((err) =>
+      console.error('emailSubscriptionStatus failed', err),
+    );
+  }
   return updated;
 }
 
@@ -343,18 +363,18 @@ export async function manageSubscription(db, sub, action, {frequencyDays, now = 
  * @param {{email: string, name: string}} customer
  * @param {string} manageUrl
  */
-export function announceSubscription(sub, customer, manageUrl) {
+export async function announceSubscription(sub, customer, manageUrl) {
   const product = getProduct(sub.cafeHandle);
-  return notifySubscriptionStarted(
-    {
-      id: sub.id,
-      cafeTitle: product?.title ?? sub.cafeHandle,
-      frequencyLabel: frequencyLabel(sub.frequencyDays),
-      amountCents: sub.amountCents,
-    },
-    customer,
-    manageUrl,
-  ).catch(() => {});
+  const details = {
+    id: sub.id,
+    cafeTitle: product?.title ?? sub.cafeHandle,
+    frequencyLabel: frequencyLabel(sub.frequencyDays),
+    amountCents: sub.amountCents,
+  };
+  await notifySubscriptionStarted(details, customer, manageUrl).catch(() => {});
+  await emailSubscriptionStarted(details, customer, manageUrl).catch((err) =>
+    console.error('emailSubscriptionStarted failed', err),
+  );
 }
 
 async function findRecentPendingOrder(db, subscriptionId, now) {

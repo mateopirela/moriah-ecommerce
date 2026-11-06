@@ -4,7 +4,7 @@ import {CONTACT, whatsappUrl} from '~/data/contact';
 import {IconWhatsapp} from '~/components/Icons';
 
 /** Rutas donde no se muestra: el pago no debe tener distracciones. */
-const OCULTAR = ['/checkout', '/suscripcion/gestionar'];
+const OCULTAR = ['/admin', '/checkout', '/suscripcion/gestionar'];
 
 /**
  * Botón flotante de WhatsApp. Es ayuda para elegir o resolver dudas, no un

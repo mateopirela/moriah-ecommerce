@@ -145,8 +145,36 @@
   /* reset.css limita todos los forms a 400px en escritorio. */
   max-width: none;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
   gap: var(--space-3);
   margin-top: var(--space-3);
+}
+
+.admin-order__tracking {
+  flex: 1 1 220px;
+  max-width: 340px;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+.admin-order__hint {
+  margin-top: var(--space-2);
+  text-align: right;
+  font-size: 0.875rem;
+}
+
+.admin__warning {
+  margin-bottom: var(--space-4);
+  padding: var(--space-3);
+  border: 1px solid #a3341f;
+  border-radius: 6px;
+  color: #a3341f;
+  font-weight: 600;
 }

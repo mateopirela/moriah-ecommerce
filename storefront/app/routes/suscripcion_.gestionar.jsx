@@ -4,6 +4,7 @@ import {customers, orders, subscriptions} from '~/db/schema';
 import {getDb} from '~/db/client.server';
 import {FREQUENCY_DAYS, formatCop, getProduct} from '~/lib/catalog';
 import {siteUrl} from '~/lib/env.server';
+import {emailSubscriptionLink} from '~/lib/notify.server';
 import {getKlaviyo} from '~/lib/klaviyo.server';
 import {findByManageToken, frequencyLabel, manageSubscription} from '~/lib/subscriptions.server';
 
@@ -76,6 +77,9 @@ export async function action({request}) {
               properties: {links},
             })
             .catch(() => {});
+          await emailSubscriptionLink(customer, links).catch((err) =>
+            console.error('emailSubscriptionLink failed', err),
+          );
         }
       }
     }
@@ -183,7 +187,7 @@ export default function ManageSubscription() {
           <>
             <Form method="post" className="manage-card__actions">
               <input type="hidden" name="token" value={s.token} />
-              {s.status === 'paused' ? (
+              {s.status === 'paused' || s.status === 'past_due' ? (
                 <button className="btn" name="intent" value="resume" disabled={busy}>
                   Reanudar
                 </button>
