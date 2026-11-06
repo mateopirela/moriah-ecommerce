@@ -1,9 +1,10 @@
 import {and, count, desc, eq, isNotNull, isNull} from 'drizzle-orm';
-import {Form, Link, redirect, useLoaderData, useNavigation} from 'react-router';
+import {Form, Link, redirect, useActionData, useLoaderData, useNavigation} from 'react-router';
 import {getDb} from '~/db/client.server';
 import {customers, orders} from '~/db/schema';
 import {logoutHeaders, requireAdmin} from '~/lib/admin.server';
 import {formatCop} from '~/lib/catalog';
+import {shipOrder} from '~/lib/orders.server';
 import adminStyles from '~/styles/admin.css?url';
 
 export const links = () => [{rel: 'stylesheet', href: adminStyles}];
@@ -24,6 +25,8 @@ const VIEWS = {
   },
   todos: {label: 'Todos', where: undefined},
 };
+
+const TRACKING_MAX = 120;
 
 const STATUS_LABELS = {
   pending: 'Pago pendiente',
@@ -67,6 +70,7 @@ export async function loader({request}) {
       notes: order.notes,
       createdAt: order.createdAt.toISOString(),
       fulfilledAt: order.fulfilledAt?.toISOString() ?? null,
+      tracking: order.tracking,
       email: customer?.email ?? null,
     })),
   };
@@ -82,11 +86,17 @@ export async function action({request}) {
   await requireAdmin(request);
 
   const id = String(form.get('id') ?? '');
-  if (id && (intent === 'fulfill' || intent === 'unfulfill')) {
+  if (id && intent === 'fulfill') {
+    const db = await getDb();
+    const tracking = String(form.get('tracking') ?? '').trim().slice(0, TRACKING_MAX);
+    const {order, emailSent} = await shipOrder(db, id, tracking);
+    return {emailFailedRef: order && !emailSent ? order.reference : null};
+  }
+  if (id && intent === 'unfulfill') {
     const db = await getDb();
     await db
       .update(orders)
-      .set({fulfilledAt: intent === 'fulfill' ? new Date() : null, updatedAt: new Date()})
+      .set({fulfilledAt: null, tracking: null, updatedAt: new Date()})
       .where(eq(orders.id, id));
   }
   return null;
@@ -107,6 +117,7 @@ function whatsappUrl(phone) {
 
 export default function AdminOrders() {
   const {view, toShip, orders: list} = useLoaderData();
+  const actionData = useActionData();
   const navigation = useNavigation();
   const busyId = navigation.formData?.get('id');
 
@@ -137,6 +148,14 @@ export default function AdminOrders() {
           </Link>
         ))}
       </nav>
+
+      {/* Arriba de la lista: el pedido recién enviado ya no aparece en "Por enviar". */}
+      {actionData?.emailFailedRef ? (
+        <p className="admin__warning" role="alert">
+          {actionData.emailFailedRef} quedó marcado como enviado, pero el correo al cliente no salió. Avísale
+          por WhatsApp.
+        </p>
+      ) : null}
 
       {list.length === 0 ? (
         <p className="admin__empty muted">
@@ -208,17 +227,32 @@ export default function AdminOrders() {
                     <input type="hidden" name="id" value={o.id} />
                     {o.fulfilledAt ? (
                       <>
-                        <span className="muted">Enviado el {dateFormat.format(new Date(o.fulfilledAt))}</span>
+                        <span className="muted">
+                          Enviado el {dateFormat.format(new Date(o.fulfilledAt))}
+                          {o.tracking ? ` · Guía: ${o.tracking}` : ''}
+                        </span>
                         <button className="btn btn--ghost" name="intent" value="unfulfill" disabled={busy}>
                           Deshacer
                         </button>
                       </>
                     ) : (
-                      <button className="btn" name="intent" value="fulfill" disabled={busy}>
-                        {busy ? 'Guardando…' : 'Marcar como enviado'}
-                      </button>
+                      <>
+                        <input
+                          className="admin-order__tracking"
+                          name="tracking"
+                          maxLength={TRACKING_MAX}
+                          placeholder="Transportadora y guía"
+                          aria-label={`Transportadora y número de guía del pedido ${o.reference}`}
+                        />
+                        <button className="btn" name="intent" value="fulfill" disabled={busy}>
+                          {busy ? 'Guardando…' : 'Marcar como enviado'}
+                        </button>
+                      </>
                     )}
                   </Form>
+                ) : null}
+                {o.status === 'approved' && !o.fulfilledAt ? (
+                  <p className="admin-order__hint muted">Al marcarlo, el cliente recibe un correo con la guía.</p>
                 ) : null}
               </li>
             );

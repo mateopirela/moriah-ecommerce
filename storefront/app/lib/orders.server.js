@@ -1,8 +1,13 @@
-import {and, eq} from 'drizzle-orm';
+import {and, eq, isNull} from 'drizzle-orm';
 import {customers, orders} from '~/db/schema';
 import {getProduct, toCents} from '~/lib/catalog';
 import {notifyOrderPaid} from '~/lib/klaviyo.server';
-import {notifyMerchantOrderPaid} from '~/lib/notify.server';
+import {
+  emailOrderConfirmation,
+  emailOrderPaymentFailed,
+  emailOrderShipped,
+  notifyMerchantOrderPaid,
+} from '~/lib/notify.server';
 import {
   getTransaction,
   isFinalStatus,
@@ -152,12 +157,48 @@ export async function applyTransactionToOrder(db, order, tx) {
       await notifyOrderPaid(updated, customer).catch((err) =>
         console.error('notifyOrderPaid failed', err),
       );
+      await emailOrderConfirmation(updated, customer).catch((err) =>
+        console.error('emailOrderConfirmation failed', err),
+      );
     }
     await notifyMerchantOrderPaid(updated, customer).catch((err) =>
       console.error('notifyMerchantOrderPaid failed', err),
     );
   }
+
+  // Las suscripciones tienen su propio correo de cobro fallido.
+  if (previousStatus === 'pending' && status !== 'approved' && isFinalStatus(status) && !updated.subscriptionId) {
+    const customer = await findCustomer(db, updated.customerId);
+    await emailOrderPaymentFailed(updated, customer).catch((err) =>
+      console.error('emailOrderPaymentFailed failed', err),
+    );
+  }
   return {order: updated, changed: previousStatus !== status, previousStatus};
+}
+
+/**
+ * Marca un pedido pagado como despachado y le avisa al cliente, una sola vez aunque
+ * el formulario del panel se envíe dos veces.
+ * @param {any} db
+ * @param {string} id
+ * @param {string} [tracking]
+ * @returns {Promise<{order: any|null, emailSent: boolean}>}
+ */
+export async function shipOrder(db, id, tracking) {
+  const now = new Date();
+  const [updated] = await db
+    .update(orders)
+    .set({fulfilledAt: now, tracking: tracking || null, updatedAt: now})
+    .where(and(eq(orders.id, id), eq(orders.status, 'approved'), isNull(orders.fulfilledAt)))
+    .returning();
+  if (!updated) return {order: null, emailSent: false};
+
+  const customer = await findCustomer(db, updated.customerId);
+  const result = await emailOrderShipped(updated, customer).catch((err) => {
+    console.error('emailOrderShipped failed', err);
+    return {sent: false};
+  });
+  return {order: updated, emailSent: result.sent};
 }
 
 /**
