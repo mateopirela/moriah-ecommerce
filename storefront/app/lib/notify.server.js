@@ -92,6 +92,8 @@ export async function notifyMerchantOrderPaid(order, customer) {
     headers: {
       Authorization: `Bearer ${env('RESEND_API_KEY')}`,
       'Content-Type': 'application/json',
+      // Una sola vez por pedido aunque el webhook de Wompi llegue repetido (Resend lo respeta 24 h).
+      'Idempotency-Key': `order-paid/${order.reference}`,
     },
     body: JSON.stringify({
       from: env('EMAIL_FROM', DEFAULT_FROM),
