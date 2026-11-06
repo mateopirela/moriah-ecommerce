@@ -228,6 +228,9 @@
   background: var(--tx-surface);
   border-radius: 999px;
 }
+.tx-quiz__facts li:empty {
+  display: none;
+}
 .tx-quiz__desc {
   margin: 0;
   font-size: 0.95rem;
@@ -275,11 +278,13 @@
   border-color: var(--tx-ink);
 }
 .tx-quiz__select {
+  -webkit-appearance: none;
+  appearance: none;
   min-height: 44px;
-  padding: 0 0.9rem;
+  padding: 0 2.4rem 0 0.9rem;
   font: inherit;
   color: var(--tx-ink);
-  background: var(--tx-white, #fff);
+  background: var(--tx-white, #fff) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2319332f' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 0.9rem center;
   border: 1.5px solid var(--tx-line);
   border-radius: 12px;
 }
@@ -294,6 +299,9 @@
   font-weight: 500;
   color: var(--tx-muted);
 }
+.tx-quiz__price small a {
+  padding-block: 0.85rem; /* 44px de área táctil dentro de la línea */
+}
 .tx-quiz__price a,
 .tx-quiz__more {
   color: var(--tx-gold-deep);
@@ -304,6 +312,10 @@
   min-height: 52px;
 }
 .tx-quiz__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  min-height: 44px;
   font-size: 0.9rem;
   text-decoration: none;
 }

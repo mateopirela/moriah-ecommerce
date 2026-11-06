@@ -372,18 +372,28 @@
 .cart-summary-aside .cart-payments { margin: 0.5rem 0 0.2rem; font-size: 0.74rem; }
 .cart-summary-aside .cart-code summary { font-size: 0.8rem; padding: 0.2rem 0; }
 .cart-seguir {
-  display: inline-block;
-  margin-top: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 44px;
+  margin-top: 0.3rem;
   font-size: 0.88rem;
   font-weight: 700;
   color: var(--tx-gold-deep, #b36d18);
   text-decoration: none;
 }
 .cart-seguir:hover { text-decoration: underline; text-underline-offset: 4px; }
-.cart-seguir--aside { display: block; margin-top: 0.3rem; text-align: center; }
+.cart-seguir--aside { display: flex; justify-content: center; margin-top: 0; }
 
-/* Página /cart: respiro bajo la cabecera y resumen fijo a la derecha */
+/* Página /cart: respiro bajo la cabecera y resumen fijo a la derecha.
+   El relleno lateral y el scroll interno son del panel: en la página las
+   líneas van al mismo ancho que el título y el total. */
 .cart.container { padding-top: clamp(1.8rem, 1.2rem + 2vw, 3rem); padding-bottom: 3rem; }
+.cart-main--page .cart-details > div:first-of-type {
+  overflow: visible;
+  padding: 0;
+}
+.cart-main--page .freeship { padding-inline: 0; }
 @media (min-width: 900px) {
   .cart-main--page .cart-details {
     display: grid;
@@ -391,13 +401,9 @@
     gap: 2.5rem;
     align-items: start;
   }
-  .cart-main--page .cart-details > div:first-of-type {
-    overflow: visible;
-    padding: 0;
-  }
   .cart-main--page .cart-summary-page {
     position: sticky;
-    top: calc(var(--header-h, 72px) + 1.5rem);
+    top: calc(var(--header-total) + 1.5rem);
     margin: 0;
     padding: 1.4rem 1.5rem 1.6rem;
     background: rgba(255, 255, 255, 0.55);

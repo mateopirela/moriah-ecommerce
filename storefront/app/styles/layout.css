@@ -30,7 +30,7 @@
   background: var(--gold-500);
   opacity: 0.7;
 }
-@media (max-width: 700px) {
+@media (max-width: 1023px) {
   .announcement__sep,
   .announcement .hide-sm {
     display: none;

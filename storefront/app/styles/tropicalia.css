@@ -55,7 +55,7 @@
   color: var(--tx-ink);
   margin: 0;
 }
-.tx-h1 { font-size: clamp(2.6rem, 1.4rem + 5.4vw, 4.4rem); }
+.tx-h1 { font-size: clamp(2.2rem, 1.2rem + 5.4vw, 4.4rem); }
 .tx-h2 { font-size: clamp(2rem, 1.3rem + 2.8vw, 3rem); }
 .tx-h3 { font-size: clamp(1.4rem, 1.1rem + 1.3vw, 2rem); }
 
@@ -137,7 +137,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  height: 72px;
+  height: var(--header-h);
   padding-inline: var(--tx-gutter);
   background: transparent;
   transition: background 0.3s ease, box-shadow 0.3s ease;
@@ -288,6 +288,17 @@
 .header-menu-desktop > .tx-nav-group:last-child:focus-within .tx-nav-panel {
   transform: translateY(0);
 }
+/* Justo donde aparece el menú de escritorio, el primero centrado se salía por la izquierda. */
+@media (max-width: 1100px) {
+  .header-menu-desktop > .tx-nav-group:first-child .tx-nav-panel {
+    left: 0;
+    transform: translateY(6px);
+  }
+  .header-menu-desktop > .tx-nav-group:first-child:hover .tx-nav-panel,
+  .header-menu-desktop > .tx-nav-group:first-child:focus-within .tx-nav-panel {
+    transform: translateY(0);
+  }
+}
 .tx-nav-panel a {
   display: flex;
   flex-direction: column;
@@ -314,7 +325,7 @@
 }
 
 /* Páginas sin hero: offset bajo el header + announcement bar */
-main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); }
+main:not(:has(.tx-banner)) { padding-top: var(--header-total); }
 
 /* Mobile aside nav */
 .header-menu-mobile { display: grid; gap: 0.2rem; padding: 0.5rem 0; }
@@ -446,7 +457,7 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
 .tx-lineas-head .tx-h2 br {
   display: none;
 }
-@media (min-width: 40em) {
+@media (min-width: 62em) {
   .tx-lineas-head .tx-h2 br {
     display: inline;
   }
@@ -880,7 +891,7 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
   background: var(--tx-bg);
   border-bottom: 1px solid var(--tx-line);
   position: sticky;
-  top: 72px;
+  top: var(--header-total);
   z-index: 10;
 }
 .tx-cat-pills__row {
@@ -925,6 +936,7 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
 
 .tx-col-card {
   display: grid;
+  align-content: start;
   gap: 0.7rem;
   text-decoration: none;
   color: inherit;
@@ -1000,6 +1012,9 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
 .tx-shop-banner {
   position: relative;
   display: block;
+  /* Con `aspect-ratio`, el `min-height` también empuja el ancho: sin este 100%
+     el banner medía 711px en celulares horizontales y 330px a 320px. */
+  width: 100%;
   /* Más bajo (antes 16/6 con tope de 460px): el banner ocupaba media
      pantalla y la primera fila de productos quedaba bajo el pliegue. */
   aspect-ratio: 16 / 4.5;
@@ -1139,6 +1154,13 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
   padding: clamp(4rem, 3rem + 5vw, 8rem) var(--tx-gutter);
   max-width: var(--tx-maxw);
   margin-inline: auto;
+}
+/* Lista de políticas y "volver": enlaces sueltos, cómodos para el dedo. */
+.policies a,
+.policy > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 
 /* ============================================================
@@ -1433,7 +1455,6 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
   .footer__grid { grid-template-columns: 1fr 1fr; }
   .tx-banner { height: 80svh; }
   .tx-col-grid { grid-template-columns: repeat(2, 1fr); }
-  .tx-tambien__grid { grid-template-columns: 1fr 1fr; }
   .tx-footer__cols { gap: 2rem; }
   /* Nosotros */
   .tx-nosotros__intro { grid-template-columns: 1fr; }
@@ -1465,11 +1486,15 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
   .footer__grid { grid-template-columns: 1fr; }
   .tx-banner__h1 { font-size: clamp(2.2rem, 8vw, 3rem); }
   .tx-col-grid { grid-template-columns: repeat(2, 1fr); }
-  .tx-tambien__grid { grid-template-columns: 1fr; }
   .tx-cat-banner { height: clamp(220px, 50vw, 340px); }
   .tx-footer__top { flex-direction: column; }
   .tx-footer__cols { align-items: flex-start; }
   .tx-footer__logo-wrap { margin-left: 0; }
+}
+
+@media (max-width: 560px) {
+  .tx-tambien__grid { grid-template-columns: minmax(0, 1fr); }
+  .tx-tambien__card { aspect-ratio: 16 / 9; }
 }
 
 @media (max-width: 460px) {
@@ -1510,6 +1535,18 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
 }
 .announcement strong { color: var(--tx-gold-light); font-weight: 700; }
 .header { top: var(--announce-h, 40px); }
+/* Pantallas muy angostas: el anuncio cabe en una línea y el logo no toca los iconos. */
+@media (max-width: 360px) {
+  .announcement { font-size: 0.68rem; letter-spacing: 0.04em; }
+  .header { gap: 0.25rem; }
+  .header__brand { gap: 0.4rem; }
+  .header__brand img { width: 32px; height: 32px; }
+  .header__wordmark { font-size: 1.2rem; }
+  .header-ctas { gap: 0; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .announcement { display: none; }
+}
 
 /* ============================================================
    CART DRAWER — nivel premium
@@ -1620,6 +1657,26 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
   border-top: 1px solid var(--tx-line);
   box-shadow: 0 -14px 30px -22px rgba(25, 51, 47, 0.5);
 }
+/* Pantallas bajas (celular horizontal, iPhone en Safari): el resumen fijo se
+   comía el alto y las líneas del pedido quedaban en 0px. Aquí se desplaza el
+   panel completo y las líneas van antes del resumen. */
+@media (max-height: 700px) {
+  .overlay aside > header {
+    padding-block: var(--space-2);
+  }
+  .overlay aside > .aside__body:has(.cart-main) {
+    display: block;
+    overflow-y: auto;
+  }
+  .cart-main--aside,
+  .cart-main--aside .cart-details {
+    display: block;
+    height: auto;
+  }
+  .cart-main--aside .cart-details > div:first-of-type {
+    overflow: visible;
+  }
+}
 .cart-subtotal {
   display: flex;
   justify-content: space-between;
@@ -1628,6 +1685,13 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
   font-weight: 700;
   color: var(--tx-ink);
   margin: 0 0 0.15rem;
+}
+.cart-subtotal dd {
+  margin: 0;
+  white-space: nowrap;
+}
+.cart-subtotal {
+  gap: 0.75rem;
 }
 .cart-subtotal__note {
   font-size: 0.78rem;
@@ -1702,7 +1766,7 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
   border-radius: 999px;
   background: #fff;
   font-family: var(--tx-body);
-  font-size: 0.9rem;
+  font-size: 1rem;
   min-height: 44px;
   color: var(--tx-ink);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -1815,7 +1879,7 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  min-height: 40px;
+  min-height: 44px;
   padding: 0.4rem 0.85rem;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
@@ -2082,7 +2146,7 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
   background: rgba(250, 244, 230, 0.08);
   color: var(--tx-cream);
   font-family: var(--tx-body);
-  font-size: 0.88rem;
+  font-size: 1rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .tx-newsletter__form input::placeholder { color: rgba(240, 222, 189, 0.5); }
@@ -2120,8 +2184,6 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
   max-width: 56ch;
   text-shadow: 0 1px 10px rgba(16, 34, 31, 0.5);
 }
-/* Pills sticky bajo header + announcement */
-.tx-cat-pills { top: calc(72px + var(--announce-h, 40px)); }
 
 /* Card de colección enriquecida */
 .tx-col-card__badge {
@@ -2129,6 +2191,7 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
   top: 0.7rem;
   left: 0.7rem;
   z-index: 2;
+  max-width: calc(100% - 1.4rem);
   background: var(--tx-ink);
   color: var(--tx-gold-light);
   font-size: 0.76rem;
@@ -2391,7 +2454,7 @@ main:not(:has(.tx-banner)) { padding-top: calc(72px + var(--announce-h, 40px)); 
 /* Botón "Agregar" del upsell: alto cómodo para el dedo. */
 @media (hover: none), (max-width: 760px) {
   .cart-upsell__add {
-    min-height: 40px;
+    min-height: 44px;
     padding-inline: 0.85rem;
   }
 }

@@ -64,6 +64,7 @@
 
 .admin__list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-3);
   padding: 0;
   list-style: none;
@@ -135,15 +136,20 @@
 .admin-order__contact {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
+  gap: 0 var(--space-3);
+}
+.admin-order__contact a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .admin-order__notes {
   font-style: italic;
 }
 
 .admin-order__actions {
-  /* reset.css limita todos los forms a 400px en escritorio. */
-  max-width: none;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
